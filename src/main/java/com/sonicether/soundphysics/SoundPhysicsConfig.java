@@ -6,7 +6,7 @@ import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = "sound_physics")
-@Config.Gui.Background("minecraft:textures/block/noteblock.png")
+@Config.Gui.Background("minecraft:textures/block/note_block.png")
 public class SoundPhysicsConfig implements ConfigData {
 
     @ConfigEntry.Gui.RequiresRestart

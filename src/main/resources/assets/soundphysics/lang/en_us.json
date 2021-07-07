@@ -1,0 +1,38 @@
+{
+  "text.autoconfig.sound_physics.title": "Sound Physics Config",
+
+  "text.autoconfig.sound_physics.option.enabled": "Enable rendering?",
+
+  "text.autoconfig.sound_physics.option.General": "General options:",
+  "text.autoconfig.sound_physics.option.Performance": "Performance options:",
+  "text.autoconfig.sound_physics.option.Material_Properties": "Material reflectance options:",
+  "text.autoconfig.sound_physics.option.Misc": "Logging options:",
+
+  "text.autoconfig.sound_physics.option.General.attenuationFactor": "Attenuation (fade over distance) factor",
+  "text.autoconfig.sound_physics.option.General.globalReverbGain": "Reverb volume gain",
+  "text.autoconfig.sound_physics.option.General.globalReverbBrightness": "Reverb brightness",
+  "text.autoconfig.sound_physics.option.General.globalBlockAbsorption": "Block passthrough sound absorption",
+  "text.autoconfig.sound_physics.option.General.globalBlockReflectance": "Block reflectance multiplier",
+  "text.autoconfig.sound_physics.option.General.soundDistanceAllowance": "Sound packet send radius multiplier",
+  "text.autoconfig.sound_physics.option.General.airAbsorption": "Sound absorption by air",
+  "text.autoconfig.sound_physics.option.General.underwaterFilter": "Underwater filter strength",
+
+  "text.autoconfig.sound_physics.option.Performance.skipRainOcclusionTracing": "Skip tracing for rain sounds",
+  "text.autoconfig.sound_physics.option.Performance.environmentEvaluationRays": "Rays per sound",
+  "text.autoconfig.sound_physics.option.Performance.simplerSharedAirspaceSimulation": "Cheap shared airspace detection",
+
+  "text.autoconfig.sound_physics.option.Material_Properties.stoneReflectivity": "Stone reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.woodReflectivity": "Wood reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.groundReflectivity": "Gravel reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.foliageReflectivity": "Foliage reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.metalReflectivity": "Metal reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.glassReflectivity": "Glass reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.clothReflectivity": "Wool reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.sandReflectivity": "Sand reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.snowReflectivity": "Snow reflectivity",
+
+  "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
+  "text.autoconfig.sound_physics.option.Misc.occlusionLogging": "Occlusion logging",
+  "text.autoconfig.sound_physics.option.Misc.environmentLogging": "Environment logging",
+  "text.autoconfig.sound_physics.option.Misc.performanceLogging": "Performance logging"
+}
