@@ -1,4 +1,7 @@
 # Sound-Physics
+
+**!!! REQUIRES AutoconfigUpdatedApi !!!**
+
 A Minecraft mod that provides realistic sound attenuation, reverberation, and absorption through blocks. (By the means of cheap ray tracing)
 
 Ported to 1.17 fabric by vlad2305m featuring some improvements by daipenjer (I only found one 1.16 fabric fork which is just the example mod, so I believe this one is unique)
