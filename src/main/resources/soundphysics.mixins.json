@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "com.sonicether.soundphysics.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "EntityMixin",
+    "ReloadCommandMixin",
+    "ServerWorldMixin",
+    "SoundSystemMixin",
+    "SourceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
