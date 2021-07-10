@@ -150,7 +150,7 @@ public class SoundPhysics
 	
 	public static void onPlaySound(double posX, double posY, double posZ, int sourceID)
 	{
-		logGeneral("On play sound... Sounrce ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
+		logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
 		if (ConfigManager.getConfig().reloadReverb) {
 			ConfigManager.reload();
@@ -243,7 +243,7 @@ public class SoundPhysics
 				dir.x > 0 ? targetBlock.getX() : targetBlock.getX() + 1,
 				dir.y > 0 ? targetBlock.getY() : targetBlock.getY() + 1,
 				dir.z > 0 ? targetBlock.getZ() : targetBlock.getZ() + 1	);
-		// how far do we need to go to reach each in dir's
+		// how far do we need to go to reach each (in dir)
 		Vec3d lambda = divide(target.subtract(vec), dir);
 		// 0 if already between the planes
 		if(targetBlock.getX() <= vec.x && vec.x <= targetBlock.getX()+1)lambda = new Vec3d(0.0, lambda.y, lambda.z);
@@ -567,7 +567,7 @@ public class SoundPhysics
 		checkErrorLog("Set Environment directFilter0:");
 		
 		AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, (float) ConfigManager.getConfig().General.airAbsorption);
-		checkErrorLog("Set Environment airAbsorbtion:");
+		checkErrorLog("Set Environment airAbsorption:");
 	}
 
 	private static void setSoundPos(final int sourceID, final Vec3d pos) {// TODO sound pos

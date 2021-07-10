@@ -16,7 +16,7 @@ public class RaycastFix {
     // ===copied and modified===
     // we want to only pick up the block's sides. so I just return when I cross a side
     public static BlockHitResult fixedRaycast(RaycastContext context, BlockView world, @Nullable BlockPos ignore) {
-        return (BlockHitResult) BlockView.raycast(context.getStart(), context.getEnd(), context, (contextx, pos) -> {
+        return BlockView.raycast(context.getStart(), context.getEnd(), context, (contextx, pos) -> {
             BlockState blockState = world.getBlockState(pos);
             FluidState fluidState = world.getFluidState(pos);
             Vec3d vec3d = contextx.getStart();

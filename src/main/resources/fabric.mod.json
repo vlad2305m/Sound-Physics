@@ -21,7 +21,7 @@
     "soundphysics.mixins.json"
   ],
   "depends": {
-    "autoconfig1u": ">=3.0.0",
+    "cloth-config2": ">=5.0.0",
     "fabricloader": ">=0.11.2",
     "minecraft": "1.17.x"
   }

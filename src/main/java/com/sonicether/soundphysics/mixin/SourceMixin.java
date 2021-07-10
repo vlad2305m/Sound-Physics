@@ -31,9 +31,9 @@ public class SourceMixin {
         SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer);
         SoundPhysics.checkErrorLog("onplayinjector");
     }
-    @ModifyArg(method = "setAttenuation", at = @At(value = "INVOKE", target = "org/lwjgl/openal/AL10.alSourcef (IIF)V", ordinal = 0), index = 2)
-    private float AttenuationHijack(int pointer2, int paramid, float attenuation) {
-        if (paramid != 4131) throw new IllegalArgumentException("Tried modifying wrong field. No attenuation here.");
+    @ModifyArg(method = "setAttenuation", at = @At(value = "INVOKE", target = "org/lwjgl/openal/AL10.alSourcef (IIF)V", ordinal = 0, remap = false), index = 2)
+    private float AttenuationHijack(int pointer2, int param_id, float attenuation) {
+        if (param_id != 4131) throw new IllegalArgumentException("Tried modifying wrong field. No attenuation here.");
         return  attenuation / (float)(ConfigManager.getConfig().General.attenuationFactor);
     }
 

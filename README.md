@@ -1,6 +1,6 @@
 # Sound-Physics
 
-**!!! REQUIRES AutoconfigUpdatedApi !!!**
+**!!! REQUIRES Cloth Config !!!**
 
 A Minecraft mod that provides realistic sound attenuation, reverberation, and absorption through blocks. (By the means of cheap ray tracing)
 
