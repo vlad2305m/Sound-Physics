@@ -4,10 +4,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class ConfigChanger {
     public static void changeConfig(SoundPhysicsConfig config, @Nullable Boolean enabled,
-        @Nullable Float attenuationFactor, @Nullable Float globalReverbGain, @Nullable Float globalReverbBrightness, @Nullable Float globalBlockAbsorption, @Nullable Float globalBlockReflectance, @Nullable Float soundDistanceAllowance, @Nullable Float airAbsorption, @Nullable Float underwaterFilter,
+        @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
         @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Boolean simplerSharedAirspaceSimulation,
-        @Nullable Float stoneReflectivity, @Nullable Float woodReflectivity, @Nullable Float groundReflectivity, @Nullable Float foliageReflectivity, @Nullable Float metalReflectivity, @Nullable Float glassReflectivity, @Nullable Float clothReflectivity, @Nullable Float sandReflectivity, @Nullable Float snowReflectivity,
-        @Nullable Float leakyBlocksOcclusionMultiplier, @Nullable Float maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion,
+        @Nullable Double stoneReflectivity, @Nullable Double woodReflectivity, @Nullable Double groundReflectivity, @Nullable Double foliageReflectivity, @Nullable Double metalReflectivity, @Nullable Double glassReflectivity, @Nullable Double clothReflectivity, @Nullable Double sandReflectivity, @Nullable Double snowReflectivity,
+        @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion,
         @Nullable Boolean debugLogging, @Nullable Boolean occlusionLogging, @Nullable Boolean environmentLogging, @Nullable Boolean performanceLogging
     ) {
         if (enabled != null) config.enabled = enabled;
@@ -21,7 +21,7 @@ public class ConfigChanger {
         ConfigManager.save();
     }
 
-    public static void setGeneral(SoundPhysicsConfig.General general, @Nullable Float attenuationFactor, @Nullable Float globalReverbGain, @Nullable Float globalReverbBrightness, @Nullable Float globalBlockAbsorption, @Nullable Float globalBlockReflectance, @Nullable Float soundDistanceAllowance, @Nullable Float airAbsorption, @Nullable Float underwaterFilter) {
+    public static void setGeneral(SoundPhysicsConfig.General general, @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter) {
         if (attenuationFactor != null) general.attenuationFactor = attenuationFactor;
         if (globalReverbGain != null) general.globalReverbGain = globalReverbGain;
         if (globalReverbBrightness != null) general.globalReverbBrightness = globalReverbBrightness;
@@ -38,7 +38,7 @@ public class ConfigChanger {
         if (simplerSharedAirspaceSimulation != null) performance.simplerSharedAirspaceSimulation = simplerSharedAirspaceSimulation;
     }
 
-    public static void setMaterial_Properties(SoundPhysicsConfig.Material_Properties material_properties, @Nullable Float stoneReflectivity, @Nullable Float woodReflectivity, @Nullable Float groundReflectivity, @Nullable Float foliageReflectivity, @Nullable Float metalReflectivity, @Nullable Float glassReflectivity, @Nullable Float clothReflectivity, @Nullable Float sandReflectivity, @Nullable Float snowReflectivity) {
+    public static void setMaterial_Properties(SoundPhysicsConfig.Material_Properties material_properties, @Nullable Double stoneReflectivity, @Nullable Double woodReflectivity, @Nullable Double groundReflectivity, @Nullable Double foliageReflectivity, @Nullable Double metalReflectivity, @Nullable Double glassReflectivity, @Nullable Double clothReflectivity, @Nullable Double sandReflectivity, @Nullable Double snowReflectivity) {
         if (stoneReflectivity != null) material_properties.stoneReflectivity = stoneReflectivity;
         if (woodReflectivity != null) material_properties.woodReflectivity = woodReflectivity;
         if (groundReflectivity != null) material_properties.groundReflectivity = groundReflectivity;
@@ -50,7 +50,7 @@ public class ConfigChanger {
         if (snowReflectivity != null) material_properties.snowReflectivity = snowReflectivity;
     }
 
-    public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Float leakyBlocksOcclusionMultiplier, @Nullable Float maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion) {
+    public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion) {
         if (leakyBlocksOcclusionMultiplier != null) vlads_tweaks.leakyBlocksOcclusionMultiplier = leakyBlocksOcclusionMultiplier;
         if (maxDirectOcclusionFromBlocks != null) vlads_tweaks.maxDirectOcclusionFromBlocks = maxDirectOcclusionFromBlocks;
         if (_9RayDirectOcclusion != null) vlads_tweaks._9RayDirectOcclusion = _9RayDirectOcclusion;

@@ -200,7 +200,7 @@ public class SoundPhysics
 		BlockState blockState = mc.world.getBlockState(blockPos);
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		
-		float reflectivity = 0.5f;
+		double reflectivity = 0.5f;
 
 		if (soundType == BlockSoundGroup.STONE)
 			reflectivity = ConfigManager.getConfig().Material_Properties.stoneReflectivity;
@@ -227,7 +227,7 @@ public class SoundPhysics
 		
 		reflectivity *= ConfigManager.getConfig().General.globalBlockReflectance;
 		
-		return reflectivity;
+		return (float) reflectivity;
 	}
 	
 	private static Vec3d getNormalFromFacing(Direction direction)
@@ -335,7 +335,7 @@ public class SoundPhysics
 		
 		
 		float directCutoff;
-		final float absorptionCoeff = ConfigManager.getConfig().General.globalBlockAbsorption * 3.0f;
+		final float absorptionCoeff = (float) (ConfigManager.getConfig().General.globalBlockAbsorption * 3.0);
 		
 		//Direct sound occlusion
 		Vec3d playerPos = mc.player.getPos();
@@ -346,14 +346,14 @@ public class SoundPhysics
 		final BlockPos soundBlockPos = new BlockPos(soundPos.x, soundPos.y,soundPos.z);
 
 		logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
-		float occlusionAccumulation = 0.0f;
+		double occlusionAccumulation = 0.0f;
 		//Cast a ray from the source towards the player
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
 		BlockPos lastBlockPos = soundBlockPos;
 		final boolean _9ray = ConfigManager.getConfig().Vlads_Tweaks._9RayDirectOcclusion && (lastSoundCategory == SoundCategory.BLOCKS || blockPattern.matcher(lastSoundName).matches());
 		final int nOccRays = _9ray ? 9 : 1;
-		float occlusionAccMin = Float.MAX_VALUE;
+		double occlusionAccMin = Double.MAX_VALUE;
 		for (int j = 0; j < nOccRays; j++) {
 			if(j > 0){
 				final int jj = j - 1;
@@ -627,7 +627,7 @@ public class SoundPhysics
 		AL10.alSourcei(sourceID, EXTEfx.AL_DIRECT_FILTER, directFilter0);
 		checkErrorLog("Set Environment directFilter0:");
 		
-		AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, ConfigManager.getConfig().General.airAbsorption);
+		AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, (float) ConfigManager.getConfig().General.airAbsorption);
 		checkErrorLog("Set Environment airAbsorbtion:");
 	}
 

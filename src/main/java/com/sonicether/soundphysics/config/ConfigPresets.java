@@ -11,15 +11,15 @@ public enum ConfigPresets {
     LOAD_SUCCESS(null),
     DEFAULT((SoundPhysicsConfig c) -> changeConfig(c, true,
 
-            1f, 1f, 1f, 1f,
-            1f, 4f, 1f, 0.8f,
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 4.0, 1.0, 0.8,
 
             true, 32, false,
 
-            1f, 0.4f, 0.3f,  0.5f, 1f,
-            0.5f, 0.05f, 0.2f, 0.2f,
+            1.0, 0.4, 0.3,  0.5, 1.0,
+            0.5, 0.05, 0.2, 0.2,
 
-            0.15f, 10f, true,
+            0.15, 10.0, true,
 
             false, false, false, false
     )),
@@ -30,8 +30,8 @@ public enum ConfigPresets {
 
             null, null, null,
 
-            1f, 0.4f, 0.3f,  0.5f, 1f,
-            0.5f, 0.05f, 0.2f, 0.2f,
+            1.0, 0.4, 0.3,  0.5, 1.0,
+            0.5, 0.05, 0.2, 0.2,
 
             null, null, null,
 
