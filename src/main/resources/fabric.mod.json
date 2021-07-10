@@ -13,7 +13,9 @@
     "main": [
       "com.sonicether.soundphysics.SoundPhysicsMod"
     ],
-    "modmenu": [ "com.sonicether.soundphysics.ModMenuIntegration" ]
+    "modmenu": [
+      "com.sonicether.soundphysics.config.ModMenuIntegration"
+    ]
   },
   "mixins": [
     "soundphysics.mixins.json"

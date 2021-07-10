@@ -1,5 +1,6 @@
-package com.sonicether.soundphysics;
+package com.sonicether.soundphysics.config;
 
+import com.sonicether.soundphysics.SoundPhysics;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigHolder;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
@@ -24,16 +25,21 @@ public class ConfigManager {
         return holder.getConfig();
     }
 
-    public static boolean isConfigUsable() {
-        return holder != null && getConfig().isEnabled();
-    }
-
     public static void reload() {
         if (holder == null) {
             return;
         }
 
         holder.load();
+        holder.getConfig().preset.setConfig();
         SoundPhysics.applyConfigChanges();
+    }
+
+    public static void save() {
+        if (holder == null) {
+            registerAutoConfig();
+        }
+
+        holder.save();
     }
 }

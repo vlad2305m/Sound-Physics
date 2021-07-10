@@ -1,6 +1,6 @@
 package com.sonicether.soundphysics.mixin;
 
-import com.sonicether.soundphysics.ConfigManager;
+import com.sonicether.soundphysics.config.ConfigManager;
 import net.minecraft.server.command.ReloadCommand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -2,10 +2,12 @@
   "text.autoconfig.sound_physics.title": "Sound Physics Config",
 
   "text.autoconfig.sound_physics.option.enabled": "Enable rendering?",
+  "text.autoconfig.sound_physics.option.reloadReverb": "!!!Check if changing config!!!",
 
   "text.autoconfig.sound_physics.option.General": "General options:",
   "text.autoconfig.sound_physics.option.Performance": "Performance options:",
   "text.autoconfig.sound_physics.option.Material_Properties": "Material reflectance options:",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks": "Vlad's tweaks:",
   "text.autoconfig.sound_physics.option.Misc": "Logging options:",
 
   "text.autoconfig.sound_physics.option.General.attenuationFactor": "Attenuation (fade over distance) factor",
@@ -30,6 +32,10 @@
   "text.autoconfig.sound_physics.option.Material_Properties.clothReflectivity": "Wool reflectivity",
   "text.autoconfig.sound_physics.option.Material_Properties.sandReflectivity": "Sand reflectivity",
   "text.autoconfig.sound_physics.option.Material_Properties.snowReflectivity": "Snow reflectivity",
+
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.leakyBlocksOcclusionMultiplier": "Leaky blocks occlusion multiplier",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirectOcclusionFromBlocks": "Maximum direct occlusion",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray d. occlusion calculation",
 
   "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
   "text.autoconfig.sound_physics.option.Misc.occlusionLogging": "Occlusion logging",

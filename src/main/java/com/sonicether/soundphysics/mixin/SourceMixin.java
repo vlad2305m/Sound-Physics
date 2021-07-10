@@ -1,5 +1,6 @@
 package com.sonicether.soundphysics.mixin;
 
+import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.SoundPhysics;
 import net.minecraft.client.sound.Source;
 import net.minecraft.util.math.Vec3d;
@@ -33,7 +34,7 @@ public class SourceMixin {
     @ModifyArg(method = "setAttenuation", at = @At(value = "INVOKE", target = "org/lwjgl/openal/AL10.alSourcef (IIF)V", ordinal = 0), index = 2)
     private float AttenuationHijack(int pointer2, int paramid, float attenuation) {
         if (paramid != 4131) throw new IllegalArgumentException("Tried modifying wrong field. No attenuation here.");
-        return attenuation / SoundPhysics.globalRolloffFactor;
+        return attenuation / ConfigManager.getConfig().General.attenuationFactor;
     }
 
 }

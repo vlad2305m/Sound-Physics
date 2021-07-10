@@ -11,9 +11,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 public class RaycastFix {
 
     // ===copied and modified===

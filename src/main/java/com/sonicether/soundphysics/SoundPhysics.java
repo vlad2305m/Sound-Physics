@@ -3,7 +3,8 @@ package com.sonicether.soundphysics;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import net.fabricmc.loader.util.sat4j.core.Vec;
+import com.sonicether.soundphysics.config.ConfigManager;
+import com.sonicether.soundphysics.config.ReverbParams;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
@@ -15,7 +16,6 @@ import net.minecraft.util.math.*;
 
 import net.minecraft.world.RaycastContext;
 import org.lwjgl.openal.*;
-import org.lwjgl.system.CallbackI;
 
 import static com.sonicether.soundphysics.RaycastFix.fixedRaycast;
 
@@ -51,10 +51,10 @@ public class SoundPhysics
 	
 	//Public fields
 	//public static int attenuationModel = 16;
-	public static float globalRolloffFactor = ConfigManager.getConfig().General.attenuationFactor;
+	//public static float globalRolloffFactor = ConfigManager.getConfig().General.attenuationFactor;
 	public static float globalVolumeMultiplier = 4.0f;
-	public static float globalReverbMultiplier = 0.7f * ConfigManager.getConfig().General.globalReverbGain;
-	public static double soundDistanceAllowance = ConfigManager.getConfig().General.soundDistanceAllowance;
+	//public static float globalReverbMultiplier = 0.7f * ConfigManager.getConfig().General.globalReverbGain;
+	//public static double soundDistanceAllowance = ConfigManager.getConfig().General.soundDistanceAllowance;
 
 
 
@@ -70,9 +70,8 @@ public class SoundPhysics
 	
 	public static void applyConfigChanges()
 	{
-		globalRolloffFactor = ConfigManager.getConfig().General.attenuationFactor;
-		globalReverbMultiplier = 0.7f * ConfigManager.getConfig().General.globalReverbGain;
-		soundDistanceAllowance = ConfigManager.getConfig().General.soundDistanceAllowance;
+		//globalReverbMultiplier = 0.7f * ConfigManager.getConfig().General.globalReverbGain;
+		//soundDistanceAllowance = ConfigManager.getConfig().General.soundDistanceAllowance;
 		
 		if (auxFXSlot0 != 0)
 		{
@@ -164,6 +163,12 @@ public class SoundPhysics
 	public static void onPlaySound(double posX, double posY, double posZ, int sourceID)
 	{
 		logGeneral("On play sound... Sounrce ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
+
+		if (ConfigManager.getConfig().reloadReverb) {
+			ConfigManager.reload();
+			ConfigManager.getConfig().reloadReverb = false;
+			ConfigManager.save();
+		}
 
 		long startTime = 0;
 		long endTime;
@@ -310,34 +315,6 @@ public class SoundPhysics
 
 	}
 
-	/*private static Vec3d extendToSide(final Vec3d vec, final Vec3d dir, final Direction side, final BlockPos targetBlock) {
-		if(side == Direction.EAST) {
-			double lambda = (targetBlock.getX() + 1.0 - vec.x)/(dir.x);
-			return new Vec3d(targetBlock.getX() + 1.0, vec.y + dir.y * lambda, vec.z + dir.z * lambda);
-		}
-		else if(side == Direction.WEST) {
-			double lambda = (targetBlock.getX() - vec.x)/(dir.x);
-			return new Vec3d(targetBlock.getX(), vec.y + dir.y * lambda, vec.z + dir.z * lambda);
-		}
-		else if(side == Direction.SOUTH) {
-			double lambda = (targetBlock.getZ() + 1.0 - vec.z)/(dir.z);
-			return new Vec3d(vec.x + dir.x * lambda, vec.y + dir.y * lambda, targetBlock.getZ() + 1.0);
-		}
-		else if(side == Direction.NORTH) {
-			double lambda = (targetBlock.getZ() - vec.z)/(dir.z);
-			return new Vec3d(vec.x + dir.x * lambda, vec.y + dir.y * lambda, targetBlock.getZ());
-		}
-		else if(side == Direction.UP) {
-			double lambda = (targetBlock.getY() + 1.0 - vec.y)/(dir.y);
-			return new Vec3d(vec.x + dir.x * lambda, targetBlock.getY() + 1.0, vec.z + dir.z * lambda);
-		}
-		else if(side == Direction.DOWN) {
-			double lambda = (targetBlock.getY() - vec.y)/(dir.y);
-			return new Vec3d(vec.x + dir.x * lambda, targetBlock.getY(), vec.z + dir.z * lambda);
-		}
-		return vec;
-	}*/
-
 	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ)
 	{
 		if (mc.player == null | mc.world == null | posY <= 0 | lastSoundCategory == SoundCategory.RECORDS)
@@ -364,7 +341,7 @@ public class SoundPhysics
 		Vec3d playerPos = mc.player.getPos();
 			  playerPos = new Vec3d(playerPos.x, playerPos.y + mc.player.getEyeHeight(mc.player.getPose()), playerPos.z);
 		final Vec3d soundPos = offsetSoundByName(new Vec3d(posX, posY, posZ), playerPos, lastSoundName, lastSoundCategory);
-		final Vec3d normalToPlayer = playerPos.subtract(soundPos).normalize();
+		Vec3d normalToPlayer = playerPos.subtract(soundPos).normalize();
 
 		final BlockPos soundBlockPos = new BlockPos(soundPos.x, soundPos.y,soundPos.z);
 
@@ -374,40 +351,54 @@ public class SoundPhysics
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
 		BlockPos lastBlockPos = soundBlockPos;
-		for (int i = 0; i < 10; i++) {
-			BlockHitResult rayHit = fixedRaycast(new RaycastContext(rayOrigin, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastBlockPos);
-			lastBlockPos = rayHit.getBlockPos();
-			//If we hit a block
-			if (rayHit.getType() == HitResult.Type.MISS) {
-				break;
+		final boolean _9ray = ConfigManager.getConfig().Vlads_Tweaks._9RayDirectOcclusion && (lastSoundCategory == SoundCategory.BLOCKS || blockPattern.matcher(lastSoundName).matches());
+		final int nOccRays = _9ray ? 9 : 1;
+		float occlusionAccMin = Float.MAX_VALUE;
+		for (int j = 0; j < nOccRays; j++) {
+			if(j > 0){
+				final int jj = j - 1;
+				rayOrigin = new Vec3d(soundBlockPos.getX() + jj % 2, soundBlockPos.getY() + (jj >> 1) % 2, soundBlockPos.getZ() + (jj >> 2) % 2);
+				lastBlockPos = soundBlockPos;
+				normalToPlayer = playerPos.subtract(rayOrigin).normalize();
+				occlusionAccumulation = 0.0f;
 			}
+			for (int i = 0; i < 10; i++) {
+				BlockHitResult rayHit = fixedRaycast(new RaycastContext(rayOrigin, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastBlockPos);
+				lastBlockPos = rayHit.getBlockPos();
+				//If we hit a block
 
-			final BlockPos blockHitPos = rayHit.getBlockPos();
-			final Vec3d rayHitPos = extendToAFace(rayOrigin, normalToPlayer, blockHitPos); // Minecraft raytracing doesn't work as you expect, so we fix what it doesn't do
-			final BlockState blockHit = mc.world.getBlockState(blockHitPos);
+				if (rayHit.getType() == HitResult.Type.MISS) {
+					break;
+				}
 
-			float blockOcclusion = 1.0f;
+				final BlockPos blockHitPos = rayHit.getBlockPos();
+				final Vec3d rayHitPos = extendToAFace(rayOrigin, normalToPlayer, blockHitPos); // Minecraft raytracing doesn't work as you expect, so we fix what it doesn't do
+				final BlockState blockHit = mc.world.getBlockState(blockHitPos);
 
-			// Regardless to whether we hit from inside or outside
-			final Vec3d dirVec =  rayHitPos.subtract(blockHitPos.getX() + 0.5, blockHitPos.getY() + 0.5, blockHitPos.getZ() + 0.5);
-			final Direction sideHit = Direction.getFacing(dirVec.x, dirVec.y, dirVec.z);
+				float blockOcclusion = 1.0f;
 
-			//System.out.println("Hit "+sideHit.asString()+" of "+blockHit.getBlock().getTranslationKey()+"       "+rayHitPos.toString()+"              "+rayHit.getBlockPos().toShortString());
-			if (!blockHit.isSideSolidFullSquare(mc.world,rayHit.getBlockPos(),sideHit))
-			{
-				// log("not a solid block!");
-				blockOcclusion = 0.15f;//TODO settings
-			} else //System.out.println("Hard");
+				// Regardless to whether we hit from inside or outside
+				final Vec3d dirVec = rayHitPos.subtract(blockHitPos.getX() + 0.5, blockHitPos.getY() + 0.5, blockHitPos.getZ() + 0.5);
+				final Direction sideHit = Direction.getFacing(dirVec.x, dirVec.y, dirVec.z);
 
-			logOcclusion(blockHit.getBlock().getTranslationKey() + "    " + rayHitPos.x + ", " + rayHitPos.y + ", " + rayHitPos.z);
+				//System.out.println("Hit "+sideHit.asString()+" of "+blockHit.getBlock().getTranslationKey()+"       "+rayHitPos.toString()+"              "+rayHit.getBlockPos().toShortString());
+				if (!blockHit.isSideSolidFullSquare(mc.world, rayHit.getBlockPos(), sideHit)) {
+					// log("not a solid block!");
+					blockOcclusion *= ConfigManager.getConfig().Vlads_Tweaks.leakyBlocksOcclusionMultiplier;
+				} else //System.out.println("Hard");
 
-			//Accumulate density
-			occlusionAccumulation += blockOcclusion;
+					logOcclusion(blockHit.getBlock().getTranslationKey() + "    " + rayHitPos.x + ", " + rayHitPos.y + ", " + rayHitPos.z);
 
-			rayOrigin = rayHitPos; //new Vec3d(rayHit.getPos().x + normalToPlayer.x * 0.1, rayHit.getPos().y + normalToPlayer.y * 0.1, rayHit.getPos().z + normalToPlayer.z * 0.1);
+				//Accumulate density
+				occlusionAccumulation += blockOcclusion;
 
-			logOcclusion("New trace position: " + rayOrigin.x + ", " + rayOrigin.y + ", " + rayOrigin.z);
+				rayOrigin = rayHitPos; //new Vec3d(rayHit.getPos().x + normalToPlayer.x * 0.1, rayHit.getPos().y + normalToPlayer.y * 0.1, rayHit.getPos().z + normalToPlayer.z * 0.1);
+
+				logOcclusion("New trace position: " + rayOrigin.x + ", " + rayOrigin.y + ", " + rayOrigin.z);
+			}
+			occlusionAccMin = Math.min(occlusionAccMin, occlusionAccumulation);
 		}
+		occlusionAccumulation = Math.min(occlusionAccMin, ConfigManager.getConfig().Vlads_Tweaks.maxDirectOcclusionFromBlocks);
 		directCutoff = (float) Math.exp(-occlusionAccumulation * absorptionCoeff);
 		float directGain = (float) Math.pow(directCutoff, 0.1);
 		

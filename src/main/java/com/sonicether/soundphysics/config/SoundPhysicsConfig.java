@@ -1,4 +1,4 @@
-package com.sonicether.soundphysics;
+package com.sonicether.soundphysics.config;
 
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
@@ -9,9 +9,11 @@ import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
 @Config.Gui.Background("minecraft:textures/block/note_block.png")
 public class SoundPhysicsConfig implements ConfigData {
 
-    @ConfigEntry.Gui.RequiresRestart
     @Comment("Enable reverb?")
     public boolean enabled = true;
+
+    @Comment("Don't forget to make this true when you change the config")
+    public boolean reloadReverb = true;
 
     @ConfigEntry.Gui.CollapsibleObject
     public General General = new General();
@@ -21,6 +23,9 @@ public class SoundPhysicsConfig implements ConfigData {
 
     @ConfigEntry.Gui.CollapsibleObject
     public Material_Properties Material_Properties = new Material_Properties();
+
+    @ConfigEntry.Gui.CollapsibleObject
+    public Vlads_Tweaks Vlads_Tweaks = new Vlads_Tweaks();
 
     @ConfigEntry.Gui.CollapsibleObject
     public Misc Misc = new Misc();
@@ -42,7 +47,6 @@ public class SoundPhysicsConfig implements ConfigData {
         public float airAbsorption = 1.0f;
         @Comment("How much sound is filtered when the player is underwater. 0.0 means no filter. 1.0 means fully filtered.\n0.0 - 1.0")
         public float underwaterFilter = 0.8f;
-
     }
 
     public static class Performance{
@@ -75,6 +79,15 @@ public class SoundPhysicsConfig implements ConfigData {
         public float snowReflectivity = 0.2f;
     }
 
+    public static class Vlads_Tweaks {
+        @Comment("If sound hits non-full-square side, direct block occlusion is multiplied by this.\n0.0 - ")
+        public float leakyBlocksOcclusionMultiplier = 0.15f;
+        @Comment("The amount at which this is capped. 10 * block_occlusion is the theoretical limit")
+        public float maxDirectOcclusionFromBlocks = 10f;
+        @Comment("Calculate direct occlusion as the minimum of 9 rays from vertices of a block")
+        public boolean _9RayDirectOcclusion = true;
+    }
+
     public static class Misc {
         @Comment("General debug logging")
         public boolean debugLogging = false;
@@ -86,8 +99,8 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean performanceLogging = false;
     }
 
-    public boolean isEnabled(){
-        return this.enabled;
-    }
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
+    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS]. (LOAD_SUCCESS = null)")
+    public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 
 }
