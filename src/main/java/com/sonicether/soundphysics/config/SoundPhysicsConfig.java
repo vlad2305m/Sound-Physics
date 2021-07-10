@@ -100,7 +100,7 @@ public class SoundPhysicsConfig implements ConfigData {
     }
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
-    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS]. (LOAD_SUCCESS = null)")
+    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION]. (LOAD_SUCCESS = null)")
     public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 
 }

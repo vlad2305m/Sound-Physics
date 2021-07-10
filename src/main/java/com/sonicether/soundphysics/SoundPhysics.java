@@ -24,7 +24,7 @@ public class SoundPhysics
 
 	private static final Pattern rainPattern = Pattern.compile(".*rain.*");
 	private static final Pattern stepPattern = Pattern.compile(".*step.*");
-	private static final Pattern blockPattern = Pattern.compile(".*block.*");
+	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	//Private fields
 	private static final String logPrefix = "[SOUND PHYSICS]";
 	private static int auxFXSlot0;
@@ -47,16 +47,9 @@ public class SoundPhysics
 	private static String lastSoundName;
 
 	private static Random rand;
-	
-	
+
 	//Public fields
-	//public static int attenuationModel = 16;
-	//public static float globalRolloffFactor = ConfigManager.getConfig().General.attenuationFactor;
 	public static float globalVolumeMultiplier = 4.0f;
-	//public static float globalReverbMultiplier = 0.7f * ConfigManager.getConfig().General.globalReverbGain;
-	//public static double soundDistanceAllowance = ConfigManager.getConfig().General.soundDistanceAllowance;
-
-
 
 	public static void init()
 	{
@@ -68,11 +61,8 @@ public class SoundPhysics
 	}
 	
 	
-	public static void applyConfigChanges()
+	public static void syncReverbParams()
 	{
-		//globalReverbMultiplier = 0.7f * ConfigManager.getConfig().General.globalReverbGain;
-		//soundDistanceAllowance = ConfigManager.getConfig().General.soundDistanceAllowance;
-		
 		if (auxFXSlot0 != 0)
 		{
 			//Set the global reverb parameters and apply them to the effect and effectslot
@@ -149,16 +139,14 @@ public class SoundPhysics
 		logGeneral("filter3: "+sendFilter3);
 		checkErrorLog("Error creating lowpass filters!");
 		
-		applyConfigChanges();
+		syncReverbParams();
 	}
 	
-	public static void setLastSoundCategory(SoundCategory sc)
-	{//log("Set last sound category");
-		lastSoundCategory = sc; }
-	
-	public static void setLastSoundName(String name)
-	{//log("Set last sound name: " + name);
-		lastSoundName = name; }
+	public static void setLastSoundCategoryAndName(SoundCategory sc, String name)
+	{//log("Set last sound category and name");
+		lastSoundCategory = sc;
+		lastSoundName = name;
+	}
 	
 	public static void onPlaySound(double posX, double posY, double posZ, int sourceID)
 	{
@@ -229,10 +217,7 @@ public class SoundPhysics
 		
 		return (float) reflectivity;
 	}
-	
-	private static Vec3d getNormalFromFacing(Direction direction)
-	{ return new Vec3d(direction.getUnitVector()); }
-	
+
 	private static Vec3d reflect(Vec3d dir, Vec3d normal)
 	{
 		//dir - 2.0 * dot(normal, dir) * normal
@@ -243,46 +228,6 @@ public class SoundPhysics
 		final double z = dir.z - dot * normal.z;
 		
 		return new Vec3d(x, y, z);
-	}
-	
-	private static Vec3d offsetSoundByName(Vec3d soundPos, Vec3d playerPos, final String name, final SoundCategory soundCategory)
-	{
-		double offsetX = 0.0;
-		double offsetY = 0.0;
-		double offsetZ = 0.0;
-		double offsetTowardsPlayer;
-
-		double tempNormX;
-		double tempNormY;
-		double tempNormZ;
-		//names
-		//if (soundPos.y % 1.0 < 0.001 || stepPattern.matcher(name).matches())
-		//{
-		//	offsetY = 0.1;
-		//}
-		
-		//categories
-		/*if (soundCategory == SoundCategory.BLOCKS || blockPattern.matcher(name).matches()) {
-			// The ray will probably hit the block that it's emitting from
-			// before
-			// escaping. Offset the ray start position towards the player by the
-			// diagonal half length of a cube
-
-			tempNormX = playerPos.x - soundPos.x;
-			tempNormY = playerPos.y - soundPos.y;
-			tempNormZ = playerPos.z - soundPos.z;
-			final double length = Math.sqrt(tempNormX * tempNormX + tempNormY * tempNormY + tempNormZ * tempNormZ);
-			tempNormX /= length;
-			tempNormY /= length;
-			tempNormZ /= length;
-			// 0.867 > square root of 0.5^2 * 3
-			offsetTowardsPlayer = 0.867;
-			offsetX += tempNormX * offsetTowardsPlayer;
-			offsetY += tempNormY * offsetTowardsPlayer;
-			offsetZ += tempNormZ * offsetTowardsPlayer;
-		}*/
-		//logDetailed("Offset sound by " + offsetX + ", " + offsetY + ", " + offsetZ);
-		return soundPos.add(offsetX, offsetY, offsetZ);
 	}
 
 	private static Vec3d divide(Vec3d top, Vec3d bottom) {
@@ -305,7 +250,7 @@ public class SoundPhysics
 		if(targetBlock.getY() <= vec.y && vec.y <= targetBlock.getY()+1)lambda = new Vec3d(lambda.x, 0.0, lambda.z);
 		if(targetBlock.getZ() <= vec.z && vec.z <= targetBlock.getZ()+1)lambda = new Vec3d(lambda.x, lambda.y, 0.0);
 		//you will *cough* not *cough* get this.
-		if(lambda.x < 0 || lambda.y < 0 || lambda.z < 0) { System.out.println("Congratulations, you broke SP!    "+ lambda.toString()+ vec.toString() + dir.toString() + targetBlock.toShortString()); return vec.add(dir.multiply(0.1));}
+		if(lambda.x < 0 || lambda.y < 0 || lambda.z < 0) { System.out.println("Congratulations, you broke SP!    "+ lambda+ vec+ dir + targetBlock.toShortString()); return vec.add(dir.multiply(0.1));}
 		// we need to hit all planes to get to the block
 		if(lambda.x >= lambda.y && lambda.x >= lambda.z) return new Vec3d( /*target.x*/vec.x + dir.x * lambda.x, vec.y + dir.y * lambda.x, vec.z + dir.z * lambda.x );
 		if(lambda.y >= lambda.z && lambda.y >= lambda.x) return new Vec3d( vec.x + dir.x * lambda.y, /*target.y*/vec.y + dir.y * lambda.y, vec.z + dir.z * lambda.y );
@@ -332,15 +277,14 @@ public class SoundPhysics
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 			return;
 		}
-		
-		
+
 		float directCutoff;
 		final float absorptionCoeff = (float) (ConfigManager.getConfig().General.globalBlockAbsorption * 3.0);
 		
 		//Direct sound occlusion
 		Vec3d playerPos = mc.player.getPos();
 			  playerPos = new Vec3d(playerPos.x, playerPos.y + mc.player.getEyeHeight(mc.player.getPose()), playerPos.z);
-		final Vec3d soundPos = offsetSoundByName(new Vec3d(posX, posY, posZ), playerPos, lastSoundName, lastSoundCategory);
+		final Vec3d soundPos = new Vec3d(posX, posY, posZ);
 		Vec3d normalToPlayer = playerPos.subtract(soundPos).normalize();
 
 		final BlockPos soundBlockPos = new BlockPos(soundPos.x, soundPos.y,soundPos.z);
@@ -357,7 +301,7 @@ public class SoundPhysics
 		for (int j = 0; j < nOccRays; j++) {
 			if(j > 0){
 				final int jj = j - 1;
-				rayOrigin = new Vec3d(soundBlockPos.getX() + jj % 2, soundBlockPos.getY() + (jj >> 1) % 2, soundBlockPos.getZ() + (jj >> 2) % 2);
+				rayOrigin = new Vec3d(soundBlockPos.getX() + 0.001 + 0.998 * (jj % 2), soundBlockPos.getY() + 0.001 + 0.998 * ((jj >> 1) % 2), soundBlockPos.getZ() + 0.001 + 0.998 * ((jj >> 2) % 2));
 				lastBlockPos = soundBlockPos;
 				normalToPlayer = playerPos.subtract(rayOrigin).normalize();
 				occlusionAccumulation = 0.0f;
@@ -428,8 +372,7 @@ public class SoundPhysics
 		
 		
 		// Shoot rays around sound
-		//final float phi = 1.618033988f;
-		//final float gAngle = phi * (float) Math.PI * 2.0f;
+
 		final float maxDistance = 256.0f;
 		
 		final int numRays = ConfigManager.getConfig().Performance.environmentEvaluationRays;
@@ -444,29 +387,25 @@ public class SoundPhysics
 
 		for (int i = 0; i < numRays; i++)
 		{
-			//final float fiN = (float) i / numRays;
-			final double longitude = 2.0 * Math.PI * rand.nextDouble(); //gAngle * (float) i * 1.0f;
-			final double latitude = Math.asin(rand.nextDouble() * 2.0f - 1.0f); //(float) Math.asin(fiN * 2.0f - 1.0f); //TODO beetter scattering
+			final double longitude = 2.0 * Math.PI * rand.nextDouble();
+			final double latitude = Math.asin(rand.nextDouble() * 2.0f - 1.0f);
 			
 			final Vec3d rayDir = new Vec3d(Math.cos(latitude) * Math.cos(longitude),
 					Math.cos(latitude) * Math.sin(longitude), Math.sin(latitude));
 
-			final Vec3d rayStart = soundPos;
+			final Vec3d rayEnd = new Vec3d(soundPos.x + rayDir.x * maxDistance, soundPos.y + rayDir.y * maxDistance,
+					soundPos.z + rayDir.z * maxDistance);
 
-			final Vec3d rayEnd = new Vec3d(rayStart.x + rayDir.x * maxDistance, rayStart.y + rayDir.y * maxDistance,
-					rayStart.z + rayDir.z * maxDistance);
-
-			BlockHitResult rayHit = fixedRaycast(new RaycastContext(rayStart, rayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, soundBlockPos);
+			BlockHitResult rayHit = fixedRaycast(new RaycastContext(soundPos, rayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, soundBlockPos);
 
 			if (rayHit.getType() == HitResult.Type.BLOCK) {
 				final double rayLength = soundPos.distanceTo(rayHit.getPos());
 				
 				// Additional bounces
 				BlockPos lastHitBlock = rayHit.getBlockPos();
-				Vec3d lastHitPos = extendToAFace(rayStart, rayDir, lastHitBlock);
-				Vec3d lastHitNormal = getNormalFromFacing(rayHit.getSide());
+				Vec3d lastHitPos = extendToAFace(soundPos, rayDir, lastHitBlock);
+				Vec3d lastHitNormal = new Vec3d(rayHit.getSide().getUnitVector());
 				Vec3d lastRayDir = rayDir;
-				BlockHitResult newRayHit = rayHit;
 				
 				float totalRayDistance = (float) rayLength;
 				
@@ -479,7 +418,7 @@ public class SoundPhysics
 					
 					//log("New ray dir: " + newRayDir.xCoord + ", " + newRayDir.yCoord + ", " + newRayDir.zCoord);
 					
-					newRayHit = fixedRaycast(new RaycastContext(newRayStart, newRayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastHitBlock);
+					BlockHitResult newRayHit = fixedRaycast(new RaycastContext(newRayStart, newRayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastHitBlock);
 
 					float energyTowardsPlayer = 0.25f;
 					final float blockReflectivity = getBlockReflectivity(lastHitBlock);
@@ -496,7 +435,7 @@ public class SoundPhysics
 						totalRayDistance += newRayLength;
 
 						lastHitPos = newRayHitPos;
-						lastHitNormal = getNormalFromFacing(newRayHit.getSide());
+						lastHitNormal = new Vec3d(newRayHit.getSide().getUnitVector());
 						lastRayDir = newRayDir;
 						lastHitBlock = newRayHit.getBlockPos();
 
@@ -629,6 +568,11 @@ public class SoundPhysics
 		
 		AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, (float) ConfigManager.getConfig().General.airAbsorption);
 		checkErrorLog("Set Environment airAbsorbtion:");
+	}
+
+	private static void setSoundPos(final int sourceID, final Vec3d pos) {// TODO sound pos
+		if (!ConfigManager.getConfig().enabled) return;
+		AL10.alSourcefv(sourceID, 4100, new float[]{(float)pos.x, (float)pos.y, (float)pos.z});
 	}
 
 	/*

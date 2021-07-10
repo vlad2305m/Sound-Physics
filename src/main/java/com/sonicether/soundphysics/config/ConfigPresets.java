@@ -36,10 +36,24 @@ public enum ConfigPresets {
             null, null, null,
 
             null, null, null, null
+    )),
+    SP1_0_SOUND_OCCLUSION((SoundPhysicsConfig c) -> changeConfig(c, true,
+
+            null, null, null, 10.0,
+            null, null, null, null,
+
+            null, null, null,
+
+            null, null, null,  null, null,
+            null, null, null, null,
+
+            null, 10.0, null,
+
+            null, null, null, null
     ));
 
 
-    private Consumer<SoundPhysicsConfig> configChanger = null;
+    private final Consumer<SoundPhysicsConfig> configChanger;
     public void setConfig(){ if (configChanger != null) configChanger.accept(ConfigManager.getConfig());}
 
     ConfigPresets(@Nullable Consumer<SoundPhysicsConfig> c) { this.configChanger = c; }

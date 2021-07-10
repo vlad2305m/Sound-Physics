@@ -22,8 +22,7 @@ public class SoundSystemMixin {
 
     @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At(value = "FIELD", target = "net/minecraft/client/sound/SoundSystem.sounds : Lcom/google/common/collect/Multimap;"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void SoundInfoStealer(SoundInstance sound, CallbackInfo ci, WeightedSoundSet weightedSoundSet, Identifier identifier, Sound sound2, float f, float g, SoundCategory soundCategory){
-        SoundPhysics.setLastSoundCategory(soundCategory);
-        SoundPhysics.setLastSoundName(sound.getId().getPath());
+        SoundPhysics.setLastSoundCategoryAndName(soundCategory, sound.getId().getPath());
     }
 
     @ModifyArg(method = "getAdjustedVolume", at = @At(value = "INVOKE", target = "net/minecraft/util/math/MathHelper.clamp (FFF)F"), index = 0)

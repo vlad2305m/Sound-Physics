@@ -32,7 +32,7 @@ public class ConfigManager {
 
         holder.load();
         holder.getConfig().preset.setConfig();
-        SoundPhysics.applyConfigChanges();
+        SoundPhysics.syncReverbParams();
     }
 
     public static void save() {
