@@ -40,5 +40,6 @@
   "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
   "text.autoconfig.sound_physics.option.Misc.occlusionLogging": "Occlusion logging",
   "text.autoconfig.sound_physics.option.Misc.environmentLogging": "Environment logging",
-  "text.autoconfig.sound_physics.option.Misc.performanceLogging": "Performance logging"
+  "text.autoconfig.sound_physics.option.Misc.performanceLogging": "Performance logging",
+  "text.autoconfig.sound_physics.option.preset": "Preset"
 }
