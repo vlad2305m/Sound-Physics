@@ -8,9 +8,9 @@
   "contact": {},
   "license": "GPL",
   "icon": "assets/soundphysics/icon.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
-    "main": [
+    "client": [
       "com.sonicether.soundphysics.SoundPhysicsMod"
     ],
     "modmenu": [

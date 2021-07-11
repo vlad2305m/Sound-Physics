@@ -1,12 +1,11 @@
 package com.sonicether.soundphysics;
 
 import com.sonicether.soundphysics.config.ConfigManager;
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.ClientModInitializer;
 
-public class SoundPhysicsMod implements ModInitializer {
+public class SoundPhysicsMod implements ClientModInitializer {
     @Override
-    public void onInitialize()
-    {
+    public void onInitializeClient() {
         ConfigManager.registerAutoConfig();
     }
 }
