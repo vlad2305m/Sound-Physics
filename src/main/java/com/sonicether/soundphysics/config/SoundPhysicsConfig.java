@@ -1,10 +1,13 @@
 package com.sonicether.soundphysics.config;
 
-
+import com.sonicether.soundphysics.SoundPhysicsMod;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Config(name = "sound_physics")
 @Config.Gui.Background("minecraft:textures/block/note_block.png")
@@ -55,29 +58,34 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean skipRainOcclusionTracing = true;
         @Comment("The number of rays to trace to determine reverberation for each sound source. More rays provides more consistent tracing results but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play.\n8 - 64")
         public int environmentEvaluationRays = 32;
+        @Comment("The number of rays bounces to trace to determine reverberation for each sound source. More bounces provides more echo and sound ducting but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play. Capped by max distance.\n4 - ?")
+        public int environmentEvaluationRayBounces = 4;
         @Comment("If true, enables a simpler technique for determining when the player and a sound source share airspace. Might sometimes miss recognizing shared airspace, but it's faster to calculate.")
         public boolean simplerSharedAirspaceSimulation = false;
     }
 
     public static class Material_Properties {
-        @Comment("Sound reflectivity for stone blocks.\n0.0 - 1.0")
-        public double stoneReflectivity = 1.0;
-        @Comment("Sound reflectivity for wooden blocks.\n0.0 - 1.0")
-        public double woodReflectivity = 0.4;
-        @Comment("Sound reflectivity for ground blocks (dirt, gravel, etc).\n0.0 - 1.0")
-        public double groundReflectivity = 0.3;
-        @Comment("Sound reflectivity for foliage blocks (leaves, grass, etc.).\n0.0 - 1.0")
-        public double foliageReflectivity = 0.5;
-        @Comment("Sound reflectivity for metal blocks.\n0.0 - 1.0")
-        public double metalReflectivity = 1.0;
-        @Comment("Sound reflectivity for glass blocks.\n0.0 - 1.0")
-        public double glassReflectivity = 0.5;
-        @Comment("Sound reflectivity for cloth blocks (carpet, wool, etc).\n0.0 - 1.0")
-        public double clothReflectivity = 0.05;
-        @Comment("Sound reflectivity for sand blocks.\n0.0 - 1.0")
-        public double sandReflectivity = 0.2;
-        @Comment("Sound reflectivity for snow blocks.\n0.0 - 1.0")
-        public double snowReflectivity = 0.2;
+        @Comment("Sound reflectivity for blocks.\n0.0 - 1.0")
+        @ConfigEntry.Gui.CollapsibleObject
+        public Map<String, Double> reflectivityMap;
+        {
+            Map<String, Double> map =
+                        SoundPhysicsMod.blockSoundGroups.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getValue, (a) -> 0.5));
+            map.put("STONE", 1.0);
+            map.put("WOOD", 0.4);
+            map.put("GRAVEL", 0.3);
+            map.put("GRASS", 0.5);
+            map.put("METAL", 1.0);
+            map.put("GLASS", 0.5);
+            map.put("WOOL", 0.05);
+            map.put("SAND", 0.2);
+            map.put("SNOW", 0.2);
+            map.put("LADDER", 0.4);
+            map.put("ANVIL", 1.0);
+            map.put(".DEFAULT", 0.5); // TODO more
+            reflectivityMap = map;
+        }
     }
 
     public static class Vlads_Tweaks {
@@ -87,6 +95,12 @@ public class SoundPhysicsConfig implements ConfigData {
         public double maxDirectOcclusionFromBlocks = 10;
         @Comment("Calculate direct occlusion as the minimum of 9 rays from vertices of a block")
         public boolean _9RayDirectOcclusion = true;
+        @Comment("Whether to try calculating where the sound should come from based on reflections")
+        public boolean soundDirectionEvaluation = true;
+        @Comment("Maximum direction variance of incoming reflections allowed to redirect sound\n0.0-1.0")
+        public double maxDirVariance = 0.5;
+        @Comment("Skip redirecting non-occluded sounds (the ones you can see directly)")
+        public boolean notOccludedNoRedirect = true;
     }
 
     public static class Misc {

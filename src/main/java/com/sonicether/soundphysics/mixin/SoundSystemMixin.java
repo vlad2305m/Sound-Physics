@@ -1,6 +1,8 @@
 package com.sonicether.soundphysics.mixin;
 
 import com.sonicether.soundphysics.SoundPhysics;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.sound.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
@@ -11,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-
+@Environment(EnvType.CLIENT)
 @Mixin(SoundSystem.class)
 public class SoundSystemMixin {
 

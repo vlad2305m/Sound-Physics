@@ -21,21 +21,17 @@
 
   "text.autoconfig.sound_physics.option.Performance.skipRainOcclusionTracing": "Skip tracing for rain sounds",
   "text.autoconfig.sound_physics.option.Performance.environmentEvaluationRays": "Rays per sound",
+  "text.autoconfig.sound_physics.option.Performance.environmentEvaluationRayBounces": "Reflections per ray",
   "text.autoconfig.sound_physics.option.Performance.simplerSharedAirspaceSimulation": "Cheap shared airspace detection",
 
-  "text.autoconfig.sound_physics.option.Material_Properties.stoneReflectivity": "Stone reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.woodReflectivity": "Wood reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.groundReflectivity": "Gravel reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.foliageReflectivity": "Foliage reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.metalReflectivity": "Metal reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.glassReflectivity": "Glass reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.clothReflectivity": "Wool reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.sandReflectivity": "Sand reflectivity",
-  "text.autoconfig.sound_physics.option.Material_Properties.snowReflectivity": "Snow reflectivity",
+  "text.autoconfig.sound_physics.option.Material_Properties.reflectivityMap": "Edit in config file",
 
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.leakyBlocksOcclusionMultiplier": "Leaky blocks occlusion multiplier",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirectOcclusionFromBlocks": "Maximum direct occlusion",
-  "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray d. occlusion calculation",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray direct occlusion calculation",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.soundDirectionEvaluation": "Sound direction reevaluation",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirVariance": "Max direction variance",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.notOccludedNoRedirect": "Skip redirecting directly visible blocks",
 
   "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
   "text.autoconfig.sound_physics.option.Misc.occlusionLogging": "Occlusion logging",

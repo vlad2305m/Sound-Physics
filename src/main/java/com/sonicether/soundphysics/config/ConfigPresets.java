@@ -2,9 +2,11 @@ package com.sonicether.soundphysics.config;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static com.sonicether.soundphysics.config.ConfigChanger.changeConfig;
+import static java.util.Map.entry;
 
 @SuppressWarnings("unused")
 public enum ConfigPresets {
@@ -14,12 +16,13 @@ public enum ConfigPresets {
             1.0, 1.0, 1.0, 1.0,
             1.0, 4.0, 1.0, 0.8,
 
-            true, 32, false,
+            true, 32, 4, false,
 
-            1.0, 0.4, 0.3,  0.5, 1.0,
-            0.5, 0.05, 0.2, 0.2,
+            Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
+            entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
+            entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
 
-            0.15, 10.0, true,
+            0.15, 10.0, true, true, 0.5, true,
 
             false, false, false, false
     )),
@@ -28,12 +31,13 @@ public enum ConfigPresets {
             null, null, null, null,
             null, null, null, null,
 
-            null, null, null,
+            null, null, null, null,
 
-            1.0, 0.4, 0.3,  0.5, 1.0,
-            0.5, 0.05, 0.2, 0.2,
+            Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
+            entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
+            entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
 
-            null, null, null,
+            null, null, null,null, null, null,
 
             null, null, null, null
     )),
@@ -42,12 +46,11 @@ public enum ConfigPresets {
             null, null, null, 10.0,
             null, null, null, null,
 
-            null, null, null,
-
-            null, null, null,  null, null,
             null, null, null, null,
 
-            null, 10.0, null,
+            null,
+
+            null, 10.0, null, null, null, null,
 
             null, null, null, null
     ));

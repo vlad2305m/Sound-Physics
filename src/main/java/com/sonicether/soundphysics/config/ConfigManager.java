@@ -25,14 +25,15 @@ public class ConfigManager {
         return holder.getConfig();
     }
 
-    public static void reload() {
+    public static void reload(boolean load) {
         if (holder == null) {
             return;
         }
 
-        holder.load();
+        if(load) holder.load();
         holder.getConfig().preset.setConfig();
         SoundPhysics.syncReverbParams();
+        holder.save();
     }
 
     public static void save() {
