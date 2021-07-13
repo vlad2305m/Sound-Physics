@@ -1,11 +1,5 @@
 package com.sonicether.soundphysics;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Vector;
-import java.util.regex.Pattern;
-
 import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.config.ReverbParams;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -16,10 +10,20 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
-
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import org.lwjgl.openal.*;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.EXTEfx;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.regex.Pattern;
 
 import static com.sonicether.soundphysics.RaycastFix.fixedRaycast;
 
@@ -473,7 +477,7 @@ public class SoundPhysics
 				sum = sum.add(direction.getKey().normalize().multiply(w));
 			}
 			sum = sum.multiply(1 / weight);
-			System.out.println(sum+"  "+sum.lengthSquared());
+			//System.out.println(sum+"  "+sum.lengthSquared());
 			if (sum.lengthSquared() >= ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 		}
@@ -530,7 +534,7 @@ public class SoundPhysics
 			sendCutoff2 *= 0.4f;
 			sendCutoff3 *= 0.4f;
 		}
-		//System.out.println(tt);tt = 0;//TODO
+		//System.out.println(tt);tt = 0;//TO DO
 		setEnvironment(sourceID, sendGain0, sendGain1, sendGain2, sendGain3, sendCutoff0, sendCutoff1, sendCutoff2, sendCutoff3, directCutoff, directGain);
 	}
 	
@@ -571,7 +575,7 @@ public class SoundPhysics
 
 	private static void setSoundPos(final int sourceID, final Vec3d pos) {
 		if (!ConfigManager.getConfig().enabled) return;
-		System.out.println(pos);//TODO
+		//System.out.println(pos);//TO DO
 		AL10.alSourcefv(sourceID, 4100, new float[]{(float)pos.x, (float)pos.y, (float)pos.z});
 	}
 
