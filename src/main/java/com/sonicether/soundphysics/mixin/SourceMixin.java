@@ -2,8 +2,6 @@ package com.sonicether.soundphysics.mixin;
 
 import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.SoundPhysics;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.sound.Source;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
@@ -14,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Environment(EnvType.CLIENT)
+
 @Mixin(Source.class)
 public class SourceMixin {
 

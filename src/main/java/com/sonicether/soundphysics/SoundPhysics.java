@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import static com.sonicether.soundphysics.RaycastFix.fixedRaycast;
 
+
 public class SoundPhysics
 {
 
@@ -465,7 +466,7 @@ public class SoundPhysics
 		dirEval:
 		{
 			if (directions.isEmpty()) break dirEval;
-			log("Evaluating direction from "+sharedAirspace+" entries...");
+			if (ConfigManager.getConfig().Misc.performanceLogging) log("Evaluating direction from "+sharedAirspace+" entries...");
 			Vec3d sum = new Vec3d(0, 0, 0);
 			double weight = 0;
 

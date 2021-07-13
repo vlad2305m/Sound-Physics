@@ -6,7 +6,9 @@
   "mixins": [
     "EntityMixin",
     "ReloadCommandMixin",
-    "ServerWorldMixin",
+    "ServerWorldMixin"
+  ],
+  "client": [
     "SoundSystemMixin",
     "SourceMixin"
   ],
