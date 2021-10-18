@@ -348,7 +348,7 @@ public class SoundPhysics
 		final float maxDistance = 256.0f;
 
 		final int numRays = ConfigManager.getConfig().Performance.environmentEvaluationRays;
-		final int rayBounces = ConfigManager.getConfig().Performance.environmentEvaluationRays;
+		final int rayBounces = ConfigManager.getConfig().Performance.environmentEvaluationRayBounces;
 
 		final List<Map.Entry<Vec3d, Double>> directions = new Vector<>(10, 10);
 		final boolean doDirEval = ConfigManager.getConfig().Vlads_Tweaks.soundDirectionEvaluation &&
@@ -361,19 +361,49 @@ public class SoundPhysics
 		final float rcpTotalRays = 1.0f / (numRays * rayBounces);
 		final float rcpPrimaryRays = 1.0f / (numRays);
 
-		final float phi = 1.618033988f;
-		final float gAngle = phi * (float) Math.PI * 2.0f;
+		final float gRatio = 1.618033988f;
+		final float epsilon;
+		
+		if (numRays >= 600000)
+		{
+			epsilon = 214.0f;
+		}
+		else if (numRays >= 400000)
+		{
+			epsilon = 75.0f;
+		}
+		else if (numRays >= 11000)
+		{
+			epsilon = 27.0f;
+		}
+		else if (numRays >= 890)
+		{
+			epsilon = 10.0f;
+		}
+		else if (numRays >= 177)
+		{
+			epsilon = 3.33f;
+		}
+		else if (numRays >= 24)
+		{
+			epsilon = 1.33f;
+		}
+		else
+		{
+			epsilon = 0.33f;
+		}
 
 		for (int i = 0; i < numRays; i++)
 		{
-			final float fiN = (float) i / numRays;
-			final float longitude = gAngle * (float) i * 1.0f;
-			final float latitude = (float) Math.asin(fiN * 2.0f - 1.0f);
-			//final double longitude = 2.0 * Math.PI * rand.nextDouble();
-			//final double latitude = Math.asin(rand.nextDouble() * 2.0f - 1.0f);
+			final float x = (float) (i + epsilon) / (numRays - 1.0 + 2.0*epsilon);
+			final float y = (float) i / gRatio;
+			final float theta = 2.0f * Math.PI * y;
+			final float phi = Math.acos(1.0f - 2.0f*x);
+			//final double theta = 2.0 * Math.PI * rand.nextDouble();
+			//final double phi = Math.acos(1.0f - 2.0f * rand.nextDouble());
 			
-			final Vec3d rayDir = new Vec3d(Math.cos(latitude) * Math.cos(longitude),
-					Math.cos(latitude) * Math.sin(longitude), Math.sin(latitude));
+			final Vec3d rayDir = new Vec3d(Math.cos(theta) * Math.sin(phi),
+					Math.sin(theta) * Math.sin(phi), Math.cos(phi));
 
 			final Vec3d rayEnd = new Vec3d(soundPos.x + rayDir.x * maxDistance, soundPos.y + rayDir.y * maxDistance,
 					soundPos.z + rayDir.z * maxDistance);
