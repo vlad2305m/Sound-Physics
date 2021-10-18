@@ -395,10 +395,10 @@ public class SoundPhysics
 
 		for (int i = 0; i < numRays; i++)
 		{
-			final float x = (float) (i + epsilon) / (numRays - 1.0 + 2.0*epsilon);
+			final float x = (float) ((float) (i + epsilon) / (numRays - 1.0 + 2.0*epsilon));
 			final float y = (float) i / gRatio;
-			final float theta = 2.0f * Math.PI * y;
-			final float phi = Math.acos(1.0f - 2.0f*x);
+			final float theta = (float) (2.0f * Math.PI * y);
+			final float phi = (float) Math.acos(1.0f - 2.0f*x);
 			//final double theta = 2.0 * Math.PI * rand.nextDouble();
 			//final double phi = Math.acos(1.0f - 2.0f * rand.nextDouble());
 			
