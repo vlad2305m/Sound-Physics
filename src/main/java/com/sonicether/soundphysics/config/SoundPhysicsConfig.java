@@ -57,7 +57,7 @@ public class SoundPhysicsConfig implements ConfigData {
         @Comment("If true, rain sound sources won't trace for sound occlusion. This can help performance during rain.")
         public boolean skipRainOcclusionTracing = true;
         @Comment("The number of rays to trace to determine reverberation for each sound source. More rays provides more consistent tracing results but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play.\n8 - 64")
-        public int environmentEvaluationRays = 32;
+        public int environmentEvaluationRays = 256;
         @Comment("The number of rays bounces to trace to determine reverberation for each sound source. More bounces provides more echo and sound ducting but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play. Capped by max distance.\n4 - ?")
         public int environmentEvaluationRayBounces = 4;
         @Comment("If true, enables a simpler technique for determining when the player and a sound source share airspace. Might sometimes miss recognizing shared airspace, but it's faster to calculate.")
@@ -112,14 +112,12 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean environmentLogging = false;
         @Comment("Performance information logging")
         public boolean performanceLogging = false;
-        @Comment("Particle traced blocks")
+        @Comment("Particles on traced blocks (structure_void is a block)")
         public boolean raytraceParticles = false;
-        @Comment("Use structure_void instead")
-        public boolean raytraceParticlesSolid = false;
     }
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
-    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION]. (LOAD_SUCCESS = null)")
+    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION, Thedocrubys_Fine_Tuned]. (LOAD_SUCCESS = null)")
     public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 
 }

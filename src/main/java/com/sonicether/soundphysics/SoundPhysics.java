@@ -503,7 +503,7 @@ public class SoundPhysics
 			}
 			sum = sum.multiply(1 / weight);
 			//System.out.println(sum+"  "+sum.lengthSquared());
-			if (sum.lengthSquared() >= ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
+			if (sum.lengthSquared() >= 1-ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 		}
 		
