@@ -9,8 +9,7 @@ public class ConfigChanger {
         @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
         @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Integer environmentEvaluationRayBounces, @Nullable Boolean simplerSharedAirspaceSimulation,
         @Nullable Map<String, Double> reflectivityMap,
-        @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect,
-        @Nullable Boolean debugLogging, @Nullable Boolean occlusionLogging, @Nullable Boolean environmentLogging, @Nullable Boolean performanceLogging
+        @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect
     ) {
         if (enabled != null) config.enabled = enabled;
         config.reloadReverb = true;
@@ -18,7 +17,6 @@ public class ConfigChanger {
         setPerformance(config.Performance, skipRainOcclusionTracing, environmentEvaluationRays, environmentEvaluationRayBounces, simplerSharedAirspaceSimulation);
         setMaterial_Properties(config.Material_Properties, reflectivityMap);
         setVlads_Tweaks(config.Vlads_Tweaks, leakyBlocksOcclusionMultiplier, maxDirectOcclusionFromBlocks, _9RayDirectOcclusion, soundDirectionEvaluation, maxDirVariance, notOccludedNoRedirect);
-        setMisc(config.Misc, debugLogging, occlusionLogging, environmentLogging, performanceLogging);
         config.preset = ConfigPresets.LOAD_SUCCESS;
         ConfigManager.save();
     }
@@ -52,12 +50,5 @@ public class ConfigChanger {
         if (soundDirectionEvaluation != null) vlads_tweaks.soundDirectionEvaluation = soundDirectionEvaluation;
         if (maxDirVariance != null) vlads_tweaks.maxDirVariance = maxDirVariance;
         if (notOccludedNoRedirect != null) vlads_tweaks.notOccludedNoRedirect = notOccludedNoRedirect;
-    }
-
-    public static void setMisc(SoundPhysicsConfig.Misc misc, @Nullable Boolean debugLogging, @Nullable Boolean occlusionLogging, @Nullable Boolean environmentLogging, @Nullable Boolean performanceLogging) {
-        if (debugLogging != null) misc.debugLogging = debugLogging;
-        if (occlusionLogging != null) misc.occlusionLogging = occlusionLogging;
-        if (environmentLogging != null) misc.environmentLogging = environmentLogging;
-        if (performanceLogging != null) misc.performanceLogging = performanceLogging;
     }
 }

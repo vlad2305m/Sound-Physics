@@ -22,9 +22,7 @@ public enum ConfigPresets {
             entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
             entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
 
-            0.15, 10.0, true, true, 0.5, true,
-
-            false, false, false, false
+            0.15, 10.0, true, true, 0.5, true
     )),
     RESET_MATERIALS((SoundPhysicsConfig c) -> changeConfig(c, true,
 
@@ -37,9 +35,7 @@ public enum ConfigPresets {
             entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
             entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
 
-            null, null, null,null, null, null,
-
-            null, null, null, null
+            null, null, null,null, null, null
     )),
     SP1_0_SOUND_OCCLUSION((SoundPhysicsConfig c) -> changeConfig(c, true,
 
@@ -50,9 +46,7 @@ public enum ConfigPresets {
 
             null,
 
-            null, 10.0, null, null, null, null,
-
-            null, null, null, null
+            null, 10.0, null, null, null, null
     ));
 
 

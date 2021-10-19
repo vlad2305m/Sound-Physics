@@ -7,7 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +31,6 @@ public class SoundPhysics
 {
 
 	private static final Pattern rainPattern = Pattern.compile(".*rain.*");
-	private static final Pattern stepPattern = Pattern.compile(".*step.*");
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	//Private fields
 	private static final String logPrefix = "[SOUND PHYSICS]";
@@ -51,8 +49,13 @@ public class SoundPhysics
 	private static int sendFilter3;
 	//public static double tt = 0;//TODO
 	//private static long ttt;
+	//private static double cumtt = 0;
+	//private static long navgt = 0;
 	//public static void t1() {ttt = System.nanoTime(); }
 	//public static void t2() { SoundPhysics.tt += (System.nanoTime()-ttt)/1000000d;}
+	//public static void tavg() { cumtt += tt; navgt++; }
+	//public static void tout() { System.out.println(String.valueOf(SoundPhysics.tt) + "   Avg: " + String.valueOf(cumtt/navgt)); }
+	//public static void tres() { SoundPhysics.tt = 0; }
 	private static MinecraftClient mc;
 	
 	private static SoundCategory lastSoundCategory;
@@ -185,15 +188,6 @@ public class SoundPhysics
 		//System.out.println(soundCategory.getCategoryName());
 	}
 	
-	public static double calculateEntitySoundOffset(float standingEyeHeight, SoundEvent sound)
-	{
-		if (stepPattern.matcher(sound.getId().getPath()).matches())
-		{
-			return 0.0;
-		}
-		return standingEyeHeight;
-	}
-	
 	private static float getBlockReflectivity(final BlockPos blockPos)
 	{
 		assert mc.world != null;
@@ -242,8 +236,10 @@ public class SoundPhysics
 		}
 		final long timeT = mc.world.getTime();
 		if (RaycastFix.lastUpd != timeT) {
+			//tavg();tout();tres();//TODO
 			if (timeT % 1024 == 0) {
-				RaycastFix.shapeCache = new Long2ObjectOpenHashMap<>(65536,0.75f); // just in case something gets corrupted
+				RaycastFix.shapeCache = new Long2ObjectOpenHashMap<>(2048,0.75f); // just in case something gets corrupted
+				//cumtt = 0; navgt = 0;
 			}
 			else {
 				RaycastFix.shapeCache.clear();
@@ -395,12 +391,10 @@ public class SoundPhysics
 
 		for (int i = 0; i < numRays; i++)
 		{
-			final float x = (float) ((float) (i + epsilon) / (numRays - 1.0 + 2.0*epsilon));
+			final float x = (float) ((i + epsilon) / (numRays - 1.0 + 2.0*epsilon));
 			final float y = (float) i / gRatio;
 			final float theta = (float) (2.0f * Math.PI * y);
 			final float phi = (float) Math.acos(1.0f - 2.0f*x);
-			//final double theta = 2.0 * Math.PI * rand.nextDouble();
-			//final double phi = Math.acos(1.0f - 2.0f * rand.nextDouble());
 			
 			final Vec3d rayDir = new Vec3d(Math.cos(theta) * Math.sin(phi),
 					Math.sin(theta) * Math.sin(phi), Math.cos(phi));
@@ -530,7 +524,7 @@ public class SoundPhysics
 		sendCutoff2 = (float) Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight2) + sharedAirspaceWeight2;
 		sendCutoff3 = (float) Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight3) + sharedAirspaceWeight3;
 
-		// attempt to preserve directionality when airspace is shared by allowing some of the dry signal through but filtered
+		// attempt to preserve directionality when airspace is shared by allowing some dry signal through but filtered
 		final float averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25f;
 		directCutoff = Math.max((float)Math.pow(averageSharedAirspace, 0.5) * 0.2f, directCutoff);
 		

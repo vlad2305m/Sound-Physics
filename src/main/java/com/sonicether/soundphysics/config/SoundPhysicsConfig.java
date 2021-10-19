@@ -112,6 +112,10 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean environmentLogging = false;
         @Comment("Performance information logging")
         public boolean performanceLogging = false;
+        @Comment("Particle traced blocks")
+        public boolean raytraceParticles = false;
+        @Comment("Use structure_void instead")
+        public boolean raytraceParticlesSolid = false;
     }
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
