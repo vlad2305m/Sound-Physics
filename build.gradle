@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.8-SNAPSHOT'
+    id 'fabric-loom' version '0.10-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -7,15 +7,10 @@ repositories {
     mavenCentral()
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.terraformersmc.com/releases" }
-    maven {
-        name = 'TerraformersMC Archive'
-        url = 'https://raw.githubusercontent.com/TerraformersMC/Archive/main/releases/'
-        artifactUrls "https://raw.githubusercontent.com/TerraformersMC/Archive/main/releases/"
-    }
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -28,7 +23,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    //modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Cloth Config (including Auto Config)
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
@@ -58,7 +53,7 @@ tasks.withType(JavaCompile).configureEach {
 
     // Minecraft 1.17 (21w19a) upwards uses Java 16.
     //noinspection GroovyAssignabilityCheck, GroovyAccessibility
-    it.options.release = 16
+    it.options.release = 17
 }
 
 java {

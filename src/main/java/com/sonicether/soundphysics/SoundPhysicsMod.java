@@ -3,15 +3,16 @@ package com.sonicether.soundphysics;
 import com.sonicether.soundphysics.config.ConfigManager;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.Pair;
 
-import java.lang.reflect.Field;
+
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SoundPhysicsMod implements ModInitializer {
-    public static Map<BlockSoundGroup, String> blockSoundGroups;
+    public static Map<BlockSoundGroup, Pair<String, String>> blockSoundGroups;
     @Override
     public void onInitialize()
     {
@@ -33,7 +34,14 @@ public class SoundPhysicsMod implements ModInitializer {
                             }
                             return null;
                         },
-                        Field::getName));
+                         (f) -> {
+                             try {
+                                 return new Pair<>(f.getName(), (f.get(null) instanceof BlockSoundGroup g ? g.getBreakSound().getId().getPath() : ""));
+                             } catch (IllegalAccessException e) {
+                                 e.printStackTrace();
+                             }
+                             return new Pair<>("", "");
+                         }));
 
         ConfigManager.registerAutoConfig();
     }

@@ -5,6 +5,7 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
+import net.minecraft.util.Pair;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,23 +68,23 @@ public class SoundPhysicsConfig implements ConfigData {
     public static class Material_Properties {
         @Comment("Sound reflectivity for blocks.\n0.0 - 1.0")
         @ConfigEntry.Gui.CollapsibleObject
-        public Map<String, Double> reflectivityMap;
+        public Map<String, Pair<Double, String>> reflectivityMap;
         {
-            Map<String, Double> map =
+            Map<String, Pair<Double, String>> map =
                         SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getValue, (a) -> 0.5));
-            map.put("STONE", 1.0);
-            map.put("WOOD", 0.4);
-            map.put("GRAVEL", 0.3);
-            map.put("GRASS", 0.5);
-            map.put("METAL", 1.0);
-            map.put("GLASS", 0.5);
-            map.put("WOOL", 0.05);
-            map.put("SAND", 0.2);
-            map.put("SNOW", 0.2);
-            map.put("LADDER", 0.4);
-            map.put("ANVIL", 1.0);
-            map.put(".DEFAULT", 0.5); // TODO more
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new Pair<>(0.5, e.getValue().getRight())));
+            map.getOrDefault("STONE", new Pair<>(1.0, ""));
+            map.getOrDefault("WOOD", new Pair<>(0.4, ""));
+            map.getOrDefault("GRAVEL", new Pair<>(0.3, ""));
+            map.getOrDefault("GRASS", new Pair<>(0.5, ""));
+            map.getOrDefault("METAL", new Pair<>(1.0, ""));
+            map.getOrDefault("GLASS", new Pair<>(0.5, ""));
+            map.getOrDefault("WOOL", new Pair<>(0.05, ""));
+            map.getOrDefault("SAND", new Pair<>(0.2, ""));
+            map.getOrDefault("SNOW", new Pair<>(0.2, ""));
+            map.getOrDefault("LADDER", new Pair<>(0.4, ""));
+            map.getOrDefault("ANVIL", new Pair<>(1.0, ""));
+            map.getOrDefault(".DEFAULT", new Pair<>(0.5, "")); // TODO more
             reflectivityMap = map;
         }
     }
@@ -118,6 +119,6 @@ public class SoundPhysicsConfig implements ConfigData {
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
     @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION, Thedocrubys_Fine_Tuned]. (LOAD_SUCCESS = null)")
-    public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
+    public ConfigPresets preset = ConfigPresets.Thedocrubys_Fine_Tuned;
 
 }

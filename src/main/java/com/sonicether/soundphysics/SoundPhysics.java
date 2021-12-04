@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -194,10 +195,10 @@ public class SoundPhysics
 		BlockState blockState = mc.world.getBlockState(blockPos);
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		
-		double reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.get(".DEFAULT");
+		double reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.get(".DEFAULT").getLeft();
 
-		String key = SoundPhysicsMod.blockSoundGroups.get(soundType);
-		reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, reflectivity);
+		String key = SoundPhysicsMod.blockSoundGroups.get(soundType).getLeft();
+		reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, new Pair<>(reflectivity, "")).getLeft();
 
 		reflectivity *= ConfigManager.getConfig().General.globalBlockReflectance;
 		

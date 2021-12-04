@@ -1,5 +1,6 @@
 package com.sonicether.soundphysics.config;
 
+import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -40,7 +41,7 @@ public class ConfigChanger {
     }
 
     public static void setMaterial_Properties(SoundPhysicsConfig.Material_Properties material_properties, @Nullable Map<String, Double> reflectivityMap) {
-        if (reflectivityMap != null) material_properties.reflectivityMap.putAll(reflectivityMap);
+        if (reflectivityMap != null) reflectivityMap.forEach((s, d) -> material_properties.reflectivityMap.compute(s, (k, v) -> (v == null) ? new Pair<>(d, "error") : new Pair<>(d, v.getRight())));
     }
 
     public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect) {
