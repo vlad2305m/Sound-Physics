@@ -33,6 +33,7 @@ public class SoundPhysics
 
 	private static final Pattern rainPattern = Pattern.compile(".*rain.*");
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
+	private static final Pattern uiPattern = Pattern.compile("ui..*");
 	//Private fields
 	private static final String logPrefix = "[SOUND PHYSICS]";
 	private static int auxFXSlot0;
@@ -220,7 +221,7 @@ public class SoundPhysics
 	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ)
 	{
 		if (!ConfigManager.getConfig().enabled) return;
-		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS)
+		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
 			

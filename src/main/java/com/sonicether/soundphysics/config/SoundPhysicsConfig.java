@@ -73,18 +73,18 @@ public class SoundPhysicsConfig implements ConfigData {
             Map<String, Pair<Double, String>> map =
                         SoundPhysicsMod.blockSoundGroups.entrySet().stream()
                         .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new Pair<>(0.5, e.getValue().getRight())));
-            map.getOrDefault("STONE", new Pair<>(1.0, ""));
-            map.getOrDefault("WOOD", new Pair<>(0.4, ""));
-            map.getOrDefault("GRAVEL", new Pair<>(0.3, ""));
-            map.getOrDefault("GRASS", new Pair<>(0.5, ""));
-            map.getOrDefault("METAL", new Pair<>(1.0, ""));
-            map.getOrDefault("GLASS", new Pair<>(0.5, ""));
-            map.getOrDefault("WOOL", new Pair<>(0.05, ""));
-            map.getOrDefault("SAND", new Pair<>(0.2, ""));
-            map.getOrDefault("SNOW", new Pair<>(0.2, ""));
-            map.getOrDefault("LADDER", new Pair<>(0.4, ""));
-            map.getOrDefault("ANVIL", new Pair<>(1.0, ""));
-            map.getOrDefault(".DEFAULT", new Pair<>(0.5, "")); // TODO more
+            map.putIfAbsent("STONE", new Pair<>(1.0, ""));
+            map.putIfAbsent("WOOD", new Pair<>(0.4, ""));
+            map.putIfAbsent("GRAVEL", new Pair<>(0.3, ""));
+            map.putIfAbsent("GRASS", new Pair<>(0.5, ""));
+            map.putIfAbsent("METAL", new Pair<>(1.0, ""));
+            map.putIfAbsent("GLASS", new Pair<>(0.5, ""));
+            map.putIfAbsent("WOOL", new Pair<>(0.05, ""));
+            map.putIfAbsent("SAND", new Pair<>(0.2, ""));
+            map.putIfAbsent("SNOW", new Pair<>(0.2, ""));
+            map.putIfAbsent("LADDER", new Pair<>(0.4, ""));
+            map.putIfAbsent("ANVIL", new Pair<>(1.0, ""));
+            map.putIfAbsent(".DEFAULT", new Pair<>(0.5, "")); // TODO more
             reflectivityMap = map;
         }
     }

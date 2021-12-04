@@ -80,7 +80,7 @@ public enum ConfigPresets {
             entry("field_28697", 0.1), entry("field_22153", 0.6), entry("field_27201", 0.3),
             entry("field_27200", 0.3), entry("field_22154", 0.4), entry("field_28696", 0.1),
             entry("field_27204", 2.3), entry("field_17734", 0.2), entry("field_17579", 0.3),
-            entry("field_28060", 1.8), entry("DEFAULT", 0.6)),
+            entry("field_28060", 1.8), entry(".DEFAULT", 0.6)),
 
             0.3, 10.0, true, true, 1.0, false
 
