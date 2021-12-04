@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -20,6 +21,7 @@ import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -283,8 +285,10 @@ public class SoundPhysics
 				lastBlockPos = rayHit.getBlockPos();
 				//If we hit a block
 
+				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor(1F / 3F * (1F - Math.min(1F, (float) occlusionAccumulation / 12F)), 1F, 1F).getRGB());
 				if (rayHit.getType() == HitResult.Type.MISS) {
 					break;
+
 				}
 
 				final BlockPos blockHitPos = rayHit.getBlockPos();
@@ -406,6 +410,8 @@ public class SoundPhysics
 
 			BlockHitResult rayHit = fixedRaycast(new RaycastContext(soundPos, rayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, soundBlockPos);
 
+			RaycastRenderer.addSoundBounceRay(soundPos, rayHit.getPos(), Formatting.GREEN.getColorValue());
+
 			if (rayHit.getType() == HitResult.Type.BLOCK) {
 				final double rayLength = soundPos.distanceTo(rayHit.getPos());
 				
@@ -433,9 +439,12 @@ public class SoundPhysics
 
 					if (newRayHit.getType() == HitResult.Type.MISS) {
 						totalRayDistance += lastHitPos.distanceTo(playerPos);
+						RaycastRenderer.addSoundBounceRay(newRayStart, newRayEnd, Formatting.RED.getColorValue());
 					} else {
 						final Vec3d newRayHitPos = rayHit.getPos();
 						final double newRayLength = lastHitPos.distanceTo(newRayHitPos);
+
+						RaycastRenderer.addSoundBounceRay(newRayStart, newRayHitPos, Formatting.BLUE.getColorValue());
 
 						bounceReflectivityRatio[j] += blockReflectivity;
 
@@ -456,12 +465,16 @@ public class SoundPhysics
 
 							final BlockHitResult finalRayHit = fixedRaycast(new RaycastContext(finalRayStart, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, null);
 
+							int color = Formatting.GRAY.getColorValue();
+
 							if (finalRayHit.getType() == HitResult.Type.MISS) {
+								color = Formatting.WHITE.getColorValue();
 
 								if (doDirEval) directions.add(Map.entry(finalRayStart.subtract(playerPos), totalRayDistance + finalRayStart.distanceTo(playerPos)));
 								//log("Secondary ray hit the player!");
 								sharedAirspace += 1.0f;
 							}
+							RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
 						}
 					}
 					
