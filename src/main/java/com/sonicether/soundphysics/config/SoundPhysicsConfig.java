@@ -17,7 +17,7 @@ public class SoundPhysicsConfig implements ConfigData {
     @Comment("Enable reverb?")
     public boolean enabled = true;
 
-    @Comment("Don't forget to make this true when you change the config")
+    @Comment("Don't forget to make this true when you change the config!")
     public boolean reloadReverb = true;
 
     @ConfigEntry.Gui.CollapsibleObject
@@ -48,7 +48,6 @@ public class SoundPhysicsConfig implements ConfigData {
         public double globalBlockReflectance = 1.0;
         @Comment("Minecraft won't allow sounds to play past a certain distance. This parameter is a multiplier for how far away a sound source is allowed to be in order for it to actually play. Values too high can cause polyphony issues.\n1.0 - 6.0")
         public double soundDistanceAllowance = 4.0;
-        @Comment("A value controlling the amount that air absorbs high frequencies with distance. A value of 1.0 is physically correct for air with normal humidity and temperature. Higher values mean air will absorb more high frequencies with distance. 0 disables this effect.\n0.0 - 5.0")
         public double airAbsorption = 1.0;
         @Comment("How much sound is filtered when the player is underwater. 0.0 means no filter. 1.0 means fully filtered.\n0.0 - 1.0")
         public double underwaterFilter = 0.8;
@@ -57,9 +56,9 @@ public class SoundPhysicsConfig implements ConfigData {
     public static class Performance{
         @Comment("If true, rain sound sources won't trace for sound occlusion. This can help performance during rain.")
         public boolean skipRainOcclusionTracing = true;
-        @Comment("The number of rays to trace to determine reverberation for each sound source. More rays provides more consistent tracing results but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play.\n8 - 64")
+        @Comment("The number of rays to trace to determine reverberation for each sound source. More rays provides more consistent tracing results but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play.\nRecommended 8 - 512")
         public int environmentEvaluationRays = 256;
-        @Comment("The number of rays bounces to trace to determine reverberation for each sound source. More bounces provides more echo and sound ducting but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play. Capped by max distance.\n4 - ?")
+        @Comment("The number of rays bounces to trace to determine reverberation for each sound source. More bounces provides more echo and sound ducting but takes more time to calculate. Decrease this value if you experience lag spikes when sounds play. Capped by max distance.\nRecommended 4 - 24")
         public int environmentEvaluationRayBounces = 4;
         @Comment("If true, enables a simpler technique for determining when the player and a sound source share airspace. Might sometimes miss recognizing shared airspace, but it's faster to calculate.")
         public boolean simplerSharedAirspaceSimulation = false;
@@ -90,7 +89,7 @@ public class SoundPhysicsConfig implements ConfigData {
     }
 
     public static class Vlads_Tweaks {
-        @Comment("If sound hits non-full-square side, direct block occlusion is multiplied by this.\n0.0 - ")
+        @Comment("If sound hits non-full-square side, direct block occlusion is multiplied by this.\n0.0 - 1.0")
         public double leakyBlocksOcclusionMultiplier = 0.15;
         @Comment("The amount at which this is capped. 10 * block_occlusion is the theoretical limit")
         public double maxDirectOcclusionFromBlocks = 10;
@@ -98,7 +97,7 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean _9RayDirectOcclusion = true;
         @Comment("Whether to try calculating where the sound should come from based on reflections")
         public boolean soundDirectionEvaluation = true;
-        @Comment("Maximum direction variance of incoming reflections allowed to redirect sound\n0.0-1.0")
+        @Comment("Maximum direction variance of incoming reflections allowed to redirect sound\n0.0 - 1.0")
         public double maxDirVariance = 0.5;
         @Comment("Skip redirecting non-occluded sounds (the ones you can see directly)")
         public boolean notOccludedNoRedirect = true;
