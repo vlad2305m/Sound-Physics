@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 public class ConfigManager {
     private static ConfigHolder<SoundPhysicsConfig> holder;
     public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
-        Map<String, Pair<Double, String>> map =
+        Map<String, ReflectivityPair> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new Pair<>(0.5, e.getValue().getRight())));
-        map.putIfAbsent("DEFAULT", new Pair<>(0.5, ""));
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new ReflectivityPair(0.5, e.getValue().getRight())));
+        map.putIfAbsent("DEFAULT", new ReflectivityPair(0.5, ""));
         Material_Properties.reflectivityMap = map;
     }};
 
@@ -27,7 +27,7 @@ public class ConfigManager {
 
         holder = AutoConfig.register(SoundPhysicsConfig.class, JanksonConfigSerializer::new);
         holder.load();
-        if (!(holder.getConfig().Material_Properties.reflectivityMap == null)) {
+        if (holder.getConfig().Material_Properties.reflectivityMap == null) {
             holder.getConfig().preset = ConfigPresets.DrRubisco_Signature;
             holder.getConfig().Material_Properties.reflectivityMap = DEFAULT.Material_Properties.reflectivityMap;
         }

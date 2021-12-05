@@ -1,6 +1,7 @@
 package com.sonicether.soundphysics;
 
 import com.sonicether.soundphysics.config.ConfigManager;
+import com.sonicether.soundphysics.config.ReflectivityPair;
 import com.sonicether.soundphysics.config.ReverbParams;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
@@ -8,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -201,7 +201,7 @@ public class SoundPhysics
 		double reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.get("DEFAULT").getLeft();
 
 		String key = SoundPhysicsMod.blockSoundGroups.get(soundType).getLeft();
-		reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, new Pair<>(reflectivity, "")).getLeft();
+		reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, new ReflectivityPair(reflectivity, "")).getLeft();
 
 		reflectivity *= ConfigManager.getConfig().General.globalBlockReflectance;
 		

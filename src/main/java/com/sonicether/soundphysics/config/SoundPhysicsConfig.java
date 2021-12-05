@@ -1,14 +1,11 @@
 package com.sonicether.soundphysics.config;
 
-import com.sonicether.soundphysics.SoundPhysicsMod;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
-import net.minecraft.util.Pair;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Config(name = "sound_physics")
 @Config.Gui.Background("minecraft:textures/block/note_block.png")
@@ -69,7 +66,7 @@ public class SoundPhysicsConfig implements ConfigData {
     public static class Material_Properties {
         @Comment("Sound reflectivity for blocks.\n0.0 - 1.0")
         @ConfigEntry.Gui.CollapsibleObject
-        public Map<String, Pair<Double, String>> reflectivityMap = null;
+        public Map<String, ReflectivityPair> reflectivityMap = null;
     }
 
     public static class Vlads_Tweaks {
