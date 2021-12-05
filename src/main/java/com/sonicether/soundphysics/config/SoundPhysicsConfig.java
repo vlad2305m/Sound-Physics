@@ -85,7 +85,7 @@ public class SoundPhysicsConfig implements ConfigData {
             map.putIfAbsent("SNOW", new Pair<>(0.2, ""));
             map.putIfAbsent("LADDER", new Pair<>(0.4, ""));
             map.putIfAbsent("ANVIL", new Pair<>(1.0, ""));
-            map.putIfAbsent(".DEFAULT", new Pair<>(0.5, "")); // TODO more
+            map.putIfAbsent("DEFAULT", new Pair<>(0.5, "")); // TODO more
             reflectivityMap = map;
         }
     }

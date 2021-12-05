@@ -198,7 +198,7 @@ public class SoundPhysics
 		BlockState blockState = mc.world.getBlockState(blockPos);
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		
-		double reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.get(".DEFAULT").getLeft();
+		double reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.get("DEFAULT").getLeft();
 
 		String key = SoundPhysicsMod.blockSoundGroups.get(soundType).getLeft();
 		reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, new Pair<>(reflectivity, "")).getLeft();

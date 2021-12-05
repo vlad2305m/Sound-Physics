@@ -53,7 +53,7 @@ public enum ConfigPresets {
             1.0, 0.8, 1.0, 0.8,
             1.0, 3.0, 1.0, 1.0,
 
-            false, 256, 12, false,
+            false, 256, 16, false,
 
             Map.ofEntries(entry("field_11528", 0.5), entry("field_27199", 0.5), entry("field_27198", 0.5),
             entry("field_11529", 1.2), entry("field_27197", 0.5), entry("field_11526", 0.3),
@@ -80,7 +80,7 @@ public enum ConfigPresets {
             entry("field_28697", 0.1), entry("field_22153", 0.6), entry("field_27201", 0.3),
             entry("field_27200", 0.3), entry("field_22154", 0.4), entry("field_28696", 0.1),
             entry("field_27204", 2.3), entry("field_17734", 0.2), entry("field_17579", 0.3),
-            entry("field_28060", 1.8), entry(".DEFAULT", 0.6)),
+            entry("field_28060", 1.8), entry("DEFAULT", 0.6)),
 
             0.5, 10.0, true, true, 0.1, false
 
@@ -89,7 +89,7 @@ public enum ConfigPresets {
 
 
 
-    private final Consumer<SoundPhysicsConfig> configChanger;
+    public final Consumer<SoundPhysicsConfig> configChanger;
     public void setConfig(){ if (configChanger != null) configChanger.accept(ConfigManager.getConfig());}
 
     ConfigPresets(@Nullable Consumer<SoundPhysicsConfig> c) { this.configChanger = c; }

@@ -15,6 +15,10 @@ public class ConfigManager {
         }
 
         holder = AutoConfig.register(SoundPhysicsConfig.class, JanksonConfigSerializer::new);
+        holder.load();
+        if (!holder.getConfig().loaded) holder.getConfig().preset = ConfigPresets.Dr_Rubisco_Signature;
+        holder.getConfig().loaded = true;
+        reload(false);
     }
 
     public static SoundPhysicsConfig getConfig() {
