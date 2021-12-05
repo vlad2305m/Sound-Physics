@@ -1,13 +1,24 @@
 package com.sonicether.soundphysics.config;
 
 import com.sonicether.soundphysics.SoundPhysics;
+import com.sonicether.soundphysics.SoundPhysicsMod;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import net.minecraft.util.Pair;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ConfigManager {
     private static ConfigHolder<SoundPhysicsConfig> holder;
-    public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig();
+    public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
+        Map<String, Pair<Double, String>> map =
+                SoundPhysicsMod.blockSoundGroups.entrySet().stream()
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new Pair<>(0.5, e.getValue().getRight())));
+        map.putIfAbsent("DEFAULT", new Pair<>(0.5, ""));
+        Material_Properties.reflectivityMap = map;
+    }};
 
     public static void registerAutoConfig() {
         if (holder != null) {
@@ -16,8 +27,10 @@ public class ConfigManager {
 
         holder = AutoConfig.register(SoundPhysicsConfig.class, JanksonConfigSerializer::new);
         holder.load();
-        if (!holder.getConfig().loaded) holder.getConfig().preset = ConfigPresets.Dr_Rubisco_Signature;
-        holder.getConfig().loaded = true;
+        if (!(holder.getConfig().Material_Properties.reflectivityMap == null)) {
+            holder.getConfig().preset = ConfigPresets.DrRubisco_Signature;
+            holder.getConfig().Material_Properties.reflectivityMap = DEFAULT.Material_Properties.reflectivityMap;
+        }
         reload(false);
     }
 

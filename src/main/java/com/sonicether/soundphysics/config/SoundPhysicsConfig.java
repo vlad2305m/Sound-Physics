@@ -69,25 +69,7 @@ public class SoundPhysicsConfig implements ConfigData {
     public static class Material_Properties {
         @Comment("Sound reflectivity for blocks.\n0.0 - 1.0")
         @ConfigEntry.Gui.CollapsibleObject
-        public Map<String, Pair<Double, String>> reflectivityMap;
-        {
-            Map<String, Pair<Double, String>> map =
-                        SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new Pair<>(0.5, e.getValue().getRight())));
-            map.putIfAbsent("STONE", new Pair<>(1.0, ""));
-            map.putIfAbsent("WOOD", new Pair<>(0.4, ""));
-            map.putIfAbsent("GRAVEL", new Pair<>(0.3, ""));
-            map.putIfAbsent("GRASS", new Pair<>(0.5, ""));
-            map.putIfAbsent("METAL", new Pair<>(1.0, ""));
-            map.putIfAbsent("GLASS", new Pair<>(0.5, ""));
-            map.putIfAbsent("WOOL", new Pair<>(0.05, ""));
-            map.putIfAbsent("SAND", new Pair<>(0.2, ""));
-            map.putIfAbsent("SNOW", new Pair<>(0.2, ""));
-            map.putIfAbsent("LADDER", new Pair<>(0.4, ""));
-            map.putIfAbsent("ANVIL", new Pair<>(1.0, ""));
-            map.putIfAbsent("DEFAULT", new Pair<>(0.5, "")); // TODO more
-            reflectivityMap = map;
-        }
+        public Map<String, Pair<Double, String>> reflectivityMap = null;
     }
 
     public static class Vlads_Tweaks {
@@ -120,6 +102,5 @@ public class SoundPhysicsConfig implements ConfigData {
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
     @Comment("Soft presets (preserve some settings). Set \"Config has changed\" to true before saving.\nPresets: [DEFAULT, DrRubisco_Signature, SP1_0_SOUND_OCCLUSION]\nLOAD_SUCCESS is used for loading any saved config not defined by a preset.\nRESET_MATERIALS is for reseting material reflectance not changed by a soft config.")
-    public ConfigPresets preset = ConfigPresets.DrRubisco_Signature;
-
+    public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 }
