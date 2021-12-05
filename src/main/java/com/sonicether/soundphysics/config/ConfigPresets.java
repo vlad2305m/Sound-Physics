@@ -48,10 +48,10 @@ public enum ConfigPresets {
 
             null, 10.0, null, null, null, null
     )),
-    Dr_Rubisco_Signature((SoundPhysicsConfig c) -> changeConfig(c, true,
+    DrRubisco_Signature((SoundPhysicsConfig c) -> changeConfig(c, true,
 
-            0.7, 1.1, 1.0, 0.8,
-            1.2, 4.2, 1.1, 1.0,
+            1.0, 0.8, 1.0, 0.8,
+            1.0, 3.0, 1.0, 1.0,
 
             false, 256, 16, false,
 
@@ -82,7 +82,7 @@ public enum ConfigPresets {
             entry("field_27204", 2.3), entry("field_17734", 0.2), entry("field_17579", 0.3),
             entry("field_28060", 1.8), entry("DEFAULT", 0.6)),
 
-            0.3, 10.0, true, true, 0.1, false
+            0.5, 10.0, true, true, 0.1, false
 
     ));
 
