@@ -84,7 +84,7 @@ public class SoundPhysicsConfig implements ConfigData {
             map.putIfAbsent("SNOW", new Pair<>(0.2, ""));
             map.putIfAbsent("LADDER", new Pair<>(0.4, ""));
             map.putIfAbsent("ANVIL", new Pair<>(1.0, ""));
-            map.putIfAbsent(".DEFAULT", new Pair<>(0.5, "")); // TODO more
+            map.putIfAbsent("DEFAULT", new Pair<>(0.5, "")); // TODO more
             reflectivityMap = map;
         }
     }
@@ -118,7 +118,7 @@ public class SoundPhysicsConfig implements ConfigData {
     }
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
-    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION, Thedocrubys_Fine_Tuned]. (LOAD_SUCCESS = null)")
-    public ConfigPresets preset = ConfigPresets.Thedocrubys_Fine_Tuned;
+    @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION, Dr_Rubisco_Signature]. (LOAD_SUCCESS = null)")
+    public ConfigPresets preset = ConfigPresets.Dr_Rubisco_Signature;
 
 }
