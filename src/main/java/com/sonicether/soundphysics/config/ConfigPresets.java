@@ -50,7 +50,7 @@ public enum ConfigPresets {
     )),
     DrRubisco_Signature((SoundPhysicsConfig c) -> changeConfig(c, true,
 
-            1.0, 0.8, 0.8, 1.0,
+            1.0, 0.8, 1.0, 0.8,
             1.0, 3.0, 1.0, 1.0,
 
             false, 256, 12, false,
