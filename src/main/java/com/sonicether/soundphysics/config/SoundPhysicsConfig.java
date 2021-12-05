@@ -119,6 +119,9 @@ public class SoundPhysicsConfig implements ConfigData {
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
     @Comment("Soft presets (preserve some settings). Press reloadReverb to apply. Presets: [DEFAULT, RESET_MATERIALS, SP1_0_SOUND_OCCLUSION, Dr_Rubisco_Signature]. (LOAD_SUCCESS = null)")
-    public ConfigPresets preset = ConfigPresets.Dr_Rubisco_Signature;
+    public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
+
+    @ConfigEntry.Gui.Excluded
+    public boolean loaded = false;
 
 }

@@ -89,7 +89,7 @@ public enum ConfigPresets {
 
 
 
-    private final Consumer<SoundPhysicsConfig> configChanger;
+    public final Consumer<SoundPhysicsConfig> configChanger;
     public void setConfig(){ if (configChanger != null) configChanger.accept(ConfigManager.getConfig());}
 
     ConfigPresets(@Nullable Consumer<SoundPhysicsConfig> c) { this.configChanger = c; }
