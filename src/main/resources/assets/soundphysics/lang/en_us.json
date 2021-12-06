@@ -39,5 +39,10 @@
   "text.autoconfig.sound_physics.option.Misc.performanceLogging": "Performance logging",
   "text.autoconfig.sound_physics.option.Misc.raytraceParticles": "Raytracing Particles",
 
-  "text.autoconfig.sound_physics.option.preset": "Preset"
+  "text.autoconfig.sound_physics.option.preset": "Preset",
+  "text.autoconfig.sound_physics.option.preset.value.DEFAULT": "Default",
+  "text.autoconfig.sound_physics.option.preset.value.LOAD_SUCCESS": "Custom",
+  "text.autoconfig.sound_physics.option.preset.value.RESET_MATERIALS": "Reset Material Properties",
+  "text.autoconfig.sound_physics.option.preset.value.SP1_0_SOUND_OCCLUSION": "Total Occlusion",
+  "text.autoconfig.sound_physics.option.preset.value.THEDOCRUBY": "Dr. Rubisco's Signature Sound"
 }

@@ -98,7 +98,7 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean raytraceParticles = false;
     }
 
-    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
-    @Comment("Soft presets (preserve some settings). Set \"Config has changed\" to true before saving.\nPresets: [DEFAULT, DrRubisco_Signature, SP1_0_SOUND_OCCLUSION]\nLOAD_SUCCESS is used for loading any saved config not defined by a preset.\nRESET_MATERIALS is for reseting material reflectance not changed by a soft config.")
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    @Comment("Soft presets (preserve some settings). Set \"Config has changed\" to true before saving!)
     public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 }
