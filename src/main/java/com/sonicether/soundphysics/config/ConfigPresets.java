@@ -3,15 +3,15 @@ package com.sonicether.soundphysics.config;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import static java.util.Map.entry;
 import java.util.function.Consumer;
+import java.lang.String;
 
 import static com.sonicether.soundphysics.config.ConfigChanger.changeConfig;
-import static java.util.Map.entry;
 
 @SuppressWarnings("unused")
 public enum ConfigPresets {
-    LOAD_SUCCESS(null),
-    DEFAULT((SoundPhysicsConfig c) -> changeConfig(c, true,
+    DEFAULT("Default", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
             1.0, 4.0, 1.0, 0.8,
@@ -24,31 +24,7 @@ public enum ConfigPresets {
 
             0.15, 10.0, true, true, 0.5, true
     )),
-    RESET_MATERIALS((SoundPhysicsConfig c) -> changeConfig(c, true,
-
-            null, null, null, null,
-            null, null, null, null,
-
-            null, null, null, null,
-
-            Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
-            entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
-            entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
-
-            null, null, null,null, null, null
-    )),
-    SP1_0_SOUND_OCCLUSION((SoundPhysicsConfig c) -> changeConfig(c, true,
-
-            null, null, null, 10.0,
-            null, null, null, null,
-
-            null, null, null, null,
-
-            null,
-
-            null, 10.0, null, null, null, null
-    )),
-    DrRubisco_Signature((SoundPhysicsConfig c) -> changeConfig(c, true,
+    THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 0.8, 1.0, 0.8,
             1.0, 3.0, 1.0, 1.0,
@@ -84,15 +60,47 @@ public enum ConfigPresets {
 
             0.5, 10.0, true, true, 0.1, false
 
-    ));
+    )),
+    SP1_0_SOUND_OCCLUSION("Total Occlusion", (SoundPhysicsConfig c) -> changeConfig(c, true,
+
+            null, null, null, 10.0,
+            null, null, null, null,
+
+            null, null, null, null,
+
+            null,
+
+            null, 10.0, null, null, null, null
+    )),
+    RESET_MATERIALS("Reset Material Properties", (SoundPhysicsConfig c) -> changeConfig(c, true,
+
+            null, null, null, null,
+            null, null, null, null,
+
+            null, null, null, null,
+
+            Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
+            entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
+            entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
+
+            null, null, null,null, null, null
+    )),
+    LOAD_SUCCESS("Choose", null);
 
 
 
 
     public final Consumer<SoundPhysicsConfig> configChanger;
+    public final String text;
     public void setConfig(){ if (configChanger != null) configChanger.accept(ConfigManager.getConfig());}
 
-    ConfigPresets(@Nullable Consumer<SoundPhysicsConfig> c) { this.configChanger = c; }
+    ConfigPresets(String text, @Nullable Consumer<SoundPhysicsConfig> c) {
+        this.configChanger = c; 
+        this.text = text;
+    }
 
-
+    @Override
+    public String toString() {
+        return this.text;
+    }
 }
