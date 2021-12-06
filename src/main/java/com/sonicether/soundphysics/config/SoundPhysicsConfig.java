@@ -98,7 +98,7 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean raytraceParticles = false;
     }
 
-    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
     @Comment("Soft presets (preserve some settings). Set \"Config has changed\" to true before saving!")
     public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 }

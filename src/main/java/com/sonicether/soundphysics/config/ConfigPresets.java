@@ -85,7 +85,7 @@ public enum ConfigPresets {
 
             null, null, null,null, null, null
     )),
-    LOAD_SUCCESS("Custom", null);
+    LOAD_SUCCESS("Choose", null);
 
 
 
