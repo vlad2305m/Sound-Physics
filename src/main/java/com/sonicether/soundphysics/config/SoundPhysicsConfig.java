@@ -99,6 +99,6 @@ public class SoundPhysicsConfig implements ConfigData {
     }
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
-    @Comment("Soft presets (preserve some settings). Set \"Config has changed\" to true before saving!)
+    @Comment("Soft presets (preserve some settings). Set \"Config has changed\" to true before saving!")
     public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
 }

@@ -9,11 +9,9 @@ import java.lang.String;
 
 import static com.sonicether.soundphysics.config.ConfigChanger.changeConfig;
 
-import net.minecraft.network.chat.TranslatableComponent;
-
 @SuppressWarnings("unused")
 public enum ConfigPresets {
-    DEFAULT("DEFAULT", (SoundPhysicsConfig c) -> changeConfig(c, true,
+    DEFAULT("Default", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
             1.0, 4.0, 1.0, 0.8,
@@ -26,7 +24,7 @@ public enum ConfigPresets {
 
             0.15, 10.0, true, true, 0.5, true
     )),
-    THEDOCRUBY("THEDOCRUBY", (SoundPhysicsConfig c) -> changeConfig(c, true,
+    THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 0.8, 1.0, 0.8,
             1.0, 3.0, 1.0, 1.0,
@@ -63,7 +61,7 @@ public enum ConfigPresets {
             0.5, 10.0, true, true, 0.1, false
 
     )),
-    SP1_0_SOUND_OCCLUSION("SP1_0_SOUND_OCCLUSION", (SoundPhysicsConfig c) -> changeConfig(c, true,
+    SP1_0_SOUND_OCCLUSION("Total Occlusion", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             null, null, null, 10.0,
             null, null, null, null,
@@ -74,7 +72,7 @@ public enum ConfigPresets {
 
             null, 10.0, null, null, null, null
     )),
-    RESET_MATERIALS("RESET_MATERIALS", (SoundPhysicsConfig c) -> changeConfig(c, true,
+    RESET_MATERIALS("Reset Material Properties", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             null, null, null, null,
             null, null, null, null,
@@ -87,22 +85,22 @@ public enum ConfigPresets {
 
             null, null, null,null, null, null
     )),
-    LOAD_SUCCESS("LOAD_SUCCESS", null);
+    LOAD_SUCCESS("Custom", null);
 
 
 
 
     public final Consumer<SoundPhysicsConfig> configChanger;
-    public TranslatableComponent component;
+    public final String text;
     public void setConfig(){ if (configChanger != null) configChanger.accept(ConfigManager.getConfig());}
 
-    ConfigPresets(String value, @Nullable Consumer<SoundPhysicsConfig> c) { 
+    ConfigPresets(String text, @Nullable Consumer<SoundPhysicsConfig> c) {
         this.configChanger = c; 
-        this.component = new TranslatableComponent("text.autoconfig.sound_physics.option.preset.value." + value);
+        this.text = text;
     }
 
     @Override
     public String toString() {
-        return this.component.toString();
+        return this.text;
     }
 }
