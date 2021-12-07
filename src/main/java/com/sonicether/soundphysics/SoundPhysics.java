@@ -5,6 +5,7 @@ import com.sonicether.soundphysics.config.ReflectivityPair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
@@ -12,6 +13,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 
 import java.awt.*;
 import java.util.List;
@@ -151,6 +153,8 @@ public class SoundPhysics
 
 		logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
 		double occlusionAccumulation = 0.0f;
+		boolean doDirEval = ConfigManager.getConfig().Vlads_Tweaks.soundDirectionEvaluation;
+		final List<Map.Entry<Vec3d, Double>> directions = new Vector<>(10, 10);
 		//Cast a ray from the source towards the player
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
@@ -174,7 +178,10 @@ public class SoundPhysics
 				//If we hit a block
 
 				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor(1F / 3F * (1F - Math.min(1F, (float) occlusionAccumulation / 12F)), 1F, 1F).getRGB());
-				if (rayHit.getType() == HitResult.Type.MISS) break;
+				if (rayHit.getType() == HitResult.Type.MISS) {
+					if (doDirEval) directions.add(Map.entry(rayOrigin.subtract(playerPos),  (_9ray?9.0:1.0)*Math.pow(soundPos.distanceTo(playerPos) ,2)/(Math.exp(-occlusionAccumulation * absorptionCoeff)*ConfigManager.getConfig().Vlads_Tweaks.directRaysDirEvalMultiplier)));
+					break;
+				}
 
 				final BlockPos blockHitPos = rayHit.getBlockPos();
 				final Vec3d rayHitPos = rayHit.getPos();
@@ -232,8 +239,7 @@ public class SoundPhysics
 		final int numRays = ConfigManager.getConfig().Performance.environmentEvaluationRays;
 		final int rayBounces = ConfigManager.getConfig().Performance.environmentEvaluationRayBounces;
 
-		final List<Map.Entry<Vec3d, Double>> directions = new Vector<>(10, 10);
-		final boolean doDirEval = ConfigManager.getConfig().Vlads_Tweaks.soundDirectionEvaluation &&
+		doDirEval = ConfigManager.getConfig().Vlads_Tweaks.soundDirectionEvaluation &&
 				(occlusionAccumulation > 0 || !ConfigManager.getConfig().Vlads_Tweaks.notOccludedNoRedirect);
 
 		final float[] bounceReflectivityRatio = new float[rayBounces];
@@ -412,6 +418,8 @@ public class SoundPhysics
 			//System.out.println(sum+"  "+sum.lengthSquared());
 			if (sum.lengthSquared() >= 1-ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
+			//Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos);//TODO this shows a star at perceived sound pos
+			//((World)mc.world).addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0);
 		}
 
 		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, bounceReflectivityRatio, δsendGain);

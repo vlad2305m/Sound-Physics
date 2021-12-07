@@ -44,7 +44,7 @@ public class ConfigChanger {
     }
 
     public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect) {
-        if (leakyBlocksOcclusionMultiplier != null) vlads_tweaks.leakyBlocksOcclusionMultiplier = leakyBlocksOcclusionMultiplier;
+        if (leakyBlocksOcclusionMultiplier != null) vlads_tweaks.directRaysDirEvalMultiplier = leakyBlocksOcclusionMultiplier;
         if (maxDirectOcclusionFromBlocks != null) vlads_tweaks.maxDirectOcclusionFromBlocks = maxDirectOcclusionFromBlocks;
         if (_9RayDirectOcclusion != null) vlads_tweaks._9RayDirectOcclusion = _9RayDirectOcclusion;
         if (soundDirectionEvaluation != null) vlads_tweaks.soundDirectionEvaluation = soundDirectionEvaluation;

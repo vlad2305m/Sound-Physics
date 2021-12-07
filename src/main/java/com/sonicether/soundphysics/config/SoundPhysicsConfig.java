@@ -72,7 +72,7 @@ public class SoundPhysicsConfig implements ConfigData {
 
     public static class Vlads_Tweaks {
         @Comment("If sound hits non-full-square side, direct block occlusion is multiplied by this.\n0.0 - 1.0")
-        public double leakyBlocksOcclusionMultiplier = 0.15;
+        public double directRaysDirEvalMultiplier = 5.0e9;
         @Comment("The amount at which this is capped. 10 * block_occlusion is the theoretical limit")
         public double maxDirectOcclusionFromBlocks = 10;
         @Comment("Calculate direct occlusion as the minimum of 9 rays from vertices of a block")
