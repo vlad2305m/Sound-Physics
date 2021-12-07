@@ -28,7 +28,7 @@ public class EntityMixin {
     {
         if (stepPattern.matcher(sound.getId().getPath()).matches())
         {
-            return 0.0;
+            return 0.01;
         }
         return standingEyeHeight;
     }

@@ -1,11 +1,9 @@
 package com.sonicether.soundphysics;
 
-import com.google.common.collect.Maps;
 import com.sonicether.soundphysics.config.ConfigManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;

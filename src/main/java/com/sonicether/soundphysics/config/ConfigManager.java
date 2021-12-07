@@ -1,11 +1,10 @@
 package com.sonicether.soundphysics.config;
 
-import com.sonicether.soundphysics.SoundPhysics;
+import com.sonicether.soundphysics.SPEfx;
 import com.sonicether.soundphysics.SoundPhysicsMod;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
-import net.minecraft.util.Pair;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,7 +48,7 @@ public class ConfigManager {
 
         if(load) holder.load();
         holder.getConfig().preset.setConfig();
-        SoundPhysics.syncReverbParams();
+        SPEfx.syncReverbParams();
         holder.save();
     }
 
