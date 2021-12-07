@@ -81,7 +81,7 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean soundDirectionEvaluation = true;
         @Comment("Randomness of the perceived direction of incoming sounds\n0.0 means sounds come straight from the source.\n1.0 means sounds come from completely random directions\n0.0 - 1.0")
         public double maxDirVariance = 0.0;
-        @Comment("Skip redirecting non-occluded sounds (the ones you can see directly).\nCan be inaccurate in some situations, especially when \"Sound direction reevaluation\" is enabled.")
+        @Comment("Skip redirecting non-occluded sounds (the ones you can see directly).\nCan be inaccurate in some situations, especially when \"Re-calculate sound direction\" is enabled.")
         public boolean notOccludedNoRedirect = false;
     }
 
