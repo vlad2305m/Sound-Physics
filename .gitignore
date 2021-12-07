@@ -1,4 +1,3 @@
-
 build/tmp/sourcesJar/MANIFEST.MF
 build/tmp/remapJar/MANIFEST.MF
 build/tmp/jar/MANIFEST.MF
@@ -40,6 +39,7 @@ build/classes/java/main/com/sonicether/soundphysics/config/ConfigChanger.class
 .idea/workspace.xml
 .idea/runConfigurations/Minecraft_Server.xml
 .idea/runConfigurations/Minecraft_Client.xml
+.idea/vcs.xml
 .idea/misc.xml
 .idea/jarRepositories.xml
 .idea/gradle.xml
