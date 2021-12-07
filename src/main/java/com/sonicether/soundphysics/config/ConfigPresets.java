@@ -11,23 +11,50 @@ import static com.sonicether.soundphysics.config.ConfigChanger.changeConfig;
 
 @SuppressWarnings("unused")
 public enum ConfigPresets {
-    DEFAULT("Default", (SoundPhysicsConfig c) -> changeConfig(c, true,
+    LOAD_SUCCESS("Choose", null),
+    DEFAULT_BALANCED("Balanced (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
             1.0, 4.0, 1.0, 0.8,
 
-            true, 256, 4, false,
+            true, 224, 12, false,
 
             Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
             entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
             entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
 
-            0.15, 10.0, true, true, 0.5, true
+            0.25, 10.0, true, true, 0.0, false
+    )),
+    DEFAULT_PERFORMANCE("Performance (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
+
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 4.0, 1.0, 0.8,
+
+            true, 96, 6, true,
+
+            Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
+                    entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
+                    entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
+
+            0.25, 10.0, true, true, 0.0, true
+    )),
+    DEFAULT_QUALITY("Quality (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
+
+            1.0, 1.0, 1.0, 1.0,
+            1.0, 4.0, 1.0, 0.8,
+
+            false, 512, 24, false,
+
+            Map.ofEntries(entry(".DEFAULT", 0.5), entry("STONE", 1.0), entry("WOOD", 0.4), entry("GRAVEL", 0.3),
+                    entry("GRASS", 0.5), entry("METAL", 1.0), entry("GLASS", 0.5), entry("WOOL", 0.05),
+                    entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
+
+            0.25, 10.0, true, true, 0.0, false
     )),
     THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 0.8, 1.0, 0.8,
-            1.0, 3.0, 1.0, 1.0,
+            1.0, 3.0, 1.0, 0.8,
 
             false, 256, 16, false,
 
@@ -58,10 +85,61 @@ public enum ConfigPresets {
             entry("field_27204", 2.3), entry("field_17734", 0.2), entry("field_17579", 0.3),
             entry("field_28060", 1.8), entry("DEFAULT", 0.6)),
 
-            0.5, 10.0, true, true, 0.1, false
+            0.25, 10.0, true, true, 0.1, false
 
     )),
-    SP1_0_SOUND_OCCLUSION("Total Occlusion", (SoundPhysicsConfig c) -> changeConfig(c, true,
+    SUPER_REVERB("Super Reverb", (SoundPhysicsConfig c) -> changeConfig(c, true,
+            null, 1.8, null, null,
+            2.0, null, null, null,
+
+            null, null, null, null,
+
+            null,
+
+            null, null, null, null, null, null
+
+    )),
+    NO_ABSORPTION("No Absorption", (SoundPhysicsConfig c) -> changeConfig(c, true,
+            null, null, null, 0.0,
+            null, null, 0.0, null,
+
+            null, null, null, null,
+
+            null,
+
+            0.0, 0.0, null, null, null, null
+    )),
+    LOW_FREQ("Bass Boost", (SoundPhysicsConfig c) -> changeConfig(c, true,
+            null, null, 0.2, null,
+            null, null, 2.0, null,
+
+            null, null, null, null,
+
+            null,
+
+            null, null, null, null, null, null
+    )),
+    HIGH_FREQ("Treble Boost", (SoundPhysicsConfig c) -> changeConfig(c, true,
+            null, null, 1.8, null,
+            null, null, 0.5, null,
+
+            null, null, null, null,
+
+            null,
+
+            null, null, null, null, null, null
+    )),
+    FOG("Foggy Air", (SoundPhysicsConfig c) -> changeConfig(c, true,
+            2.5, null, null, null,
+            null, null, 25.0, null,
+
+            null, null, null, null,
+
+            null,
+
+            null, null, null, null, null, null
+    )),
+    TOTAL_OCCLUSION("Total Occlusion", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             null, null, null, 10.0,
             null, null, null, null,
@@ -84,8 +162,7 @@ public enum ConfigPresets {
             entry("SAND", 0.2), entry("SNOW", 0.2), entry("LADDER", 0.4), entry("ANVIL", 1.0)),
 
             null, null, null,null, null, null
-    )),
-    LOAD_SUCCESS("Choose", null);
+    ));
 
 
 
