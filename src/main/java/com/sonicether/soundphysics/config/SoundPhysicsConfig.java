@@ -58,11 +58,11 @@ public class SoundPhysicsConfig implements ConfigData {
         @Comment("If true, rain sound sources won't trace for sound occlusion.\nThis can help performance during rain.")
         public boolean skipRainOcclusionTracing = true;
         @Comment("The number of rays to trace to determine reverberation for each sound source.\nMore rays provides more consistent tracing results but takes more time to calculate.\nDecrease this value if you experience lag spikes when sounds play.")
-        @ConfigEntry.BoundedDiscrete(max = 512, min = 8)
-        public int environmentEvaluationRays = 256;
+        @ConfigEntry.BoundedDiscrete(max = 768, min = 8)
+        public int environmentEvaluationRays = 224;
         @Comment("The number of rays bounces to trace to determine reverberation for each sound source.\nMore bounces provides more echo and sound ducting but takes more time to calculate.\nDecrease this value if you experience lag spikes when sounds play. Capped by max distance.")
         @ConfigEntry.BoundedDiscrete(max = 32, min = 2)
-        public int environmentEvaluationRayBounces = 4;
+        public int environmentEvaluationRayBounces = 12;
         @Comment("If true, enables a simpler technique for determining when the player and a sound source share airspace.\nMight sometimes miss recognizing shared airspace, but it's faster to calculate.")
         public boolean simplerSharedAirspaceSimulation = false;
     }
@@ -78,14 +78,14 @@ public class SoundPhysicsConfig implements ConfigData {
     }
 
     public static class Vlads_Tweaks {
-        @Comment("If sound hits non-full-square side, direct block occlusion is multiplied by this.\n0.0 - 1.0")
-        public double directRaysDirEvalMultiplier = 0.001;
         @Comment("The amount at which this is capped. 10 * block_occlusion is the theoretical limit")
         public double maxDirectOcclusionFromBlocks = 10;
         @Comment("Calculate direct occlusion as the minimum of 9 rays from vertices of a block")
         public boolean _9RayDirectOcclusion = true;
         @Comment("Whether to try calculating where the sound should come from based on reflections")
         public boolean soundDirectionEvaluation = true;
+        @Comment("How much the sound direction depends on reflected sounds.\nRequires \"Re-calculate sound direction\" to be enabled.\n0.0 is no reflected sources, 1.0 is 100% reflected sources.\n0.5 is approximately physically accurate.")
+        public double directRaysDirEvalMultiplier = 0.5;
         @Comment("Randomness of the perceived direction of incoming sounds\n0.0 means sounds come straight from the source.\n1.0 means sounds come from completely random directions\n0.0 - 1.0")
         public double maxDirVariance = 0.0;
         @Comment("Skip redirecting non-occluded sounds (the ones you can see directly).\nCan be inaccurate in some situations, especially when \"Re-calculate sound direction\" is enabled.")
@@ -107,5 +107,5 @@ public class SoundPhysicsConfig implements ConfigData {
 
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
     @Comment("Soft presets. Some of these can be applied one after another to stack effects onto a base profile.\nSet \"Config has changed\" to true before saving!")
-    public ConfigPresets preset = ConfigPresets.LOAD_SUCCESS;
+    public ConfigPresets preset = ConfigPresets.THEDOCRUBY;
 }

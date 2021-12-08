@@ -9,14 +9,14 @@ public class ConfigChanger {
         @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
         @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Integer environmentEvaluationRayBounces, @Nullable Boolean simplerSharedAirspaceSimulation,
         @Nullable Map<String, MaterialData> reflectivityMap,
-        @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect
+        @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double directRaysDirEvalMultiplier, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect
     ) {
         if (enabled != null) config.enabled = enabled;
         config.reloadReverb = true;
         setGeneral(config.General, attenuationFactor, globalReverbGain, globalReverbBrightness, globalBlockAbsorption, globalBlockReflectance, soundDistanceAllowance, airAbsorption, underwaterFilter);
         setPerformance(config.Performance, skipRainOcclusionTracing, environmentEvaluationRays, environmentEvaluationRayBounces, simplerSharedAirspaceSimulation);
         setMaterial_Properties(config.Material_Properties, reflectivityMap);
-        setVlads_Tweaks(config.Vlads_Tweaks, leakyBlocksOcclusionMultiplier, maxDirectOcclusionFromBlocks, _9RayDirectOcclusion, soundDirectionEvaluation, maxDirVariance, notOccludedNoRedirect);
+        setVlads_Tweaks(config.Vlads_Tweaks, maxDirectOcclusionFromBlocks, _9RayDirectOcclusion, soundDirectionEvaluation, directRaysDirEvalMultiplier, maxDirVariance, notOccludedNoRedirect);
         config.preset = ConfigPresets.LOAD_SUCCESS;
         ConfigManager.save();
     }
@@ -49,11 +49,11 @@ public class ConfigChanger {
                         newData.getAbsorption() == -1 ? v.getAbsorption() : newData.getAbsorption(), v.getExample())));
     }
 
-    public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect) {
-        if (leakyBlocksOcclusionMultiplier != null) vlads_tweaks.directRaysDirEvalMultiplier = leakyBlocksOcclusionMultiplier;
+    public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double directRaysDirEvalMultiplier, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect) {
         if (maxDirectOcclusionFromBlocks != null) vlads_tweaks.maxDirectOcclusionFromBlocks = maxDirectOcclusionFromBlocks;
         if (_9RayDirectOcclusion != null) vlads_tweaks._9RayDirectOcclusion = _9RayDirectOcclusion;
         if (soundDirectionEvaluation != null) vlads_tweaks.soundDirectionEvaluation = soundDirectionEvaluation;
+        if (directRaysDirEvalMultiplier != null) vlads_tweaks.directRaysDirEvalMultiplier = directRaysDirEvalMultiplier;
         if (maxDirVariance != null) vlads_tweaks.maxDirVariance = maxDirVariance;
         if (notOccludedNoRedirect != null) vlads_tweaks.notOccludedNoRedirect = notOccludedNoRedirect;
     }
