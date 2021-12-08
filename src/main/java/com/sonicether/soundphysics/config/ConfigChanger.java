@@ -8,7 +8,7 @@ public class ConfigChanger {
     public static void changeConfig(SoundPhysicsConfig config, @Nullable Boolean enabled,
         @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
         @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Integer environmentEvaluationRayBounces, @Nullable Boolean simplerSharedAirspaceSimulation,
-        @Nullable Map<String, Double> reflectivityMap,
+        @Nullable Map<String, MaterialData> reflectivityMap,
         @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect
     ) {
         if (enabled != null) config.enabled = enabled;
@@ -39,8 +39,14 @@ public class ConfigChanger {
         if (simplerSharedAirspaceSimulation != null) performance.simplerSharedAirspaceSimulation = simplerSharedAirspaceSimulation;
     }
 
-    public static void setMaterial_Properties(SoundPhysicsConfig.Material_Properties material_properties, @Nullable Map<String, Double> reflectivityMap) {
-        if (reflectivityMap != null) reflectivityMap.forEach((s, d) -> material_properties.reflectivityMap.compute(s, (k, v) -> (v == null) ? new ReflectivityPair(d, "error") : new ReflectivityPair(d, v.getRight())));
+    public static void setMaterial_Properties(SoundPhysicsConfig.Material_Properties material_properties, @Nullable Map<String, MaterialData> reflectivityMap) {
+        if (reflectivityMap != null) reflectivityMap.forEach((s, newData) -> material_properties.reflectivityMap.compute(s, (k, v) -> (v == null) ?
+                new MaterialData(
+                        newData.getReflectivity() == -1 ? 0.6 : newData.getReflectivity(),
+                        newData.getAbsorption() == -1 ? 1 : newData.getAbsorption(), "error")
+              : new MaterialData(
+                        newData.getReflectivity() == -1 ? v.getReflectivity() : newData.getReflectivity(),
+                        newData.getAbsorption() == -1 ? v.getAbsorption() : newData.getAbsorption(), v.getExample())));
     }
 
     public static void setVlads_Tweaks(SoundPhysicsConfig.Vlads_Tweaks vlads_tweaks, @Nullable Double leakyBlocksOcclusionMultiplier, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect) {

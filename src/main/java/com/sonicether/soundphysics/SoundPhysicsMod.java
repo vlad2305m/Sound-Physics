@@ -11,6 +11,13 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/*
+    Notes for developers:
+    !!!Import settings.zip to your IDEA!!! - important notices are marked like that
+    ψ This is for anchors that you'd like to jump to from the scroll bar ψ
+    //rm is for temporal test code like "System.out.println(var) //rm" (actually */  //rm)
+
+
 public class SoundPhysicsMod implements ModInitializer {
     public static Map<BlockSoundGroup, Pair<String, String>> blockSoundGroups;
     @Override

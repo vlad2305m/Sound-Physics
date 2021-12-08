@@ -33,7 +33,7 @@ public class RaycastFix {
 
         final Vec3d start = context.getStart();
         final Vec3d end = context.getEnd();
-        return raycast(context.getStart(), context.getEnd(), context, (pos) -> {
+        return raycast(context.getStart(), context.getEnd(), (pos) -> {
             //SoundPhysics.t1();
             //===============================================
             if (new BlockPos(pos).equals(ignore)) return null;
@@ -71,7 +71,7 @@ public class RaycastFix {
 
     }
 
-    static BlockHitResult raycast(Vec3d start, Vec3d end, RaycastContext context, Function<BlockPos, BlockHitResult> blockHitFactory, Supplier<BlockHitResult> missFactory) {
+    static BlockHitResult raycast(Vec3d start, Vec3d end, Function<BlockPos, BlockHitResult> blockHitFactory, Supplier<BlockHitResult> missFactory) {
         if (start.equals(end)) {
             return missFactory.get();
         } else {

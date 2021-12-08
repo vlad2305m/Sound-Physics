@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 public class ConfigManager {
     private static ConfigHolder<SoundPhysicsConfig> holder;
     public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
-        Map<String, ReflectivityPair> map =
+        Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new ReflectivityPair(0.5, e.getValue().getRight())));
-        map.putIfAbsent("DEFAULT", new ReflectivityPair(0.5, ""));
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(0.5, 1, e.getValue().getRight())));
+        map.putIfAbsent("DEFAULT", new MaterialData(0.5, 1, ""));
         Material_Properties.reflectivityMap = map;
     }};
 
