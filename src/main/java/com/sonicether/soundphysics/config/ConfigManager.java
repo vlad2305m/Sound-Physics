@@ -59,4 +59,10 @@ public class ConfigManager {
 
         holder.save();
     }
+
+    public static void handleBrokenMaterials(){
+        SoundPhysicsConfig fallback = new SoundPhysicsConfig();
+        ConfigPresets.THEDOCRUBY.configChanger.accept(fallback);
+        getConfig().Material_Properties.reflectivityMap = fallback.Material_Properties.reflectivityMap;
+    }
 }

@@ -94,6 +94,10 @@ public class SoundPhysics
 		assert mc.world != null;
 		BlockState blockState = mc.world.getBlockState(blockPos);
 		BlockSoundGroup soundType = blockState.getSoundGroup();
+
+		if (!ConfigManager.getConfig().Material_Properties.reflectivityMap.containsKey("DEFAULT")) {
+			ConfigManager.handleBrokenMaterials();
+		}
 		
 		double reflectivity = ConfigManager.getConfig().Material_Properties.reflectivityMap.get("DEFAULT").getLeft();
 
@@ -438,6 +442,7 @@ public class SoundPhysics
 		float sendCutoff2 = 1.0f;
 		float sendCutoff3 = 1.0f;
 
+		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
 		{
 			directCutoff *= 1.0f - ConfigManager.getConfig().General.underwaterFilter;
