@@ -5,7 +5,7 @@ import com.sonicether.soundphysics.config.MaterialData;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-//import net.minecraft.particle.ParticleTypes;
+// import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
@@ -187,7 +187,7 @@ public class SoundPhysics
 
 				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor(1F / 3F * (1F - Math.min(1F, (float) occlusionAccumulation / 12F)), 1F, 1F).getRGB());
 				if (rayHit.getType() == HitResult.Type.MISS) {
-					if (doDirEval) directions.add(Map.entry(rayOrigin.subtract(playerPos),  (_9ray?9.0:1.0)*Math.pow(soundPos.distanceTo(playerPos) ,2)/(Math.exp(-occlusionAccumulation * absorptionCoeff)*ConfigManager.getConfig().Vlads_Tweaks.directRaysDirEvalMultiplier)*rcpTotalRays));
+					if (doDirEval) directions.add(Map.entry(rayOrigin.subtract(playerPos),  (_9ray?9.0:1.0)*Math.pow(soundPos.distanceTo(playerPos) ,2)/(Math.exp(-occlusionAccumulation * absorptionCoeff)*Math.pow(ConfigManager.getConfig().Vlads_Tweaks.directRaysDirEvalMultiplier, 10.66))*rcpTotalRays));
 					break;
 				}
 
@@ -407,8 +407,8 @@ public class SoundPhysics
 			if (sum.lengthSquared() >= 1-ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 			// ψ this shows a star at perceived sound pos ψ
-			Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos); //rm
-			mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0); //rm
+			// Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos);
+			// mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0);
 		}
 
 		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, bounceReflectivityRatio, δsendGain);
