@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 /*
     Notes for developers:
-    !!!Import settings.zip to your IDEA!!! - important notices are marked like that
+    !!! Import settings.zip to your IDEA !!! - important notices are marked like that
     ψ This is for anchors that you'd like to jump to from the scroll bar ψ
-    //rm is for temporal test code like "System.out.println(var) //rm" (actually */  //rm)
+    //rm is for temporary test code like "System.out.println(var) //rm" (actually */  //rm)
 
 
 public class SoundPhysicsMod implements ModInitializer {

@@ -407,8 +407,8 @@ public class SoundPhysics
 			if (sum.lengthSquared() >= 1-ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 			// ψ this shows a star at perceived sound pos ψ
-			//Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos);
-			//mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0);
+			Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos); //rm
+			mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0); //rm
 		}
 
 		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, bounceReflectivityRatio, δsendGain);
