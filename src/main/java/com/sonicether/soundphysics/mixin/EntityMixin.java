@@ -10,12 +10,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import java.util.regex.Pattern;
+import static com.sonicether.soundphysics.SoundPhysics.stepPattern;
 
 @Mixin(Entity.class)
 public class EntityMixin {
 
-    @Shadow
+    @Shadow @SuppressWarnings("SameReturnValue")
     public float getStandingEyeHeight(){return 0.0f;}
 
     @ModifyArg(method = "playSound", at = @At(value = "INVOKE", target = "net/minecraft/world/World.playSound (Lnet/minecraft/entity/player/PlayerEntity;DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"), index = 2)
@@ -23,12 +23,12 @@ public class EntityMixin {
         return y + calculateEntitySoundOffset(getStandingEyeHeight(),sound);
     }
 
-    private static final Pattern stepPattern = Pattern.compile(".*step.*");
+
     private static double calculateEntitySoundOffset(float standingEyeHeight, SoundEvent sound)
     {
         if (stepPattern.matcher(sound.getId().getPath()).matches())
         {
-            return 0.0;
+            return 0.01;
         }
         return standingEyeHeight;
     }

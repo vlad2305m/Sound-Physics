@@ -1,5 +1,6 @@
 package com.sonicether.soundphysics.mixin;
 
+import com.sonicether.soundphysics.SPLog;
 import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.SoundPhysics;
 import net.minecraft.client.sound.Source;
@@ -30,8 +31,9 @@ public class SourceMixin {
     @Inject(method = "play", at = @At("HEAD"))
     private void OnPlaySoundInjector(CallbackInfo ci) {
         SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer);
-        SoundPhysics.checkErrorLog("onplayinjector");
+        SPLog.checkErrorLog("onplayinjector");
     }
+
     @ModifyArg(method = "setAttenuation", at = @At(value = "INVOKE", target = "org/lwjgl/openal/AL10.alSourcef (IIF)V", ordinal = 0, remap = false), index = 2)
     private float AttenuationHijack(int pointer2, int param_id, float attenuation) {
         if (param_id != 4131) throw new IllegalArgumentException("Tried modifying wrong field. No attenuation here.");

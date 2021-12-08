@@ -1,11 +1,10 @@
 package com.sonicether.soundphysics.config;
 
-import com.sonicether.soundphysics.SoundPhysics;
+import com.sonicether.soundphysics.SPEfx;
 import com.sonicether.soundphysics.SoundPhysicsMod;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
-import net.minecraft.util.Pair;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,10 +12,10 @@ import java.util.stream.Collectors;
 public class ConfigManager {
     private static ConfigHolder<SoundPhysicsConfig> holder;
     public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
-        Map<String, ReflectivityPair> map =
+        Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new ReflectivityPair(0.5, e.getValue().getRight())));
-        map.putIfAbsent("DEFAULT", new ReflectivityPair(0.5, ""));
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(0.5, 1, e.getValue().getRight())));
+        map.putIfAbsent("DEFAULT", new MaterialData(0.5, 1, ""));
         Material_Properties.reflectivityMap = map;
     }};
 
@@ -49,7 +48,7 @@ public class ConfigManager {
 
         if(load) holder.load();
         holder.getConfig().preset.setConfig();
-        SoundPhysics.syncReverbParams();
+        SPEfx.syncReverbParams();
         holder.save();
     }
 
@@ -59,5 +58,11 @@ public class ConfigManager {
         }
 
         holder.save();
+    }
+
+    public static void handleBrokenMaterials(){
+        SoundPhysicsConfig fallback = new SoundPhysicsConfig();
+        ConfigPresets.THEDOCRUBY.configChanger.accept(fallback);
+        getConfig().Material_Properties.reflectivityMap = fallback.Material_Properties.reflectivityMap;
     }
 }
