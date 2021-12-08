@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import static com.sonicether.soundphysics.RaycastFix.fixedRaycast;
 import static com.sonicether.soundphysics.SPLog.*;
 import static com.sonicether.soundphysics.SPEfx.*;
-
+import static java.util.Map.entry;
 
 @SuppressWarnings({"NonAsciiCharacters", "CommentedOutCode"})
 public class SoundPhysics
@@ -33,6 +33,9 @@ public class SoundPhysics
 	public static final Pattern stepPattern = Pattern.compile(".*step.*");
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	private static final Pattern uiPattern = Pattern.compile("ui..*");
+	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = Map.ofEntries( // !!!1 becomes 2!!! //rm
+			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK)
+	);
 	//Private fields
 	// ψ time ψ
 	//public static double tt = 0;
@@ -94,15 +97,20 @@ public class SoundPhysics
 	{
 		assert mc.world != null;
 		BlockState blockState = mc.world.getBlockState(blockPos);
+		String blockName = blockState.getBlock().getTranslationKey();
+		List<String> wl = ConfigManager.getConfig().Material_Properties.blockWhiteList;
+		String key;
+
 		BlockSoundGroup soundType = blockState.getSoundGroup();
+		soundType = redirectMap.getOrDefault(soundType, soundType);
 
 		if (!ConfigManager.getConfig().Material_Properties.reflectivityMap.containsKey("DEFAULT")) {
 			ConfigManager.handleBrokenMaterials();
 		}
 		
 		MaterialData materialData = ConfigManager.getConfig().Material_Properties.reflectivityMap.get("DEFAULT");
-
-		String key = SoundPhysicsMod.blockSoundGroups.get(soundType).getLeft();
+		if (wl != null && wl.contains(blockName)) key = blockName;
+		else key = SoundPhysicsMod.blockSoundGroups.get(soundType).getLeft();
 		materialData = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, materialData);
 		
 		return materialData;

@@ -134,7 +134,7 @@ public enum ConfigPresets {
                     entry("field_27201", new MaterialData(0.09999999999999999, -1)),    //large_amethyst_bud
                     entry("field_27200", new MaterialData(0.09999999999999999, -1)),    //medium_amethyst_bud
                     entry("field_22154", new MaterialData(0.13333333333333333, -1)),    //fungus
-                    entry("field_28696", new MaterialData(0.03333333333333333, -1)),    //moss_carpet
+                    //entry("field_28696", new MaterialData(0.03333333333333333, -1)),    //moss_carpet
                     entry("field_27204", new MaterialData(0.7666666666666666, -1)),    //copper
                     entry("field_17734", new MaterialData(0.06666666666666667, -1)),    //lantern
                     entry("field_17579", new MaterialData(0.09999999999999999, -1)),    //sweet_berry_bush

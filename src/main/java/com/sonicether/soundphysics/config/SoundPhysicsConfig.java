@@ -5,6 +5,8 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("CanBeFinal")
@@ -69,6 +71,10 @@ public class SoundPhysicsConfig implements ConfigData {
         @Comment("Sound reflectivity for blocks.\n0.0 - 1.0")
         @ConfigEntry.Gui.CollapsibleObject
         public Map<String, MaterialData> reflectivityMap = null;
+
+        @Comment("Like block.minecraft.stone")
+        @ConfigEntry.Gui.CollapsibleObject
+        public List<String> blockWhiteList = new ArrayList<>();
     }
 
     public static class Vlads_Tweaks {

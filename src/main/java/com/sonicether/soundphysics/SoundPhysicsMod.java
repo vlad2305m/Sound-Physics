@@ -26,7 +26,8 @@ public class SoundPhysicsMod implements ModInitializer {
         blockSoundGroups = Arrays.stream(BlockSoundGroup.class.getDeclaredFields())
                 .filter((f) -> {
                     try {
-                        return Modifier.isStatic(f.getModifiers()) && Modifier.isPublic(f.getModifiers()) && f.get(null) instanceof BlockSoundGroup;
+                        return Modifier.isStatic(f.getModifiers()) && Modifier.isPublic(f.getModifiers())
+                                && (f.get(null) instanceof BlockSoundGroup group) && !SoundPhysics.redirectMap.containsKey(group);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }

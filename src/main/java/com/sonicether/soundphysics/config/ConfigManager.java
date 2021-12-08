@@ -6,6 +6,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -64,5 +65,6 @@ public class ConfigManager {
         SoundPhysicsConfig fallback = new SoundPhysicsConfig();
         ConfigPresets.THEDOCRUBY.configChanger.accept(fallback);
         getConfig().Material_Properties.reflectivityMap = fallback.Material_Properties.reflectivityMap;
+        getConfig().Material_Properties.blockWhiteList = List.of("block.minecraft.water_source");
     }
 }
