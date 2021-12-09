@@ -34,7 +34,36 @@ public class SoundPhysics
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	private static final Pattern uiPattern = Pattern.compile("ui..*");
 	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = Map.ofEntries( // !!!1 becomes 2!!! //rm
-			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK)
+			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK),
+			entry(BlockSoundGroup.AMETHYST_CLUSTER, BlockSoundGroup.AMETHYST_BLOCK),
+			entry(BlockSoundGroup.SMALL_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
+			entry(BlockSoundGroup.MEDIUM_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
+			entry(BlockSoundGroup.LARGE_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
+			entry(BlockSoundGroup.POINTED_DRIPSTONE, BlockSoundGroup.DRIPSTONE_BLOCK),
+			entry(BlockSoundGroup.FLOWERING_AZALEA, BlockSoundGroup.AZALEA),
+			entry(BlockSoundGroup.DEEPSLATE_BRICKS, BlockSoundGroup.POLISHED_DEEPSLATE),
+			entry(BlockSoundGroup.COPPER, BlockSoundGroup.METAL),
+			entry(BlockSoundGroup.ANVIL, BlockSoundGroup.METAL),
+			entry(BlockSoundGroup.NETHER_SPROUTS, BlockSoundGroup.ROOTS),
+			entry(BlockSoundGroup.WEEPING_VINES_LOW_PITCH, BlockSoundGroup.WEEPING_VINES),
+			entry(BlockSoundGroup.LILY_PAD, BlockSoundGroup.WET_GRASS),
+			entry(BlockSoundGroup.NETHER_GOLD_ORE, BlockSoundGroup.NETHERRACK),
+			entry(BlockSoundGroup.NETHER_ORE, BlockSoundGroup.NETHERRACK),
+			entry(BlockSoundGroup.CALCITE, BlockSoundGroup.STONE),
+			entry(BlockSoundGroup.GILDED_BLACKSTONE, BlockSoundGroup.STONE),
+			entry(BlockSoundGroup.SMALL_DRIPLEAF, BlockSoundGroup.CAVE_VINES),
+			entry(BlockSoundGroup.BIG_DRIPLEAF, BlockSoundGroup.CAVE_VINES),
+			entry(BlockSoundGroup.SPORE_BLOSSOM, BlockSoundGroup.CAVE_VINES),
+			entry(BlockSoundGroup.GLOW_LICHEN, BlockSoundGroup.VINE),
+			entry(BlockSoundGroup.HANGING_ROOTS, BlockSoundGroup.VINE),
+			entry(BlockSoundGroup.ROOTED_DIRT, BlockSoundGroup.GRAVEL),
+			entry(BlockSoundGroup.WART_BLOCK, BlockSoundGroup.NETHER_WART),
+			entry(BlockSoundGroup.CROP, BlockSoundGroup.GRASS),
+			entry(BlockSoundGroup.BAMBOO_SAPLING, BlockSoundGroup.GRASS),
+			entry(BlockSoundGroup.SWEET_BERRY_BUSH, BlockSoundGroup.GRASS),
+			entry(BlockSoundGroup.SCAFFOLDING, BlockSoundGroup.BAMBOO),
+			entry(BlockSoundGroup.LODESTONE, BlockSoundGroup.NETHERITE),
+			entry(BlockSoundGroup.LADDER, BlockSoundGroup.WOOD)
 	);
 	//Private fields
 	// ψ time ψ

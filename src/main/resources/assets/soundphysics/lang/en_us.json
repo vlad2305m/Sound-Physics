@@ -6,7 +6,7 @@
 
   "text.autoconfig.sound_physics.option.General": "General options:",
   "text.autoconfig.sound_physics.option.Performance": "Performance options:",
-  "text.autoconfig.sound_physics.option.Material_Properties": "Material reflectance options:",
+  "text.autoconfig.sound_physics.option.Material_Properties": "Material properties:",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks": "Vlad's tweaks:",
   "text.autoconfig.sound_physics.option.Misc": "Logging options:",
 
@@ -24,7 +24,8 @@
   "text.autoconfig.sound_physics.option.Performance.environmentEvaluationRayBounces": "Reflections per ray",
   "text.autoconfig.sound_physics.option.Performance.simplerSharedAirspaceSimulation": "Cheap shared airspace detection",
 
-  "text.autoconfig.sound_physics.option.Material_Properties.reflectivityMap": "Edit in config file",
+  "text.autoconfig.sound_physics.option.Material_Properties.reflectivityMap": "Advanced users only!",
+  "text.autoconfig.sound_physics.option.Material_Properties.blockWhiteList": "Edit in config file",
 
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirectOcclusionFromBlocks": "Maximum direct occlusion",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray direct occlusion calculation",
