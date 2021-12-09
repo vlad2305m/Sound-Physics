@@ -4,7 +4,7 @@ import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.config.MaterialData;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;//rm
+//import net.minecraft.block.Blocks;//rm
 import net.minecraft.client.MinecraftClient;
 // import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.BlockSoundGroup;
@@ -34,8 +34,8 @@ public class SoundPhysics
 	public static final Pattern stepPattern = Pattern.compile(".*step.*");
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	private static final Pattern uiPattern = Pattern.compile("ui..*");
-	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = Map.ofEntries( // !!!1 becomes 2!!! //rm
-			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK),
+	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = /*<editor-fold desc="Map.ofEntries()">*/Map.ofEntries(
+			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK),			// first becomes second
 			entry(BlockSoundGroup.AMETHYST_CLUSTER, BlockSoundGroup.AMETHYST_BLOCK),
 			entry(BlockSoundGroup.SMALL_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
 			entry(BlockSoundGroup.MEDIUM_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
@@ -65,7 +65,7 @@ public class SoundPhysics
 			entry(BlockSoundGroup.SCAFFOLDING, BlockSoundGroup.BAMBOO),
 			entry(BlockSoundGroup.LODESTONE, BlockSoundGroup.NETHERITE),
 			entry(BlockSoundGroup.LADDER, BlockSoundGroup.WOOD)
-	);
+	)/*</editor-fold>*/;
 	//Private fields
 	// ψ time ψ
 	//public static double tt = 0;
@@ -132,7 +132,7 @@ public class SoundPhysics
 		String key;
 
 		// !!! Middle(wheel)-click "BlockSoundGroup" to see all groups !!! //rm
-		Blocks b;//rm
+		//Blocks b;//rm
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		soundType = redirectMap.getOrDefault(soundType, soundType);
 

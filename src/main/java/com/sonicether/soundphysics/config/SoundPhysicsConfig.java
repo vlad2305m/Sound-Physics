@@ -72,7 +72,7 @@ public class SoundPhysicsConfig implements ConfigData {
         @ConfigEntry.Gui.CollapsibleObject
         public Map<String, MaterialData> reflectivityMap = null;
 
-        @Comment("Like block.minecraft.stone")
+        @Comment("Makes blocks use name (like block.minecraft.stone) instead of sound group to determine material")
         @ConfigEntry.Gui.CollapsibleObject
         public List<String> blockWhiteList = new ArrayList<>();
     }
