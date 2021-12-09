@@ -4,6 +4,7 @@ import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.config.MaterialData;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;//rm
 import net.minecraft.client.MinecraftClient;
 // import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.BlockSoundGroup;
@@ -101,6 +102,8 @@ public class SoundPhysics
 		List<String> wl = ConfigManager.getConfig().Material_Properties.blockWhiteList;
 		String key;
 
+		// !!! Middle(wheel)-click "BlockSoundGroup" to see all groups !!! //rm
+		Blocks b;//rm
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		soundType = redirectMap.getOrDefault(soundType, soundType);
 

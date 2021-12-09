@@ -3,6 +3,7 @@ package com.sonicether.soundphysics;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sonicether.soundphysics.config.ConfigManager;
 import net.minecraft.client.render.*;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -18,6 +19,8 @@ public class RaycastRenderer {
         if (world == null) {
             return;
         }
+        // ψ Get the name of a block you are standing on ψ
+        //world.getPlayers().forEach((p) -> p.sendMessage(new LiteralText(world.getBlockState(p.getBlockPos().add(0,-1,0)).getBlock().getTranslationKey()),true));
         if (!ConfigManager.getConfig().Misc.raytraceParticles) {
             synchronized (rays) {
                 rays.clear();
