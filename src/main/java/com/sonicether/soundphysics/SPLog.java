@@ -36,7 +36,7 @@ public class SPLog {
         System.out.println(logPrefix + ": " + message);
     }
 
-    protected static void logError(String errorMessage)
+    public static void logError(String errorMessage)
     {
         System.out.println(logPrefix + " [ERROR]: " + errorMessage);
     }
