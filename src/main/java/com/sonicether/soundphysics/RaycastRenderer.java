@@ -3,7 +3,6 @@ package com.sonicether.soundphysics;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sonicether.soundphysics.config.ConfigManager;
 import net.minecraft.client.render.*;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 

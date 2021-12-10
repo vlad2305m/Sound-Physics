@@ -2,16 +2,20 @@ package com.sonicether.soundphysics.config;
 
 import com.sonicether.soundphysics.SPEfx;
 import com.sonicether.soundphysics.SoundPhysicsMod;
+import com.sonicether.soundphysics.config.BlueTapePack.GuiRegistryinit;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import net.minecraft.util.ActionResult;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ConfigManager {
     private static ConfigHolder<SoundPhysicsConfig> holder;
+
     public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
         Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
@@ -26,6 +30,10 @@ public class ConfigManager {
         }
 
         holder = AutoConfig.register(SoundPhysicsConfig.class, JanksonConfigSerializer::new);
+        try {
+            GuiRegistryinit.register();
+        } catch (@SuppressWarnings("CatchMayIgnoreException") Exception ignored){System.out.println(Arrays.toString(ignored.getStackTrace()));}
+        holder.registerSaveListener((holder, config) -> onSave(config));
         holder.load();
         if (holder.getConfig().Material_Properties.reflectivityMap == null) {
             holder.getConfig().preset = ConfigPresets.THEDOCRUBY;
@@ -66,5 +74,14 @@ public class ConfigManager {
         ConfigPresets.THEDOCRUBY.configChanger.accept(fallback);
         getConfig().Material_Properties.reflectivityMap = fallback.Material_Properties.reflectivityMap;
         getConfig().Material_Properties.blockWhiteList = List.of("block.minecraft.water_source");
+    }
+
+    @SuppressWarnings("SameReturnValue")
+    public static ActionResult onSave(SoundPhysicsConfig c) {
+        SPEfx.syncReverbParams();
+        if (c.preset != ConfigPresets.LOAD_SUCCESS) {
+            c.preset.configChanger.accept(c);
+        }
+        return ActionResult.SUCCESS;
     }
 }

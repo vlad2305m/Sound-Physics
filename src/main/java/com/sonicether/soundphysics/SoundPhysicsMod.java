@@ -52,5 +52,6 @@ public class SoundPhysicsMod implements ModInitializer {
                          }));
 
         ConfigManager.registerAutoConfig();
+
     }
 }

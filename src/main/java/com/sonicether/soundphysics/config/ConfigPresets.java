@@ -11,7 +11,7 @@ import static com.sonicether.soundphysics.config.ConfigChanger.changeConfig;
 
 @SuppressWarnings({"unused", "RedundantTypeArguments"})
 public enum ConfigPresets {
-    // !!! Press ctrl+shift+numpad_'-' to collapse all and enjoy !!!
+    // Press ctrl+shift+numpad_'-' to collapse all
     LOAD_SUCCESS("Choose", null),
     //<editor-fold desc="DEFAULT_BALANCED,">
     DEFAULT_BALANCED("Balanced (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
@@ -65,7 +65,7 @@ public enum ConfigPresets {
             Map.<String, MaterialData>ofEntries(
                     entry("field_11528", new MaterialData(0.16666666666666667,  0.9)),    // Coral              (coral_block)
                     entry("field_11529", new MaterialData(0.4,                  0.8)),    // Gravel, Dirt       (gravel, rooted_dirt)
-                    entry("field_27197", new MaterialData(0.16666666666666667,  0.9)),    // Amethyst           (amethyst_block, small_amethyst_bud, medium_amethyst_bud, large_amethyst_bud, anethyst_cluster)
+                    entry("field_27197", new MaterialData(0.16666666666666667,  0.9)),    // Amethyst           (amethyst_block, small_amethyst_bud, medium_amethyst_bud, large_amethyst_bud, amethyst_cluster)
                     entry("field_11526", new MaterialData(0.1,                  0.9)),    // Sand               (sand)
                     entry("field_27196", new MaterialData(0.03333333333333333,  0.6)),    // Candle Wax         (candle)
                     entry("field_22140", new MaterialData(0.06666666666666667,  0.4)),    // Weeping Vines      (weeping_vines, weeping_vines_low_pitch)

@@ -18,7 +18,8 @@
     ]
   },
   "mixins": [
-    "soundphysics.mixins.json"
+    "soundphysics.mixins.json",
+    "bluetapepack.mixins.json"
   ],
   "depends": {
     "cloth-config2": ">=5.0.0",
