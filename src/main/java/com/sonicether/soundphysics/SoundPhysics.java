@@ -93,8 +93,12 @@ public class SoundPhysics
 	}
 
 	public static void setLastSoundCategoryAndName(SoundCategory sc, String name) { lastSoundCategory = sc; lastSoundName = name; }
-	
-	public static void onPlaySound(double posX, double posY, double posZ, int sourceID, boolean directPass)
+
+	public static void onPlaySound(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, true);}
+
+	public static void onPlayReverb(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, false);}
+
+	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean directPass)
 	{
 		if (pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
