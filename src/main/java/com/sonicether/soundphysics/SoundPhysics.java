@@ -8,8 +8,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
@@ -18,7 +18,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import static com.sonicether.soundphysics.performance.RaycastFix.fixedRaycast;
 import static com.sonicether.soundphysics.SPLog.*;
@@ -75,13 +77,15 @@ public class SoundPhysics
 	//public static void t1() {ttt = System.nanoTime(); }
 	//public static void t2() { SoundPhysics.tt += (System.nanoTime()-ttt)/1000000d;}
 	//public static void tavg() { cumtt += tt; navgt++; }
-	//public static void tout() { System.out.println(String.valueOf(SoundPhysics.tt) + "   Avg: " + String.valueOf(cumtt/navgt)); }
+	//public static void tout() { System.out.println(SoundPhysics.tt + "   Avg: " + cumtt/navgt); }
 	//public static void tres() { SoundPhysics.tt = 0; }
 
 	private static MinecraftClient mc;
 	
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;
+	private static boolean inWorld = false;
+	private static long worldJoinedTime = 0;
 
 	public static void init()
 	{
@@ -96,6 +100,7 @@ public class SoundPhysics
 
 	public static void onPlaySound(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, true);}
 
+	@SuppressWarnings("unused")
 	public static void onPlayReverb(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, false);}
 
 	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean directPass)
@@ -106,9 +111,9 @@ public class SoundPhysics
 		long endTime;
 		
 		if (pC.pLog) startTime = System.nanoTime();
-		//t1();
-		evaluateEnvironment(sourceID, posX, posY, posZ, directPass);
-		//t2();tavg();
+		//t1();//rm
+		evaluateEnvironment(sourceID, posX, posY, posZ, directPass); // time = 4 ^ω^ YAY! ^ω^
+		//t2();if (tt != 0) tavg();tout();tres();// ψ time ψ
 		if (pC.pLog) { endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
@@ -140,14 +145,25 @@ public class SoundPhysics
 	@SuppressWarnings("ConstantConditions")
 	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ, boolean directPass)
 	{
+		boolean oldInWorld = inWorld;
+		inWorld = mc.world != null;
+		if (!oldInWorld && inWorld) worldJoinedTime = mc.world.getTime();
+
 		if (pC.off) return;
+
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
-			
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
 			return;
 		}
+		final long timeT = mc.world.getTime();
+		if (timeT-worldJoinedTime < 400) {
+			int t = (int) (timeT-worldJoinedTime);
+			mc.player.sendMessage(new LiteralText("Sound Physics starting... "+(419-t)/20), true);
+			if (timeT % 40 != 0) return; // let some through to warm it up
+		} else if(timeT-worldJoinedTime < 420) mc.player.sendMessage(new LiteralText("Sound Physics started!"), true);
+		else if(timeT-worldJoinedTime < 430) mc.player.sendMessage(new LiteralText(""), true);
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
 
@@ -156,12 +172,11 @@ public class SoundPhysics
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
 			return;
 		}
-		final long timeT = mc.world.getTime();
+
 		if (RaycastFix.lastUpd != timeT) {
-			//tout();tres();// ψ time ψ
 			if (timeT % 1024 == 0) {
 				RaycastFix.shapeCache = new Long2ObjectOpenHashMap<>(2048,0.75f); // just in case something gets corrupted
-				//cumtt = 0; navgt = 0;
+				//cumtt = 0; navgt = 0; ψ time ψ
 			}
 			else {
 				RaycastFix.shapeCache.clear();
@@ -169,11 +184,11 @@ public class SoundPhysics
 			RaycastFix.lastUpd = timeT;
 		}
 
-		double directCutoff;
+		double directCutoff; // time = 0.1
 
 		//Direct sound occlusion
-		Vec3d playerPos = mc.player.getPos();
-			  playerPos = new Vec3d(playerPos.x, playerPos.y + mc.player.getEyeHeight(mc.player.getPose()), playerPos.z);
+		final Vec3d playerPosOld = mc.player.getPos();
+		final Vec3d playerPos = new Vec3d(playerPosOld.x, playerPosOld.y + mc.player.getEyeHeight(mc.player.getPose()), playerPosOld.z);
 		final Vec3d soundPos = new Vec3d(posX, posY, posZ);
 		Vec3d normalToPlayer = playerPos.subtract(soundPos).normalize();
 
@@ -228,7 +243,7 @@ public class SoundPhysics
 
 				SPHitResult rayBack = fixedRaycast(new RaycastContext(rayHit.getPos(), rayOrigin, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, rayHit.getBlockPos());
 
-				if (!rayBack.getBlockPos().equals(lastBlockPos)) {
+				if (!rayBack.getBlockPos().equals(lastBlockPos)) { // happens rarely
 					logError("[Occlusion reverse]Block "+lastBlockPos.toString()+ " is not "+rayBack.getBlockPos().toString() );
 					occlusionAccumulation += blockOcclusion;
 				}
@@ -236,6 +251,7 @@ public class SoundPhysics
 				{
 					//Accumulate density
 					occlusionAccumulation += blockOcclusion * (rayOrigin.distanceTo(rayBack.getPos()));
+					if (occlusionAccumulation > pC.maxDirectOcclusionFromBlocks) break;
 				}
 
 
@@ -262,7 +278,7 @@ public class SoundPhysics
 
 		final double[] bounceReflectivityRatio = new double[pC.nRayBounces];
 		
-		double sharedAirspace = 0d;
+		AtomicReference<Double> sharedAirspace = new AtomicReference<>(0d);
 
 		final double gRatio = 1.618033988;
 		final double epsilon;
@@ -296,8 +312,10 @@ public class SoundPhysics
 			epsilon = 0.33d;
 		}
 
-		for (int i = 0; i < pC.nRays; i++)
-		{
+		//for (int i = 0; i < pC.nRays; i++)
+
+		IntStream stream = IntStream.range(0, pC.nRays);
+		(pC.multiThreading ? stream.parallel() : stream).forEach((i) -> { // time = 3
 			final double x = (i + epsilon) / (pC.nRays - 1d + 2d*epsilon);
 			final double y = (double) i / gRatio;
 			final double theta = 2d * Math.PI * y;
@@ -345,10 +363,10 @@ public class SoundPhysics
 
 							double totalFinalRayDistance = totalRayDistance + finalRayStart.distanceTo(playerPos);
 
-							if (doDirEval) directions.add(Map.entry(finalRayStart.subtract(playerPos), (totalFinalRayDistance*totalFinalRayDistance)*(totalReflectivityCoefficient == 0d ? 1000000d : 1d/totalReflectivityCoefficient)));
+							if (doDirEval) synchronized (directions) {directions.add(Map.entry(finalRayStart.subtract(playerPos), (totalFinalRayDistance*totalFinalRayDistance)*(totalReflectivityCoefficient == 0d ? 1000000d : 1d/totalReflectivityCoefficient)));}
 							//log("Secondary ray hit the player!");
 
-							sharedAirspace += 1d;
+							sharedAirspace.updateAndGet(v -> v + 1d);
 
 							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * blockReflectivity * pC.globalBlockReflectance;
 
@@ -358,10 +376,12 @@ public class SoundPhysics
 							final double cross3 = MathHelper.clamp(reflectionDelay - 2d, 0d, 1d);
 
 							double factor = energyTowardsPlayer * 12.8 * pC.rcpTotRays;
-							δsendGain[0] += cross0 * factor * 0.5;
-							δsendGain[1] += cross1 * factor;
-							δsendGain[2] += cross2 * factor;
-							δsendGain[3] += cross3 * factor;
+							synchronized (δsendGain) {
+								δsendGain[0] += cross0 * factor * 0.5;
+								δsendGain[1] += cross1 * factor;
+								δsendGain[2] += cross2 * factor;
+								δsendGain[3] += cross3 * factor;
+							}
 
 						}
 						if (pC.dRays) RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
@@ -401,15 +421,16 @@ public class SoundPhysics
 					}
 				}
 			}
-		}
-		for (int i = 0; i < bounceReflectivityRatio.length; i++) {
+		});
+		for (int i = 0; i < pC.nRayBounces; i++) {
 			bounceReflectivityRatio[i] = bounceReflectivityRatio[i] * pC.rcpNRays;
 		}
 
 		// Take weighted (on squared distance) average of the directions sound reflection came from
-		dirEval:
+		dirEval: // time = 0.04
 		{
 			if (directions.isEmpty()) break dirEval;
+
 			if (pC.pLog) log("Evaluating direction from "+sharedAirspace+" entries...");
 			Vec3d sum = new Vec3d(0, 0, 0);
 			double weight = 0;
@@ -429,8 +450,9 @@ public class SoundPhysics
 			// mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0);
 		}
 
-		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, occlusionAccumulation,  directGain, directPass, bounceReflectivityRatio, δsendGain);
-		}
+
+		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace.get(), occlusionAccumulation,  directGain, directPass, bounceReflectivityRatio, δsendGain);
+	}
 
 	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double occlusionAccumulation, double directGain, boolean directPass, double[] bounceReflectivityRatio, double[] δsendGain) {
 		// Calculate reverb parameters for this sound

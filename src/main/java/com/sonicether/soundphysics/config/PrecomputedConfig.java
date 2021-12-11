@@ -18,6 +18,7 @@ public class PrecomputedConfig {
     public final static float globalVolumeMultiplier = 4f;
     public static double soundDistanceAllowance = 4;
     public static double defaultAttenuationFactor = 1;
+    public boolean multiThreading = true; //todo do we need to turn it off?
 
     public final boolean off;
 

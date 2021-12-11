@@ -1,5 +1,6 @@
 package com.sonicether.soundphysics.performance;
 
+import com.sonicether.soundphysics.SoundPhysics;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -36,39 +37,44 @@ public class RaycastFix {
         final Vec3d end = context.getEnd();
         return raycast(context.getStart(), context.getEnd(),
                 (pos) -> {
-            //SoundPhysics.t1();
-            //===============================================
-            if (new BlockPos(pos).equals(ignore)) return null;
-            //===============================================
+                    //SoundPhysics.t1();
+                    //===============================================
+                    if (new BlockPos(pos).equals(ignore)) return null;
+                    //===============================================
 
-            BlockState bs = world.getBlockState(pos);
+                    BlockState bs = world.getBlockState(pos);
 
-            if (bs.isAir() || bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
-            long posl = pos.asLong();
-            ImmutableTriple<BlockState,VoxelShape, VoxelShape> shapes = shapeCache.computeIfAbsent(posl, (key) -> {
-                //SoundPhysics.t2();
-                //SoundPhysics.t1();
-                if(bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
-                if (pC.dRays) ((World)world).addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY()+1d, pos.getZ()+0.5d, 0,0,0);
-                return new ImmutableTriple<>(bs, bs.getCollisionShape(world, pos), context.getFluidShape(world.getFluidState(pos), world, pos));
-            });
-            //SoundPhysics.t2();
-            //SoundPhysics.t1();
+                    if (bs.isAir() || bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
+                    long posl = pos.asLong();
+                    ImmutableTriple<BlockState, VoxelShape, VoxelShape> shapes;
+                    //noinspection SynchronizeOnNonFinalField
+                    synchronized (shapeCache) {
+                        shapes = shapeCache.computeIfAbsent(posl, (key) -> {
+                            //SoundPhysics.t2();
+                            //SoundPhysics.t1();
+                            if (bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
+                            if (pC.dRays)
+                                ((World) world).addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY() + 1d, pos.getZ() + 0.5d, 0, 0, 0);
+                            return new ImmutableTriple<>(bs, bs.getCollisionShape(world, pos), context.getFluidShape(world.getFluidState(pos), world, pos));
+                        });
+                    }
+
+                    //SoundPhysics.t1();
 
 
-            if (shapes == null) return null;
-            VoxelShape voxelShape = shapes.getMiddle();//BlockShape
-            SPHitResult blockHitResult = SPHitResult.get(world.raycastBlock(start, end, pos, voxelShape, bs), bs);
-            VoxelShape voxelShape2 = shapes.getRight();//FluidShape
-            SPHitResult blockHitResult2 = SPHitResult.get(voxelShape2.raycast(start, end, pos), bs);
+                    if (shapes == null) return null;
+                    VoxelShape voxelShape = shapes.getMiddle();//BlockShape
+                    SPHitResult blockHitResult = SPHitResult.get(world.raycastBlock(start, end, pos, voxelShape, bs), bs);
+                    VoxelShape voxelShape2 = shapes.getRight();//FluidShape
+                    SPHitResult blockHitResult2 = SPHitResult.get(voxelShape2.raycast(start, end, pos), bs);
 
-            //SoundPhysics.t2();
-            if (blockHitResult2 == null) return blockHitResult;
-            if (blockHitResult == null) return blockHitResult2;
-            double d = start.squaredDistanceTo(blockHitResult.getPos());
-            double e = start.squaredDistanceTo(blockHitResult2.getPos());
-            return d <= e ? blockHitResult : blockHitResult2;
-        });
+                    //SoundPhysics.t2();
+                    if (blockHitResult2 == null) return blockHitResult;
+                    if (blockHitResult == null) return blockHitResult2;
+                    double d = start.squaredDistanceTo(blockHitResult.getPos());
+                    double e = start.squaredDistanceTo(blockHitResult2.getPos());
+                    return d <= e ? blockHitResult : blockHitResult2;
+                });
 
     }
 
