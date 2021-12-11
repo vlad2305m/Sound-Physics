@@ -1,4 +1,4 @@
-package com.sonicether.soundphysics.liquid;
+package com.sonicether.soundphysics.performance;
 
 import com.sonicether.soundphysics.SPLog;
 import net.minecraft.block.Block;

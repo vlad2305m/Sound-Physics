@@ -1,6 +1,8 @@
 package com.sonicether.soundphysics;
 
 import com.sonicether.soundphysics.config.PrecomputedConfig;
+import com.sonicether.soundphysics.performance.RaycastFix;
+import com.sonicether.soundphysics.performance.SPHitResult;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +20,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import static com.sonicether.soundphysics.RaycastFix.fixedRaycast;
+import static com.sonicether.soundphysics.performance.RaycastFix.fixedRaycast;
 import static com.sonicether.soundphysics.SPLog.*;
 import static com.sonicether.soundphysics.SPEfx.*;
 import static java.util.Map.entry;
@@ -75,6 +77,7 @@ public class SoundPhysics
 	//public static void tavg() { cumtt += tt; navgt++; }
 	//public static void tout() { System.out.println(String.valueOf(SoundPhysics.tt) + "   Avg: " + String.valueOf(cumtt/navgt)); }
 	//public static void tres() { SoundPhysics.tt = 0; }
+
 	private static MinecraftClient mc;
 	
 	private static SoundCategory lastSoundCategory;
@@ -99,42 +102,32 @@ public class SoundPhysics
 		long endTime;
 		
 		if (pC.pLog) startTime = System.nanoTime();
-
+		//t1();
 		evaluateEnvironment(sourceID, posX, posY, posZ, directPass);
-
+		//t2();tavg();
 		if (pC.pLog) { endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
 	}
 	
-	private static double getBlockReflectivity(final BlockPos blockPos)
+	private static double getBlockReflectivity(final BlockState blockState)
 	{
-		assert mc.world != null;
-		BlockState blockState = mc.world.getBlockState(blockPos);
 		BlockSoundGroup soundType = blockState.getSoundGroup();
+		String blockName = blockState.getBlock().getTranslationKey();
+		if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).reflectivity;
 
 		double r = pC.reflectivityMap.getOrDefault(soundType, Double.NaN);
-		if (Double.isNaN(r)) {
-			String blockName = blockState.getBlock().getTranslationKey();
-			if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).reflectivity;
-			else return pC.defaultReflectivity;
-		}
-		return r;
+		return Double.isNaN(r) ? pC.defaultReflectivity : r;
 	}
 
-	private static double getBlockOcclusionD(final BlockPos blockPos)
+	private static double getBlockOcclusionD(final BlockState blockState)
 	{
-		assert mc.world != null;
-		BlockState blockState = mc.world.getBlockState(blockPos);
 		BlockSoundGroup soundType = blockState.getSoundGroup();
+		String blockName = blockState.getBlock().getTranslationKey();
+		if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).absorption;
 
 		double r = pC.absorptionMap.getOrDefault(soundType, Double.NaN);
-		if (Double.isNaN(r)) {
-			String blockName = blockState.getBlock().getTranslationKey();
-			if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).absorption;
-			else return pC.defaultAbsorption;
-		}
-		return r;
+		return Double.isNaN(r) ? pC.defaultAbsorption : r;
 	}
 
 	private static Vec3d pseudoReflect(Vec3d dir, Vec3i normal)
@@ -161,7 +154,7 @@ public class SoundPhysics
 		}
 		final long timeT = mc.world.getTime();
 		if (RaycastFix.lastUpd != timeT) {
-			//tavg();tout();tres();// ψ time ψ
+			//tout();tres();// ψ time ψ
 			if (timeT % 1024 == 0) {
 				RaycastFix.shapeCache = new Long2ObjectOpenHashMap<>(2048,0.75f); // just in case something gets corrupted
 				//cumtt = 0; navgt = 0;
@@ -200,14 +193,14 @@ public class SoundPhysics
 				occlusionAccumulation = 0;
 			}
 
-			BlockHitResult rayHit = fixedRaycast(new RaycastContext(rayOrigin, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastBlockPos);
+			SPHitResult rayHit = fixedRaycast(new RaycastContext(rayOrigin, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastBlockPos);
 
 			for (int i = 0; i < 10; i++) {
 
 				lastBlockPos = rayHit.getBlockPos();
 				//If we hit a block
 
-				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
+				if (pC.dRays) RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
 				if (rayHit.getType() == HitResult.Type.MISS) {
 					if (pC.soundDirectionEvaluation) directions.add(Map.entry(rayOrigin.subtract(playerPos),
 							(_9ray?9:1) * Math.pow(soundPos.distanceTo(playerPos), 2.0)* pC.rcpTotRays
@@ -219,8 +212,8 @@ public class SoundPhysics
 
 				final BlockPos blockHitPos = rayHit.getBlockPos();
 				final Vec3d rayHitPos = rayHit.getPos();
-				final BlockState blockHit = mc.world.getBlockState(blockHitPos);
-				double blockOcclusion = getBlockOcclusionD(blockHitPos);//todo add blockstate to blockhitresult
+				final BlockState blockHit = rayHit.getBlockState();
+				double blockOcclusion = getBlockOcclusionD(blockHit);
 
 				// Regardless to whether we hit from inside or outside
 
@@ -230,7 +223,7 @@ public class SoundPhysics
 
 				rayHit = fixedRaycast(new RaycastContext(rayOrigin, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastBlockPos);
 
-				BlockHitResult rayBack = fixedRaycast(new RaycastContext(rayHit.getPos(), rayOrigin, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, rayHit.getBlockPos());
+				SPHitResult rayBack = fixedRaycast(new RaycastContext(rayHit.getPos(), rayOrigin, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, rayHit.getBlockPos());
 
 				if (!rayBack.getBlockPos().equals(lastBlockPos)) {
 					logError("[Occlusion reverse]Block "+lastBlockPos.toString()+ " is not "+rayBack.getBlockPos().toString() );
@@ -313,9 +306,9 @@ public class SoundPhysics
 			final Vec3d rayEnd = new Vec3d(soundPos.x + rayDir.x * maxDistance, soundPos.y + rayDir.y * maxDistance,
 					soundPos.z + rayDir.z * maxDistance);
 
-			BlockHitResult rayHit = fixedRaycast(new RaycastContext(soundPos, rayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, soundBlockPos);
+			SPHitResult rayHit = fixedRaycast(new RaycastContext(soundPos, rayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, soundBlockPos);
 
-			RaycastRenderer.addSoundBounceRay(soundPos, rayHit.getPos(), Formatting.GREEN.getColorValue());
+			if (pC.dRays) RaycastRenderer.addSoundBounceRay(soundPos, rayHit.getPos(), Formatting.GREEN.getColorValue());
 
 			if (rayHit.getType() == HitResult.Type.BLOCK) {
 				
@@ -327,7 +320,7 @@ public class SoundPhysics
 				
 				double totalRayDistance = soundPos.distanceTo(rayHit.getPos());
 
-				double blockReflectivity = getBlockReflectivity(lastHitBlock);
+				double blockReflectivity = getBlockReflectivity(rayHit.getBlockState());
 
 				double totalReflectivityCoefficient = Math.min(blockReflectivity, 1);
 				
@@ -341,7 +334,7 @@ public class SoundPhysics
 						final Vec3d finalRayStart = new Vec3d(lastHitPos.x + lastHitNormal.getX() * 0.01,
 								lastHitPos.y + lastHitNormal.getY() * 0.01, lastHitPos.z + lastHitNormal.getZ() * 0.01);
 
-						final BlockHitResult finalRayHit = fixedRaycast(new RaycastContext(finalRayStart, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, null);
+						final SPHitResult finalRayHit = fixedRaycast(new RaycastContext(finalRayStart, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, null);
 
 						int color = Formatting.GRAY.getColorValue();
 						if (finalRayHit.getType() == HitResult.Type.MISS) {
@@ -368,7 +361,7 @@ public class SoundPhysics
 							δsendGain[3] += cross3 * factor;
 
 						}
-						RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
+						if (pC.dRays) RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
 					}
 
 					final Vec3d newRayDir = pseudoReflect(lastRayDir, lastHitNormal);
@@ -378,22 +371,20 @@ public class SoundPhysics
 					
 					//log("New ray dir: " + newRayDir.xCoord + ", " + newRayDir.yCoord + ", " + newRayDir.zCoord);
 
-					BlockHitResult newRayHit = fixedRaycast(new RaycastContext(newRayStart, newRayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastHitBlock);
+					SPHitResult newRayHit = fixedRaycast(new RaycastContext(newRayStart, newRayEnd, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastHitBlock);
 
 
 					if (newRayHit.getType() == HitResult.Type.MISS) {
-						RaycastRenderer.addSoundBounceRay(newRayStart, newRayEnd, Formatting.DARK_RED.getColorValue());
+						if (pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayEnd, Formatting.DARK_RED.getColorValue());
 						break;
 					} else {
 						final Vec3d newRayHitPos = newRayHit.getPos();
 						final double newRayLength = lastHitPos.distanceTo(newRayHitPos);
 
-						RaycastRenderer.addSoundBounceRay(newRayStart, newRayHitPos, Formatting.BLUE.getColorValue());
-
+						if (pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayHitPos, Formatting.BLUE.getColorValue());
 
 
 						bounceReflectivityRatio[j] += blockReflectivity * pC.globalBlockReflectance;
-
 
 						totalRayDistance += newRayLength;
 
@@ -401,7 +392,7 @@ public class SoundPhysics
 						lastHitNormal = newRayHit.getSide().getVector();
 						lastRayDir = newRayDir;
 						lastHitBlock = newRayHit.getBlockPos();
-						blockReflectivity = getBlockReflectivity(lastHitBlock);
+						blockReflectivity = getBlockReflectivity(newRayHit.getBlockState());
 						totalReflectivityCoefficient *= Math.min(blockReflectivity, 1);
 
 					}
