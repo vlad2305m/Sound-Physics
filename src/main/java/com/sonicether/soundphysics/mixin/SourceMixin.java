@@ -30,7 +30,7 @@ public class SourceMixin {
 
     @Inject(method = "play", at = @At("HEAD"))
     private void OnPlaySoundInjector(CallbackInfo ci) {
-        SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer, true);
+        SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer);
         SPLog.checkErrorLog("onplayinjector");
     }
 
