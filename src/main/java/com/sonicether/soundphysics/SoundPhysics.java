@@ -1,6 +1,5 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
@@ -32,7 +31,7 @@ public class SoundPhysics
 	public static final Pattern stepPattern = Pattern.compile(".*step.*");
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	private static final Pattern uiPattern = Pattern.compile("ui..*");
-	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = /*<editor-fold desc="Map.ofEntries()">*/Map.ofEntries(
+	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = /*<editor-fold desc="Map.ofEntries()">*/ Map.ofEntries(
 			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK),			// first becomes second
 			entry(BlockSoundGroup.AMETHYST_CLUSTER, BlockSoundGroup.AMETHYST_BLOCK),
 			entry(BlockSoundGroup.SMALL_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
@@ -99,7 +98,7 @@ public class SoundPhysics
 		lastSoundName = name;
 	}
 	
-	public static void onPlaySound(double posX, double posY, double posZ, int sourceID)
+	public static void onPlaySound(double posX, double posY, double posZ, int sourceID, boolean directPass)
 	{
 		if (pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
@@ -108,7 +107,7 @@ public class SoundPhysics
 		
 		if (pC.pLog) startTime = System.nanoTime();
 
-		evaluateEnvironment(sourceID, posX, posY, posZ);
+		evaluateEnvironment(sourceID, posX, posY, posZ, directPass);
 		
 		if (pC.pLog)
 		{ endTime = System.nanoTime();
@@ -150,14 +149,14 @@ public class SoundPhysics
 	{return new Vec3d(normal.getX() == 0 ? dir.x : -dir.x, normal.getY() == 0 ? dir.y : -dir.y, normal.getZ() == 0 ? dir.z : -dir.z);}
 
 	@SuppressWarnings("ConstantConditions")
-	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ)
+	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ, boolean directPass)
 	{
 		if (!pC.on) return;
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
 			
-			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
 			return;
 		}
 
@@ -165,7 +164,7 @@ public class SoundPhysics
 
 		if (pC.skipRainOcclusionTracing && isRain)
 		{
-			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
 			return;
 		}
 		final long timeT = mc.world.getTime();
@@ -262,13 +261,13 @@ public class SoundPhysics
 		}
 		occlusionAccumulation = Math.min(occlusionAccMin, pC.maxDirectOcclusionFromBlocks);
 		directCutoff = Math.exp(-occlusionAccumulation * absorptionCoeff);
-		double directGain = Math.pow(directCutoff, 0.1);
+		double directGain = directPass ? Math.pow(directCutoff, 0.1) : 0.0f;
 
 		if (pC.oLog) logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
 
 		final double[] δsendGain = {0,0,0,0};
 
-		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, 0, 0, occlusionAccumulation, absorptionCoeff, directGain, null, δsendGain); return;}
+		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, 0, 0, occlusionAccumulation, absorptionCoeff, directGain, directPass, null, δsendGain); return;}
 
 		// Shoot rays around sound
 
@@ -448,10 +447,10 @@ public class SoundPhysics
 			// mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0);
 		}
 
-		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, bounceReflectivityRatio, δsendGain);
+		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, directPass, bounceReflectivityRatio, δsendGain);
 		}
 
-	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double rcpPrimaryRays, double rcpTotalRays, double occlusionAccumulation, double absorptionCoeff, double directGain, double[] bounceReflectivityRatio, double[] δsendGain) {
+	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double rcpPrimaryRays, double rcpTotalRays, double occlusionAccumulation, double absorptionCoeff, double directGain, boolean directPass, double[] bounceReflectivityRatio, double[] δsendGain) {
 
 		// Calculate reverb parameters for this sound
 		double sendGain0 = 0.0f + δsendGain[0];
@@ -497,7 +496,7 @@ public class SoundPhysics
 		final double averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25f;
 		directCutoff = Math.max(Math.pow(averageSharedAirspace, 0.5) * 0.2f, directCutoff);
 
-		directGain = Math.pow(directCutoff, 0.1);
+		directGain = directPass ? Math.pow(directCutoff, 0.1) : 0.0f;
 
 		//logDetailed("HitRatio0: " + hitRatioBounce1 + " HitRatio1: " + hitRatioBounce2 + " HitRatio2: " + hitRatioBounce3 + " HitRatio3: " + hitRatioBounce4);
 
