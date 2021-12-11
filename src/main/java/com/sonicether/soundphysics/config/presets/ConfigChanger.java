@@ -1,6 +1,5 @@
 package com.sonicether.soundphysics.config.presets;
 
-import com.sonicether.soundphysics.config.ConfigManager;
 import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +19,6 @@ public class ConfigChanger {
         setMaterial_Properties(config.Material_Properties, reflectivityMap);
         setVlads_Tweaks(config.Vlads_Tweaks, maxDirectOcclusionFromBlocks, _9RayDirectOcclusion, soundDirectionEvaluation, directRaysDirEvalMultiplier, maxDirVariance, notOccludedNoRedirect);
         config.preset = ConfigPresets.LOAD_SUCCESS;
-        ConfigManager.save();
     }
 
     public static void setGeneral(SoundPhysicsConfig.General general, @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter) {
@@ -56,7 +54,7 @@ public class ConfigChanger {
         if (_9RayDirectOcclusion != null) vlads_tweaks._9RayDirectOcclusion = _9RayDirectOcclusion;
         if (soundDirectionEvaluation != null) vlads_tweaks.soundDirectionEvaluation = soundDirectionEvaluation;
         if (directRaysDirEvalMultiplier != null) vlads_tweaks.directRaysDirEvalMultiplier = directRaysDirEvalMultiplier;
-        if (maxDirVariance != null) vlads_tweaks.maxDirVariance = maxDirVariance;
+        if (maxDirVariance != null) vlads_tweaks.maxDirRayAntilength = maxDirVariance;
         if (notOccludedNoRedirect != null) vlads_tweaks.notOccludedNoRedirect = notOccludedNoRedirect;
     }
 }

@@ -46,5 +46,5 @@
   "text.autoconfig.sound_physics.option.MaterialData": "Material Data",
   "text.autoconfig.sound_physics.option.MaterialData.reflectivity": "Reflectivity",
   "text.autoconfig.sound_physics.option.MaterialData.absorption": "Occlusion density",
-  "text.autoconfig.sound_physics.option.MaterialData.example": "Example sound"
+  "text.autoconfig.sound_physics.option.MaterialData.example": "Break sound"
 }

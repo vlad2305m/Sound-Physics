@@ -1,6 +1,7 @@
 package com.sonicether.soundphysics.mixin;
 
 import com.sonicether.soundphysics.SoundPhysics;
+import com.sonicether.soundphysics.config.PrecomputedConfig;
 import net.minecraft.client.sound.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
@@ -26,7 +27,7 @@ public class SoundSystemMixin {
 
     @ModifyArg(method = "getAdjustedVolume", at = @At(value = "INVOKE", target = "net/minecraft/util/math/MathHelper.clamp (FFF)F"), index = 0)
     private float VolumeMultiplierInjector(float vol){
-        return vol * SoundPhysics.globalVolumeMultiplier;
+        return vol * PrecomputedConfig.globalVolumeMultiplier;
     }
 
 }

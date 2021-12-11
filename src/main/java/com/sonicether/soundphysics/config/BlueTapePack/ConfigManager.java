@@ -1,16 +1,19 @@
-package com.sonicether.soundphysics.config;
+package com.sonicether.soundphysics.config.BlueTapePack;
 
 import com.sonicether.soundphysics.SPEfx;
+import com.sonicether.soundphysics.SPLog;
 import com.sonicether.soundphysics.SoundPhysics;
 import com.sonicether.soundphysics.SoundPhysicsMod;
 import com.sonicether.soundphysics.config.BlueTapePack.GuiRegistryinit;
+import com.sonicether.soundphysics.config.MaterialData;
+import com.sonicether.soundphysics.config.PrecomputedConfig;
+import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import com.sonicether.soundphysics.config.presets.ConfigPresets;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.minecraft.util.ActionResult;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,7 +25,7 @@ public class ConfigManager {
         Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
                         .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(0.5, 1, e.getValue().getRight())));
-        map.putIfAbsent("DEFAULT", new MaterialData(0.5, 1, ""));
+        map.putIfAbsent("DEFAULT", new MaterialData(0.5, 1, "[default]"));
         Material_Properties.reflectivityMap = map;
     }};
 
@@ -56,18 +59,20 @@ public class ConfigManager {
     public static void save() { if (holder == null) {registerAutoConfig();} holder.save(); }
 
     public static void handleBrokenMaterials( SoundPhysicsConfig c ){
-        SoundPhysicsConfig fallback = new SoundPhysicsConfig();
+        SPLog.logError("Critical reflectivityMap error. Resetting reflectivityMap");
+        SoundPhysicsConfig fallback = DEFAULT;
         ConfigPresets.THEDOCRUBY.configChanger.accept(fallback);
         c.Material_Properties.reflectivityMap = fallback.Material_Properties.reflectivityMap;
         c.Material_Properties.blockWhiteList = List.of("block.minecraft.water");
     }
 
-    @SuppressWarnings("SameReturnValue")
     public static ActionResult onSave(SoundPhysicsConfig c) {
+        if (c.Material_Properties.reflectivityMap == null || c.Material_Properties.reflectivityMap.get("DEFAULT") == null)
+            handleBrokenMaterials(c);
         if (c.preset != ConfigPresets.LOAD_SUCCESS) {c.preset.configChanger.accept(c);}
-        if (c.Material_Properties.reflectivityMap.get("DEFAULT") == null) handleBrokenMaterials(c);
         SPEfx.syncReverbParams();
-        SoundPhysics.pC = new PrecomputedConfig(c);
+        if(SoundPhysics.pC != null) SoundPhysics.pC.deactivate();
+        try {SoundPhysics.pC = new PrecomputedConfig(c);} catch (CloneNotSupportedException e) {e.printStackTrace(); return ActionResult.FAIL;}
         return ActionResult.SUCCESS;
     }
 }

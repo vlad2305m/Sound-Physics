@@ -83,7 +83,7 @@ public class SoundPhysicsConfig implements ConfigData {
         @Comment("How much the sound direction depends on reflected sounds.\nRequires \"Re-calculate sound direction\" to be enabled.\n0.0 is no reflected sources, 1.0 is 100% reflected sources.\n0.5 is approximately physically accurate.")
         public double directRaysDirEvalMultiplier = 0.5;
         @Comment("Randomness of the perceived direction of incoming sounds\n0.0 means sounds come straight from the source.\n1.0 means sounds come from completely random directions\n0.0 - 1.0")
-        public double maxDirVariance = 0.0;
+        public double maxDirRayAntilength = 1.0;
         @Comment("Skip redirecting non-occluded sounds (the ones you can see directly).\nCan be inaccurate in some situations, especially when \"Re-calculate sound direction\" is enabled.")
         public boolean notOccludedNoRedirect = false;
     }

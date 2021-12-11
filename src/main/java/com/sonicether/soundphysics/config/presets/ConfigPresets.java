@@ -1,6 +1,6 @@
 package com.sonicether.soundphysics.config.presets;
 
-import com.sonicether.soundphysics.config.ConfigManager;
+import com.sonicether.soundphysics.config.BlueTapePack.ConfigManager;
 import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import org.jetbrains.annotations.Nullable;
@@ -197,7 +197,7 @@ public enum ConfigPresets {
 
     public final Consumer<SoundPhysicsConfig> configChanger;
     public final String text;
-    public void setConfig(){ if (configChanger != null) configChanger.accept(ConfigManager.getConfig());}
+    public void setConfig(){ if (configChanger != null) {configChanger.accept(ConfigManager.getConfig());ConfigManager.save();}}
 
     ConfigPresets(String text, @Nullable Consumer<SoundPhysicsConfig> c) {
         this.configChanger = c; 

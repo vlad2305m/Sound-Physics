@@ -1,10 +1,10 @@
 package com.sonicether.soundphysics;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.sonicether.soundphysics.config.ConfigManager;
 import net.minecraft.client.render.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import static com.sonicether.soundphysics.SoundPhysics.pC;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,14 +18,8 @@ public class RaycastRenderer {
         if (world == null) {
             return;
         }
-        // ψ Get the name of a block you are standing on ψ
+        // ψ Get the name of the block you are standing on ψ
         //world.getPlayers().forEach((p) -> p.sendMessage(new LiteralText(world.getBlockState(p.getBlockPos().add(0,-1,0)).getBlock().getTranslationKey()),true));
-        if (!ConfigManager.getConfig().Misc.raytraceParticles) {
-            synchronized (rays) {
-                rays.clear();
-            }
-            return;
-        }
         long gameTime = world.getTime();
         synchronized (rays) {
             for (Ray ray : rays) {
@@ -37,14 +31,14 @@ public class RaycastRenderer {
     }
 
     public static void addSoundBounceRay(Vec3d start, Vec3d end, int color) {
-        if (!ConfigManager.getConfig().Misc.raytraceParticles) {
+        if (!pC.dRays) {
             return;
         }
         addRay(start, end, color, false);
     }
 
     public static void addOcclusionRay(Vec3d start, Vec3d end, int color) {
-        if (!ConfigManager.getConfig().Misc.raytraceParticles) {
+        if (!pC.dRays) {
             return;
         }
         addRay(start, end, color, true);

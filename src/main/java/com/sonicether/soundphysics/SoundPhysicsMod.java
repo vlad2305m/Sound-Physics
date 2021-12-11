@@ -1,13 +1,11 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.config.ConfigManager;
-import com.sonicether.soundphysics.config.PrecomputedConfig;
+import com.sonicether.soundphysics.config.BlueTapePack.ConfigManager;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Pair;
 
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
@@ -47,7 +45,7 @@ public class SoundPhysicsMod implements ModInitializer {
                         },
                          (f) -> {
                              try {
-                                 return new Pair<>(f.getName(), (f.get(null) instanceof BlockSoundGroup g ? g.getBreakSound().getId().getPath() : ""));
+                                 return new Pair<>(f.getName(), (f.get(null) instanceof BlockSoundGroup g ? g.getBreakSound().getId().getPath().split("\\.")[1] : "not a group"));
                              } catch (IllegalAccessException e) {
                                  e.printStackTrace();
                              }
@@ -71,6 +69,5 @@ public class SoundPhysicsMod implements ModInitializer {
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         ConfigManager.registerAutoConfig();
-        SoundPhysics.pC = new PrecomputedConfig(ConfigManager.DEFAULT);
     }
 }

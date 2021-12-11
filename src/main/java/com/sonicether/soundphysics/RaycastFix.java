@@ -1,6 +1,5 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.config.ConfigManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -19,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.sonicether.soundphysics.SoundPhysics.pC;
 
 public class RaycastFix {
 
@@ -46,8 +47,7 @@ public class RaycastFix {
             ImmutableTriple<BlockState,VoxelShape, VoxelShape> shapes = shapeCache.computeIfAbsent(posl, (key) -> {
                 //SoundPhysics.t2();
                 //SoundPhysics.t1();
-                if (ConfigManager.getConfig().Misc.raytraceParticles)
-                    ((World)world).addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY()+1d, pos.getZ()+0.5d, 0,0,0);
+                if (pC.dRays) ((World)world).addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY()+1d, pos.getZ()+0.5d, 0,0,0);
                 if(bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
                 return new ImmutableTriple<>(bs, bs.getCollisionShape(world, pos), context.getFluidShape(world.getFluidState(pos), world, pos));
             });

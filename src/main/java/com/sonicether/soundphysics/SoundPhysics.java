@@ -63,7 +63,7 @@ public class SoundPhysics
 			entry(BlockSoundGroup.LODESTONE, BlockSoundGroup.NETHERITE),
 			entry(BlockSoundGroup.LADDER, BlockSoundGroup.WOOD)
 	)/*</editor-fold>*/;
-	public static PrecomputedConfig pC;
+	public static PrecomputedConfig pC = null;
 	//Private fields
 	// ψ time ψ
 	//public static double tt = 0;
@@ -80,9 +80,6 @@ public class SoundPhysics
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;
 
-	//Public fields
-	public final static float globalVolumeMultiplier = 4f;
-
 	public static void init()
 	{
 		log("Initializing Sound Physics...");
@@ -92,11 +89,7 @@ public class SoundPhysics
 		//rand = new Random(System.currentTimeMillis());
 	}
 
-	public static void setLastSoundCategoryAndName(SoundCategory sc, String name)
-	{//log("Set last sound category and name");
-		lastSoundCategory = sc;
-		lastSoundName = name;
-	}
+	public static void setLastSoundCategoryAndName(SoundCategory sc, String name) { lastSoundCategory = sc; lastSoundName = name; }
 	
 	public static void onPlaySound(double posX, double posY, double posZ, int sourceID, boolean directPass)
 	{
@@ -108,9 +101,8 @@ public class SoundPhysics
 		if (pC.pLog) startTime = System.nanoTime();
 
 		evaluateEnvironment(sourceID, posX, posY, posZ, directPass);
-		
-		if (pC.pLog)
-		{ endTime = System.nanoTime();
+
+		if (pC.pLog) { endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
 	}
@@ -151,7 +143,7 @@ public class SoundPhysics
 	@SuppressWarnings("ConstantConditions")
 	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ, boolean directPass)
 	{
-		if (!pC.on) return;
+		if (pC.off) return;
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
@@ -180,14 +172,8 @@ public class SoundPhysics
 			RaycastFix.lastUpd = timeT;
 		}
 
-		final int numRays = pC.environmentEvaluationRays;
-		final int rayBounces = pC.environmentEvaluationRayBounces;
-		final double rcpTotalRays = 1.0f / (numRays * rayBounces);
-		final double rcpPrimaryRays = 1.0f / (numRays);
-
 		double directCutoff;
-		final double absorptionCoeff = pC.globalBlockAbsorption * 3.0;
-		
+
 		//Direct sound occlusion
 		Vec3d playerPos = mc.player.getPos();
 			  playerPos = new Vec3d(playerPos.x, playerPos.y + mc.player.getEyeHeight(mc.player.getPose()), playerPos.z);
@@ -197,8 +183,7 @@ public class SoundPhysics
 		final BlockPos soundBlockPos = new BlockPos(soundPos.x, soundPos.y,soundPos.z);
 
 		if (pC.dLog) logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
-		double occlusionAccumulation = 0.0f;
-		boolean doDirEval = pC.soundDirectionEvaluation;
+		double occlusionAccumulation = 0;
 		final List<Map.Entry<Vec3d, Double>> directions = new Vector<>(10, 10);
 		//Cast a ray from the source towards the player
 		Vec3d rayOrigin = soundPos;
@@ -212,7 +197,7 @@ public class SoundPhysics
 				final int jj = j - 1;
 				rayOrigin = new Vec3d(soundBlockPos.getX() + 0.001 + 0.998 * (jj % 2), soundBlockPos.getY() + 0.001 + 0.998 * ((jj >> 1) % 2), soundBlockPos.getZ() + 0.001 + 0.998 * ((jj >> 2) % 2));
 				lastBlockPos = soundBlockPos;
-				occlusionAccumulation = 0.0f;
+				occlusionAccumulation = 0;
 			}
 
 			BlockHitResult rayHit = fixedRaycast(new RaycastContext(rayOrigin, playerPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, lastBlockPos);
@@ -224,7 +209,11 @@ public class SoundPhysics
 
 				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
 				if (rayHit.getType() == HitResult.Type.MISS) {
-					if (doDirEval) directions.add(Map.entry(rayOrigin.subtract(playerPos),  (_9ray?9.0:1.0)*Math.pow(soundPos.distanceTo(playerPos) ,2)/(Math.exp(-occlusionAccumulation * absorptionCoeff)*Math.pow(pC.directRaysDirEvalMultiplier, 10.66))*rcpTotalRays));
+					if (pC.soundDirectionEvaluation) directions.add(Map.entry(rayOrigin.subtract(playerPos),
+							(_9ray?9:1) * Math.pow(soundPos.distanceTo(playerPos), 2.0)* pC.rcpTotRays
+									/
+							(Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption)*pC.directRaysDirEvalMultiplier)
+					));
 					break;
 				}
 
@@ -260,64 +249,63 @@ public class SoundPhysics
 			occlusionAccMin = Math.min(occlusionAccMin, occlusionAccumulation);
 		}
 		occlusionAccumulation = Math.min(occlusionAccMin, pC.maxDirectOcclusionFromBlocks);
-		directCutoff = Math.exp(-occlusionAccumulation * absorptionCoeff);
-		double directGain = directPass ? Math.pow(directCutoff, 0.1) : 0.0f;
+		directCutoff = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption);
+		double directGain = directPass ? Math.pow(directCutoff, 0.1) : 0;
 
 		if (pC.oLog) logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
 
-		final double[] δsendGain = {0,0,0,0};
+		final double[] δsendGain = {0d,0d,0d,0d};
 
-		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, 0, 0, occlusionAccumulation, absorptionCoeff, directGain, directPass, null, δsendGain); return;}
+		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, occlusionAccumulation, directGain, directPass, null, δsendGain); return;}
 
 		// Shoot rays around sound
 
-		final double maxDistance = 256.0f * pC.environmentEvaluationRayBounces;
+		final double maxDistance = 256 * pC.nRayBounces;
 
-		doDirEval = pC.soundDirectionEvaluation &&
-				(occlusionAccumulation > 0 || !pC.notOccludedNoRedirect);
+		boolean doDirEval = pC.soundDirectionEvaluation && (occlusionAccumulation > 0 || pC.notOccludedRedirect);
 
-		final double[] bounceReflectivityRatio = new double[rayBounces];
+		final double[] bounceReflectivityRatio = new double[pC.nRayBounces];
 		
-		double sharedAirspace = 0.0f;
+		double sharedAirspace = 0d;
 
-		final double gRatio = 1.618033988f;
+		final double gRatio = 1.618033988;
 		final double epsilon;
 		
-		if (numRays >= 600000)
+		if (pC.nRays >= 600000)
 		{
-			epsilon = 214.0f;
+			epsilon = 214d;
 		}
-		else if (numRays >= 400000)
+		else if (pC.nRays >= 400000)
 		{
-			epsilon = 75.0f;
+			epsilon = 75d;
 		}
-		else if (numRays >= 11000)
+		else if (pC.nRays >= 11000)
 		{
-			epsilon = 27.0f;
+			epsilon = 27d;
 		}
-		else if (numRays >= 890)
+		else if (pC.nRays >= 890)
 		{
-			epsilon = 10.0f;
+			epsilon = 10d;
 		}
-		else if (numRays >= 177)
+		else if (pC.nRays >= 177)
 		{
-			epsilon = 3.33f;
+			epsilon = 3.33d;
 		}
-		else if (numRays >= 24)
+		else if (pC.nRays >= 24)
 		{
-			epsilon = 1.33f;
+			epsilon = 1.33d;
 		}
 		else
 		{
-			epsilon = 0.33f;
+			epsilon = 0.33d;
 		}
 
-		for (int i = 0; i < numRays; i++)
+		for (int i = 0; i < pC.nRays; i++)
 		{
-			final double x = (i + epsilon) / (numRays - 1.0 + 2.0*epsilon);
+			final double x = (i + epsilon) / (pC.nRays - 1d + 2d*epsilon);
 			final double y = (double) i / gRatio;
-			final double theta = 2.0f * Math.PI * y;
-			final double phi = Math.acos(1.0f - 2.0f*x);
+			final double theta = 2d * Math.PI * y;
+			final double phi = Math.acos(1d - 2d*x);
 			
 			final Vec3d rayDir = new Vec3d(Math.cos(theta) * Math.sin(phi),
 					Math.sin(theta) * Math.sin(phi), Math.cos(phi));
@@ -344,12 +332,12 @@ public class SoundPhysics
 				double totalReflectivityCoefficient = Math.min(blockReflectivity, 1);
 				
 				// Secondary ray bounces
-				for (int j = 0; j < rayBounces; j++) {
+				for (int j = 0; j < pC.nRayBounces; j++) {
 					// Cast (one) final ray towards the player. If it's
 					// unobstructed, then the sound source and the player
 					// share airspace.
-					final double energyTowardsPlayer = 0.25f * (blockReflectivity * pC.globalBlockReflectance * 0.75f + 0.25f);
-					if (!pC.simplerSharedAirspaceSimulation || j == rayBounces - 1) {
+					final double energyTowardsPlayer = blockReflectivity * pC.globalBlockReflectance * 0.1875 + 0.0625;
+					if (!pC.simplerSharedAirspaceSimulation || j == pC.nRayBounces - 1) {
 						final Vec3d finalRayStart = new Vec3d(lastHitPos.x + lastHitNormal.getX() * 0.01,
 								lastHitPos.y + lastHitNormal.getY() * 0.01, lastHitPos.z + lastHitNormal.getZ() * 0.01);
 
@@ -361,22 +349,23 @@ public class SoundPhysics
 
 							double totalFinalRayDistance = totalRayDistance + finalRayStart.distanceTo(playerPos);
 
-							if (doDirEval) directions.add(Map.entry(finalRayStart.subtract(playerPos), (totalFinalRayDistance*totalFinalRayDistance)*(totalReflectivityCoefficient == 0 ? 1000000 : 1/totalReflectivityCoefficient)));
+							if (doDirEval) directions.add(Map.entry(finalRayStart.subtract(playerPos), (totalFinalRayDistance*totalFinalRayDistance)*(totalReflectivityCoefficient == 0d ? 1000000d : 1d/totalReflectivityCoefficient)));
 							//log("Secondary ray hit the player!");
 
-							sharedAirspace += 1.0f;
+							sharedAirspace += 1d;
 
 							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * blockReflectivity * pC.globalBlockReflectance;
 
-							final double cross0 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 0.0f), 0.0f, 1.0f);
-							final double cross1 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 1.0f), 0.0f, 1.0f);
-							final double cross2 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 2.0f), 0.0f, 1.0f);
-							final double cross3 = MathHelper.clamp(reflectionDelay - 2.0f, 0.0f, 1.0f);
+							final double cross0 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 0d), 0d, 1d);
+							final double cross1 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 1d), 0d, 1d);
+							final double cross2 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 2d), 0d, 1d);
+							final double cross3 = MathHelper.clamp(reflectionDelay - 2d, 0d, 1d);
 
-							δsendGain[0] += cross0 * energyTowardsPlayer * 6.4f * rcpTotalRays;
-							δsendGain[1] += cross1 * energyTowardsPlayer * 12.8f * rcpTotalRays;
-							δsendGain[2] += cross2 * energyTowardsPlayer * 12.8f * rcpTotalRays;
-							δsendGain[3] += cross3 * energyTowardsPlayer * 12.8f * rcpTotalRays;
+							double factor = energyTowardsPlayer * 12.8 * pC.rcpTotRays;
+							δsendGain[0] += cross0 * factor * 0.5;
+							δsendGain[1] += cross1 * factor;
+							δsendGain[2] += cross2 * factor;
+							δsendGain[3] += cross3 * factor;
 
 						}
 						RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
@@ -420,7 +409,7 @@ public class SoundPhysics
 			}
 		}
 		for (int i = 0; i < bounceReflectivityRatio.length; i++) {
-			bounceReflectivityRatio[i] = bounceReflectivityRatio[i] / numRays;
+			bounceReflectivityRatio[i] = bounceReflectivityRatio[i] * pC.rcpNRays;
 		}
 
 		// Take weighted (on squared distance) average of the directions sound reflection came from
@@ -439,64 +428,63 @@ public class SoundPhysics
 				sum = sum.add(direction.getKey().normalize().multiply(w));
 			}
 			sum = sum.multiply(1 / weight);
-			//System.out.println(sum+"  "+sum.lengthSquared());
-			if (sum.lengthSquared() >= 1-pC.maxDirVariance)
+			//System.out.println(sum+"  "+sum.lengthSquared());//todo
+			if (sum.lengthSquared() >= pC.maxDirVarianceSquared)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 			// ψ this shows a star at perceived sound pos ψ
 			// Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos);
 			// mc.world.addParticle(ParticleTypes.END_ROD, false, pos.getX(), pos.getY(), pos.getZ(), 0,0,0);
 		}
 
-		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, directPass, bounceReflectivityRatio, δsendGain);
+		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, occlusionAccumulation,  directGain, directPass, bounceReflectivityRatio, δsendGain);
 		}
 
-	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double rcpPrimaryRays, double rcpTotalRays, double occlusionAccumulation, double absorptionCoeff, double directGain, boolean directPass, double[] bounceReflectivityRatio, double[] δsendGain) {
-
+	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double occlusionAccumulation, double directGain, boolean directPass, double[] bounceReflectivityRatio, double[] δsendGain) {
 		// Calculate reverb parameters for this sound
-		double sendGain0 = 0.0f + δsendGain[0];
-		double sendGain1 = 0.0f + δsendGain[1];
-		double sendGain2 = 0.0f + δsendGain[2];
-		double sendGain3 = 0.0f + δsendGain[3];
+		double sendGain0 = 0d + δsendGain[0];
+		double sendGain1 = 0d + δsendGain[1];
+		double sendGain2 = 0d + δsendGain[2];
+		double sendGain3 = 0d + δsendGain[3];
 
-		double sendCutoff0 = 1.0f;
-		double sendCutoff1 = 1.0f;
-		double sendCutoff2 = 1.0f;
-		double sendCutoff3 = 1.0f;
+		double sendCutoff0 = 1d;
+		double sendCutoff1 = 1d;
+		double sendCutoff2 = 1d;
+		double sendCutoff3 = 1d;
 
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
 		{
-			directCutoff *= 1.0f - pC.underwaterFilter;
+			directCutoff *= pC.underwaterFilter;
 		}
 
 		if (isRain)
 		{
-			setEnvironment(sourceID, sendGain0, sendGain1, sendGain2, sendGain3, sendCutoff0, sendCutoff1, sendCutoff2, sendCutoff3, directCutoff, directGain);
+			setEnvironment(sourceID, (float) sendGain0, (float) sendGain1, (float) sendGain2, (float) sendGain3, (float) sendCutoff0, (float) sendCutoff1, (float) sendCutoff2, (float) sendCutoff3, (float) directCutoff, (float) directGain);
 			return;
 		}
 
-		sharedAirspace *= 64.0f;
+		sharedAirspace *= 64d;
 
 		if (pC.simplerSharedAirspaceSimulation)
-			sharedAirspace *= rcpPrimaryRays;
+			sharedAirspace *= pC.rcpNRays;
 		else
-			sharedAirspace *= rcpTotalRays;
+			sharedAirspace *= pC.rcpTotRays;
 
-		final double sharedAirspaceWeight0 = MathHelper.clamp(sharedAirspace / 20.0f, 0.0f, 1.0f);
-		final double sharedAirspaceWeight1 = MathHelper.clamp(sharedAirspace / 15.0f, 0.0f, 1.0f);
-		final double sharedAirspaceWeight2 = MathHelper.clamp(sharedAirspace / 10.0f, 0.0f, 1.0f);
-		final double sharedAirspaceWeight3 = MathHelper.clamp(sharedAirspace / 10.0f, 0.0f, 1.0f);
+		final double sharedAirspaceWeight0 = MathHelper.clamp(sharedAirspace * 0.05, 0d, 1d);
+		final double sharedAirspaceWeight1 = MathHelper.clamp(sharedAirspace * 0.06666666666666667, 0d, 1d);
+		final double sharedAirspaceWeight2 = MathHelper.clamp(sharedAirspace * 0.1, 0d, 1d);
+		final double sharedAirspaceWeight3 = MathHelper.clamp(sharedAirspace * 0.1, 0d, 1d);
 
-		sendCutoff0 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.0f) * (1.0f - sharedAirspaceWeight0) + sharedAirspaceWeight0;
-		sendCutoff1 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.0f) * (1.0f - sharedAirspaceWeight1) + sharedAirspaceWeight1;
-		sendCutoff2 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight2) + sharedAirspaceWeight2;
-		sendCutoff3 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight3) + sharedAirspaceWeight3;
+		sendCutoff0 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption) * (1d - sharedAirspaceWeight0) + sharedAirspaceWeight0;
+		sendCutoff1 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption) * (1d - sharedAirspaceWeight1) + sharedAirspaceWeight1;
+		sendCutoff2 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption * 1d) * (1d - sharedAirspaceWeight2) + sharedAirspaceWeight2;
+		sendCutoff3 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption * 1d) * (1d - sharedAirspaceWeight3) + sharedAirspaceWeight3;
 
 		// attempt to preserve directionality when airspace is shared by allowing some dry signal through but filtered
-		final double averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25f;
-		directCutoff = Math.max(Math.pow(averageSharedAirspace, 0.5) * 0.2f, directCutoff);
+		final double averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25;
+		directCutoff = Math.max(Math.pow(averageSharedAirspace, 0.5) * 0.2, directCutoff);
 
-		directGain = directPass ? Math.pow(directCutoff, 0.1) : 0.0f;
+		directGain = directPass ? Math.pow(directCutoff, 0.1) : 0d;
 
 		//logDetailed("HitRatio0: " + hitRatioBounce1 + " HitRatio1: " + hitRatioBounce2 + " HitRatio2: " + hitRatioBounce3 + " HitRatio3: " + hitRatioBounce4);
 
@@ -507,10 +495,10 @@ public class SoundPhysics
 		sendGain2 *= Math.pow(bounceReflectivityRatio[2], 3.0);
 		sendGain3 *= Math.pow(bounceReflectivityRatio[3], 4.0);
 
-		sendGain0 = MathHelper.clamp(sendGain0, 0.0f, 1.0f);
-		sendGain1 = MathHelper.clamp(sendGain1, 0.0f, 1.0f);
-		sendGain2 = MathHelper.clamp(sendGain2 * 1.05f - 0.05f, 0.0f, 1.0f);
-		sendGain3 = MathHelper.clamp(sendGain3 * 1.05f - 0.05f, 0.0f, 1.0f);
+		sendGain0 = MathHelper.clamp(sendGain0, 0d, 1d);
+		sendGain1 = MathHelper.clamp(sendGain1, 0d, 1d);
+		sendGain2 = MathHelper.clamp(sendGain2 * 1.05 - 0.05, 0d, 1d);
+		sendGain3 = MathHelper.clamp(sendGain3 * 1.05 - 0.05, 0d, 1d);
 
 		sendGain0 *= Math.pow(sendCutoff0, 0.1);
 		sendGain1 *= Math.pow(sendCutoff1, 0.1);
@@ -522,12 +510,12 @@ public class SoundPhysics
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
 		{
-			sendCutoff0 *= 0.4f;
-			sendCutoff1 *= 0.4f;
-			sendCutoff2 *= 0.4f;
-			sendCutoff3 *= 0.4f;
+			sendCutoff0 *= 0.4;
+			sendCutoff1 *= 0.4;
+			sendCutoff2 *= 0.4;
+			sendCutoff3 *= 0.4;
 		}
-		setEnvironment(sourceID, sendGain0, sendGain1, sendGain2, sendGain3, sendCutoff0, sendCutoff1, sendCutoff2, sendCutoff3, directCutoff, directGain);
+		setEnvironment(sourceID, (float) sendGain0, (float) sendGain1, (float) sendGain2, (float) sendGain3, (float) sendCutoff0, (float) sendCutoff1, (float) sendCutoff2, (float) sendCutoff3, (float) directCutoff, (float) directGain);
 
 	}
 
