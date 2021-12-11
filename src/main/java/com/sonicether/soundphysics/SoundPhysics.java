@@ -210,7 +210,6 @@ public class SoundPhysics
 					break;
 				}
 
-				final BlockPos blockHitPos = rayHit.getBlockPos();
 				final Vec3d rayHitPos = rayHit.getPos();
 				final BlockState blockHit = rayHit.getBlockState();
 				double blockOcclusion = getBlockOcclusionD(blockHit);
@@ -419,7 +418,6 @@ public class SoundPhysics
 				sum = sum.add(direction.getKey().normalize().multiply(w));
 			}
 			sum = sum.multiply(1 / weight);
-			//System.out.println(sum+"  "+sum.lengthSquared());//todo
 			if (sum.lengthSquared() >= pC.maxDirVarianceSquared)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 			// ψ this shows a star at perceived sound pos ψ

@@ -30,7 +30,7 @@
   "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray direct occlusion calculation",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.soundDirectionEvaluation": "Re-calculate sound direction",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.directRaysDirEvalMultiplier": "Sound reflection bias",
-  "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirVariance": "Max direction variance",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirRayAntilength": "Max direction variance (antilength)",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.notOccludedNoRedirect": "Skip redirecting directly visible blocks",
 
   "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
