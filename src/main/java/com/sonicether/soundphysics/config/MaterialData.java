@@ -15,7 +15,7 @@ public class MaterialData {
     }
 
     @SuppressWarnings("unused")
-    public MaterialData() { reflectivity = 0; absorption = 1; example = null; }
+    public MaterialData() { reflectivity = 0; absorption = 1; example = ""; }
 
     public double getReflectivity() {return reflectivity;}
     public double getAbsorption() {return absorption;}

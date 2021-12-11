@@ -1,11 +1,13 @@
 package com.sonicether.soundphysics;
 
 import com.sonicether.soundphysics.config.ConfigManager;
+import com.sonicether.soundphysics.config.PrecomputedConfig;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Pair;
 
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class SoundPhysicsMod implements ModInitializer {
     public static Map<BlockSoundGroup, Pair<String, String>> blockSoundGroups;
+    public static Map<String, BlockSoundGroup> groupSoundBlocks;
     @Override
     public void onInitialize()
     {
@@ -50,8 +53,24 @@ public class SoundPhysicsMod implements ModInitializer {
                              }
                              return new Pair<>("", "");
                          }));
+        groupSoundBlocks = Arrays.stream(BlockSoundGroup.class.getDeclaredFields())
+                .filter((f) -> {
+                    try {
+                        return Modifier.isStatic(f.getModifiers()) && Modifier.isPublic(f.getModifiers())
+                                && (f.get(null) instanceof BlockSoundGroup group) && !SoundPhysics.redirectMap.containsKey(group);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return false;
+                }).map((f)-> {
+                    BlockSoundGroup b;
+                    try { b = (BlockSoundGroup)f.get(null); }
+                    catch (IllegalAccessException | ClassCastException e) { e.printStackTrace(); b = null;}
+                    return new Pair<>(f.getName(),b);
+                }).filter((f) -> f.getRight() != null)
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         ConfigManager.registerAutoConfig();
-
+        SoundPhysics.pC = new PrecomputedConfig(ConfigManager.DEFAULT);
     }
 }

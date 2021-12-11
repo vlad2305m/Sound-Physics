@@ -1,7 +1,11 @@
 package com.sonicether.soundphysics.liquid;
 
 import com.sonicether.soundphysics.SPLog;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Set;
 
 /*
             !!!WIP!!!
@@ -11,14 +15,20 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 
 public class LiquidStorage {
-    private LIQUIDS liquid;
     private boolean full = false;
     private int bottom;
     private int top;
     private boolean[][] sections;
     private static boolean[] empty() {return new boolean[16*16];}
 
-    private enum LIQUIDS { WATER, LAVA, AIR }
+    public enum LIQUIDS {
+        WATER(Set.of(Blocks.WATER, Blocks.BUBBLE_COLUMN)),
+        LAVA(Set.of(Blocks.LAVA)),
+        AIR(Set.of(Blocks.AIR, Blocks.CAVE_AIR, Blocks.VOID_AIR));
+        final Set<Block> allowed;
+        LIQUIDS(Set<Block> a){allowed = a;}
+        public boolean matches(Block b){ return allowed.contains(b); }
+    }
 
     public boolean[] getSection(int y) {
         if (!full || y > top || y < bottom) return null;

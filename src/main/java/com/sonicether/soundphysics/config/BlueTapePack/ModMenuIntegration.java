@@ -1,5 +1,6 @@
-package com.sonicether.soundphysics.config;
+package com.sonicether.soundphysics.config.BlueTapePack;
 
+import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.shedaniel.autoconfig.AutoConfig;

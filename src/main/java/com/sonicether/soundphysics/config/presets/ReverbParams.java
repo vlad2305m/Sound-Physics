@@ -1,5 +1,6 @@
-package com.sonicether.soundphysics.config;
+package com.sonicether.soundphysics.config.presets;
 
+import com.sonicether.soundphysics.config.ConfigManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

@@ -14,7 +14,7 @@
       "com.sonicether.soundphysics.SoundPhysicsMod"
     ],
     "modmenu": [
-      "com.sonicether.soundphysics.config.ModMenuIntegration"
+      "com.sonicether.soundphysics.config.BlueTapePack.ModMenuIntegration"
     ]
   },
   "mixins": [

@@ -1,12 +1,10 @@
 package com.sonicether.soundphysics;
 
 import com.sonicether.soundphysics.config.ConfigManager;
-import com.sonicether.soundphysics.config.MaterialData;
+import com.sonicether.soundphysics.config.PrecomputedConfig;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
-//import net.minecraft.block.Blocks;//rm
 import net.minecraft.client.MinecraftClient;
-// import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
@@ -66,6 +64,7 @@ public class SoundPhysics
 			entry(BlockSoundGroup.LODESTONE, BlockSoundGroup.NETHERITE),
 			entry(BlockSoundGroup.LADDER, BlockSoundGroup.WOOD)
 	)/*</editor-fold>*/;
+	public static PrecomputedConfig pC;
 	//Private fields
 	// ψ time ψ
 	//public static double tt = 0;
@@ -83,7 +82,7 @@ public class SoundPhysics
 	private static String lastSoundName;
 
 	//Public fields
-	public final static float globalVolumeMultiplier = 4.0f;
+	public final static float globalVolumeMultiplier = 4f;
 
 	public static void init()
 	{
@@ -102,50 +101,49 @@ public class SoundPhysics
 	
 	public static void onPlaySound(double posX, double posY, double posZ, int sourceID)
 	{
-		logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
-
-		if (ConfigManager.getConfig().reloadReverb) {
-			ConfigManager.reload(false);
-			ConfigManager.getConfig().reloadReverb = false;
-			ConfigManager.save();
-		}
+		if (pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
 		long startTime = 0;
 		long endTime;
 		
-		if (ConfigManager.getConfig().Misc.performanceLogging) startTime = System.nanoTime();
+		if (pC.pLog) startTime = System.nanoTime();
 
 		evaluateEnvironment(sourceID, posX, posY, posZ);
 		
-		if (ConfigManager.getConfig().Misc.performanceLogging)
+		if (pC.pLog)
 		{ endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
 	}
 	
-	private static MaterialData getBlockMaterialData(final BlockPos blockPos)
+	private static double getBlockReflectivity(final BlockPos blockPos)
 	{
 		assert mc.world != null;
 		BlockState blockState = mc.world.getBlockState(blockPos);
-		String blockName = blockState.getBlock().getTranslationKey();
-		List<String> wl = ConfigManager.getConfig().Material_Properties.blockWhiteList;
-		String key;
-
-		// !!! Middle(wheel)-click "BlockSoundGroup" to see all groups !!! //rm
-		//Blocks b;//rm
 		BlockSoundGroup soundType = blockState.getSoundGroup();
-		soundType = redirectMap.getOrDefault(soundType, soundType);
 
-		if (!ConfigManager.getConfig().Material_Properties.reflectivityMap.containsKey("DEFAULT")) {
-			ConfigManager.handleBrokenMaterials();
+		double r = pC.reflectivityMap.getOrDefault(soundType, Double.NaN);
+		if (Double.isNaN(r)) {
+			String blockName = blockState.getBlock().getTranslationKey();
+			if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).reflectivity;
+			else return pC.defaultReflectivity;
 		}
-		
-		MaterialData materialData = ConfigManager.getConfig().Material_Properties.reflectivityMap.get("DEFAULT");
-		if (wl != null && wl.contains(blockName)) key = blockName;
-		else key = SoundPhysicsMod.blockSoundGroups.get(soundType).getLeft();
-		materialData = ConfigManager.getConfig().Material_Properties.reflectivityMap.getOrDefault(key, materialData);
-		
-		return materialData;
+		return r;
+	}
+
+	private static double getBlockOcclusionD(final BlockPos blockPos)
+	{
+		assert mc.world != null;
+		BlockState blockState = mc.world.getBlockState(blockPos);
+		BlockSoundGroup soundType = blockState.getSoundGroup();
+
+		double r = pC.absorptionMap.getOrDefault(soundType, Double.NaN);
+		if (Double.isNaN(r)) {
+			String blockName = blockState.getBlock().getTranslationKey();
+			if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).absorption;
+			else return pC.defaultAbsorption;
+		}
+		return r;
 	}
 
 	private static Vec3d pseudoReflect(Vec3d dir, Vec3i normal)
@@ -154,7 +152,7 @@ public class SoundPhysics
 	@SuppressWarnings("ConstantConditions")
 	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ)
 	{
-		if (!ConfigManager.getConfig().enabled) return;
+		if (!pC.on) return;
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
@@ -165,7 +163,7 @@ public class SoundPhysics
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
 
-		if (ConfigManager.getConfig().Performance.skipRainOcclusionTracing && isRain)
+		if (pC.skipRainOcclusionTracing && isRain)
 		{
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 			return;
@@ -183,13 +181,13 @@ public class SoundPhysics
 			RaycastFix.lastUpd = timeT;
 		}
 
-		final int numRays = ConfigManager.getConfig().Performance.environmentEvaluationRays;
-		final int rayBounces = ConfigManager.getConfig().Performance.environmentEvaluationRayBounces;
-		final float rcpTotalRays = 1.0f / (numRays * rayBounces);
-		final float rcpPrimaryRays = 1.0f / (numRays);
+		final int numRays = pC.environmentEvaluationRays;
+		final int rayBounces = pC.environmentEvaluationRayBounces;
+		final double rcpTotalRays = 1.0f / (numRays * rayBounces);
+		final double rcpPrimaryRays = 1.0f / (numRays);
 
-		float directCutoff;
-		final float absorptionCoeff = (float) (ConfigManager.getConfig().General.globalBlockAbsorption * 3.0);
+		double directCutoff;
+		final double absorptionCoeff = pC.globalBlockAbsorption * 3.0;
 		
 		//Direct sound occlusion
 		Vec3d playerPos = mc.player.getPos();
@@ -199,15 +197,15 @@ public class SoundPhysics
 
 		final BlockPos soundBlockPos = new BlockPos(soundPos.x, soundPos.y,soundPos.z);
 
-		logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
+		if (pC.dLog) logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
 		double occlusionAccumulation = 0.0f;
-		boolean doDirEval = ConfigManager.getConfig().Vlads_Tweaks.soundDirectionEvaluation;
+		boolean doDirEval = pC.soundDirectionEvaluation;
 		final List<Map.Entry<Vec3d, Double>> directions = new Vector<>(10, 10);
 		//Cast a ray from the source towards the player
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
 		BlockPos lastBlockPos = soundBlockPos;
-		final boolean _9ray = ConfigManager.getConfig().Vlads_Tweaks._9RayDirectOcclusion && (lastSoundCategory == SoundCategory.BLOCKS || blockPattern.matcher(lastSoundName).matches()) && !stepPattern.matcher(lastSoundName).matches();
+		final boolean _9ray = pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || blockPattern.matcher(lastSoundName).matches()) && !stepPattern.matcher(lastSoundName).matches();
 		final int nOccRays = _9ray ? 9 : 1;
 		double occlusionAccMin = Double.MAX_VALUE;
 		for (int j = 0; j < nOccRays; j++) {
@@ -225,20 +223,20 @@ public class SoundPhysics
 				lastBlockPos = rayHit.getBlockPos();
 				//If we hit a block
 
-				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor(1F / 3F * (1F - Math.min(1F, (float) occlusionAccumulation / 12F)), 1F, 1F).getRGB());
+				RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
 				if (rayHit.getType() == HitResult.Type.MISS) {
-					if (doDirEval) directions.add(Map.entry(rayOrigin.subtract(playerPos),  (_9ray?9.0:1.0)*Math.pow(soundPos.distanceTo(playerPos) ,2)/(Math.exp(-occlusionAccumulation * absorptionCoeff)*Math.pow(ConfigManager.getConfig().Vlads_Tweaks.directRaysDirEvalMultiplier, 10.66))*rcpTotalRays));
+					if (doDirEval) directions.add(Map.entry(rayOrigin.subtract(playerPos),  (_9ray?9.0:1.0)*Math.pow(soundPos.distanceTo(playerPos) ,2)/(Math.exp(-occlusionAccumulation * absorptionCoeff)*Math.pow(pC.directRaysDirEvalMultiplier, 10.66))*rcpTotalRays));
 					break;
 				}
 
 				final BlockPos blockHitPos = rayHit.getBlockPos();
 				final Vec3d rayHitPos = rayHit.getPos();
 				final BlockState blockHit = mc.world.getBlockState(blockHitPos);
-				float blockOcclusion = (float) (getBlockMaterialData(blockHitPos).getAbsorption());
+				double blockOcclusion = getBlockOcclusionD(blockHitPos);//todo add blockstate to blockhitresult
 
 				// Regardless to whether we hit from inside or outside
 
-				logOcclusion(blockHit.getBlock().getTranslationKey() + "    " + rayHitPos.x + ", " + rayHitPos.y + ", " + rayHitPos.z);
+				if (pC.oLog) logOcclusion(blockHit.getBlock().getTranslationKey() + "    " + rayHitPos.x + ", " + rayHitPos.y + ", " + rayHitPos.z);
 
 				rayOrigin = rayHitPos; //new Vec3d(rayHit.getPos().x + normalToPlayer.x * 0.1, rayHit.getPos().y + normalToPlayer.y * 0.1, rayHit.getPos().z + normalToPlayer.z * 0.1);
 
@@ -258,33 +256,33 @@ public class SoundPhysics
 
 
 
-				logOcclusion("New trace position: " + rayOrigin.x + ", " + rayOrigin.y + ", " + rayOrigin.z);
+				if (pC.oLog) logOcclusion("New trace position: " + rayOrigin.x + ", " + rayOrigin.y + ", " + rayOrigin.z);
 			}
 			occlusionAccMin = Math.min(occlusionAccMin, occlusionAccumulation);
 		}
-		occlusionAccumulation = Math.min(occlusionAccMin, ConfigManager.getConfig().Vlads_Tweaks.maxDirectOcclusionFromBlocks);
-		directCutoff = (float) Math.exp(-occlusionAccumulation * absorptionCoeff);
-		float directGain = (float) Math.pow(directCutoff, 0.1);
-		
-		logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
+		occlusionAccumulation = Math.min(occlusionAccMin, pC.maxDirectOcclusionFromBlocks);
+		directCutoff = Math.exp(-occlusionAccumulation * absorptionCoeff);
+		double directGain = Math.pow(directCutoff, 0.1);
 
-		final float[] δsendGain = {0,0,0,0};
+		if (pC.oLog) logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
+
+		final double[] δsendGain = {0,0,0,0};
 
 		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, 0, 0, occlusionAccumulation, absorptionCoeff, directGain, null, δsendGain); return;}
 
 		// Shoot rays around sound
 
-		final float maxDistance = 256.0f * ConfigManager.getConfig().Performance.environmentEvaluationRayBounces;
+		final double maxDistance = 256.0f * pC.environmentEvaluationRayBounces;
 
-		doDirEval = ConfigManager.getConfig().Vlads_Tweaks.soundDirectionEvaluation &&
-				(occlusionAccumulation > 0 || !ConfigManager.getConfig().Vlads_Tweaks.notOccludedNoRedirect);
+		doDirEval = pC.soundDirectionEvaluation &&
+				(occlusionAccumulation > 0 || !pC.notOccludedNoRedirect);
 
-		final float[] bounceReflectivityRatio = new float[rayBounces];
+		final double[] bounceReflectivityRatio = new double[rayBounces];
 		
-		float sharedAirspace = 0.0f;
+		double sharedAirspace = 0.0f;
 
-		final float gRatio = 1.618033988f;
-		final float epsilon;
+		final double gRatio = 1.618033988f;
+		final double epsilon;
 		
 		if (numRays >= 600000)
 		{
@@ -317,10 +315,10 @@ public class SoundPhysics
 
 		for (int i = 0; i < numRays; i++)
 		{
-			final float x = (float) ((i + epsilon) / (numRays - 1.0 + 2.0*epsilon));
-			final float y = (float) i / gRatio;
-			final float theta = (float) (2.0f * Math.PI * y);
-			final float phi = (float) Math.acos(1.0f - 2.0f*x);
+			final double x = (i + epsilon) / (numRays - 1.0 + 2.0*epsilon);
+			final double y = (double) i / gRatio;
+			final double theta = 2.0f * Math.PI * y;
+			final double phi = Math.acos(1.0f - 2.0f*x);
 			
 			final Vec3d rayDir = new Vec3d(Math.cos(theta) * Math.sin(phi),
 					Math.sin(theta) * Math.sin(phi), Math.cos(phi));
@@ -340,9 +338,9 @@ public class SoundPhysics
 				Vec3i lastHitNormal = rayHit.getSide().getVector();
 				Vec3d lastRayDir = rayDir;
 				
-				float totalRayDistance = (float) soundPos.distanceTo(rayHit.getPos());
+				double totalRayDistance = soundPos.distanceTo(rayHit.getPos());
 
-				float blockReflectivity = (float) getBlockMaterialData(lastHitBlock).getReflectivity();
+				double blockReflectivity = getBlockReflectivity(lastHitBlock);
 
 				double totalReflectivityCoefficient = Math.min(blockReflectivity, 1);
 				
@@ -351,9 +349,8 @@ public class SoundPhysics
 					// Cast (one) final ray towards the player. If it's
 					// unobstructed, then the sound source and the player
 					// share airspace.
-					final float energyTowardsPlayer = (float) (0.25f * (blockReflectivity * ConfigManager.getConfig().General.globalBlockReflectance * 0.75f + 0.25f));
-					if (ConfigManager.getConfig().Performance.simplerSharedAirspaceSimulation && j == rayBounces - 1
-							|| !ConfigManager.getConfig().Performance.simplerSharedAirspaceSimulation) {
+					final double energyTowardsPlayer = 0.25f * (blockReflectivity * pC.globalBlockReflectance * 0.75f + 0.25f);
+					if (!pC.simplerSharedAirspaceSimulation || j == rayBounces - 1) {
 						final Vec3d finalRayStart = new Vec3d(lastHitPos.x + lastHitNormal.getX() * 0.01,
 								lastHitPos.y + lastHitNormal.getY() * 0.01, lastHitPos.z + lastHitNormal.getZ() * 0.01);
 
@@ -370,12 +367,12 @@ public class SoundPhysics
 
 							sharedAirspace += 1.0f;
 
-							final float reflectionDelay = (float) (Math.max(totalRayDistance, 0.0) * 0.12 * blockReflectivity * ConfigManager.getConfig().General.globalBlockReflectance);
+							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * blockReflectivity * pC.globalBlockReflectance;
 
-							final float cross0 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 0.0f), 0.0f, 1.0f);
-							final float cross1 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 1.0f), 0.0f, 1.0f);
-							final float cross2 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 2.0f), 0.0f, 1.0f);
-							final float cross3 = MathHelper.clamp(reflectionDelay - 2.0f, 0.0f, 1.0f);
+							final double cross0 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 0.0f), 0.0f, 1.0f);
+							final double cross1 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 1.0f), 0.0f, 1.0f);
+							final double cross2 = 1.0f - MathHelper.clamp(Math.abs(reflectionDelay - 2.0f), 0.0f, 1.0f);
+							final double cross3 = MathHelper.clamp(reflectionDelay - 2.0f, 0.0f, 1.0f);
 
 							δsendGain[0] += cross0 * energyTowardsPlayer * 6.4f * rcpTotalRays;
 							δsendGain[1] += cross1 * energyTowardsPlayer * 12.8f * rcpTotalRays;
@@ -407,7 +404,7 @@ public class SoundPhysics
 
 
 
-						bounceReflectivityRatio[j] += blockReflectivity * ConfigManager.getConfig().General.globalBlockReflectance;
+						bounceReflectivityRatio[j] += blockReflectivity * pC.globalBlockReflectance;
 
 
 						totalRayDistance += newRayLength;
@@ -416,7 +413,7 @@ public class SoundPhysics
 						lastHitNormal = newRayHit.getSide().getVector();
 						lastRayDir = newRayDir;
 						lastHitBlock = newRayHit.getBlockPos();
-						blockReflectivity = (float) (getBlockMaterialData(lastHitBlock).getReflectivity());
+						blockReflectivity = getBlockReflectivity(lastHitBlock);
 						totalReflectivityCoefficient *= Math.min(blockReflectivity, 1);
 
 					}
@@ -431,7 +428,7 @@ public class SoundPhysics
 		dirEval:
 		{
 			if (directions.isEmpty()) break dirEval;
-			if (ConfigManager.getConfig().Misc.performanceLogging) log("Evaluating direction from "+sharedAirspace+" entries...");
+			if (pC.pLog) log("Evaluating direction from "+sharedAirspace+" entries...");
 			Vec3d sum = new Vec3d(0, 0, 0);
 			double weight = 0;
 
@@ -444,7 +441,7 @@ public class SoundPhysics
 			}
 			sum = sum.multiply(1 / weight);
 			//System.out.println(sum+"  "+sum.lengthSquared());
-			if (sum.lengthSquared() >= 1-ConfigManager.getConfig().Vlads_Tweaks.maxDirVariance)
+			if (sum.lengthSquared() >= 1-pC.maxDirVariance)
 				setSoundPos(sourceID, sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos));
 			// ψ this shows a star at perceived sound pos ψ
 			// Vec3d pos = sum.normalize().multiply(soundPos.distanceTo(playerPos)).add(playerPos);
@@ -454,23 +451,23 @@ public class SoundPhysics
 		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace, rcpPrimaryRays, rcpTotalRays, occlusionAccumulation, absorptionCoeff, directGain, bounceReflectivityRatio, δsendGain);
 		}
 
-	private static void finalizeEnvironment(boolean isRain, int sourceID, float directCutoff, float sharedAirspace, float rcpPrimaryRays, float rcpTotalRays, double occlusionAccumulation, double absorptionCoeff, float directGain, float[] bounceReflectivityRatio, float[] δsendGain) {
+	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double rcpPrimaryRays, double rcpTotalRays, double occlusionAccumulation, double absorptionCoeff, double directGain, double[] bounceReflectivityRatio, double[] δsendGain) {
 
 		// Calculate reverb parameters for this sound
-		float sendGain0 = 0.0f + δsendGain[0];
-		float sendGain1 = 0.0f + δsendGain[1];
-		float sendGain2 = 0.0f + δsendGain[2];
-		float sendGain3 = 0.0f + δsendGain[3];
+		double sendGain0 = 0.0f + δsendGain[0];
+		double sendGain1 = 0.0f + δsendGain[1];
+		double sendGain2 = 0.0f + δsendGain[2];
+		double sendGain3 = 0.0f + δsendGain[3];
 
-		float sendCutoff0 = 1.0f;
-		float sendCutoff1 = 1.0f;
-		float sendCutoff2 = 1.0f;
-		float sendCutoff3 = 1.0f;
+		double sendCutoff0 = 1.0f;
+		double sendCutoff1 = 1.0f;
+		double sendCutoff2 = 1.0f;
+		double sendCutoff3 = 1.0f;
 
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
 		{
-			directCutoff *= 1.0f - ConfigManager.getConfig().General.underwaterFilter;
+			directCutoff *= 1.0f - pC.underwaterFilter;
 		}
 
 		if (isRain)
@@ -481,47 +478,47 @@ public class SoundPhysics
 
 		sharedAirspace *= 64.0f;
 
-		if (ConfigManager.getConfig().Performance.simplerSharedAirspaceSimulation)
+		if (pC.simplerSharedAirspaceSimulation)
 			sharedAirspace *= rcpPrimaryRays;
 		else
 			sharedAirspace *= rcpTotalRays;
 
-		final float sharedAirspaceWeight0 = MathHelper.clamp(sharedAirspace / 20.0f, 0.0f, 1.0f);
-		final float sharedAirspaceWeight1 = MathHelper.clamp(sharedAirspace / 15.0f, 0.0f, 1.0f);
-		final float sharedAirspaceWeight2 = MathHelper.clamp(sharedAirspace / 10.0f, 0.0f, 1.0f);
-		final float sharedAirspaceWeight3 = MathHelper.clamp(sharedAirspace / 10.0f, 0.0f, 1.0f);
+		final double sharedAirspaceWeight0 = MathHelper.clamp(sharedAirspace / 20.0f, 0.0f, 1.0f);
+		final double sharedAirspaceWeight1 = MathHelper.clamp(sharedAirspace / 15.0f, 0.0f, 1.0f);
+		final double sharedAirspaceWeight2 = MathHelper.clamp(sharedAirspace / 10.0f, 0.0f, 1.0f);
+		final double sharedAirspaceWeight3 = MathHelper.clamp(sharedAirspace / 10.0f, 0.0f, 1.0f);
 
-		sendCutoff0 = (float) Math.exp(-occlusionAccumulation * absorptionCoeff * 1.0f) * (1.0f - sharedAirspaceWeight0) + sharedAirspaceWeight0;
-		sendCutoff1 = (float) Math.exp(-occlusionAccumulation * absorptionCoeff * 1.0f) * (1.0f - sharedAirspaceWeight1) + sharedAirspaceWeight1;
-		sendCutoff2 = (float) Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight2) + sharedAirspaceWeight2;
-		sendCutoff3 = (float) Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight3) + sharedAirspaceWeight3;
+		sendCutoff0 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.0f) * (1.0f - sharedAirspaceWeight0) + sharedAirspaceWeight0;
+		sendCutoff1 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.0f) * (1.0f - sharedAirspaceWeight1) + sharedAirspaceWeight1;
+		sendCutoff2 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight2) + sharedAirspaceWeight2;
+		sendCutoff3 = Math.exp(-occlusionAccumulation * absorptionCoeff * 1.5f) * (1.0f - sharedAirspaceWeight3) + sharedAirspaceWeight3;
 
 		// attempt to preserve directionality when airspace is shared by allowing some dry signal through but filtered
-		final float averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25f;
-		directCutoff = Math.max((float)Math.pow(averageSharedAirspace, 0.5) * 0.2f, directCutoff);
+		final double averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25f;
+		directCutoff = Math.max(Math.pow(averageSharedAirspace, 0.5) * 0.2f, directCutoff);
 
-		directGain = (float) Math.pow(directCutoff, 0.1);
+		directGain = Math.pow(directCutoff, 0.1);
 
 		//logDetailed("HitRatio0: " + hitRatioBounce1 + " HitRatio1: " + hitRatioBounce2 + " HitRatio2: " + hitRatioBounce3 + " HitRatio3: " + hitRatioBounce4);
 
-		logEnvironment("Bounce reflectivity 0: " + bounceReflectivityRatio[0] + " bounce reflectivity 1: " + bounceReflectivityRatio[1] + " bounce reflectivity 2: " + bounceReflectivityRatio[2] + " bounce reflectivity 3: " + bounceReflectivityRatio[3]);
+		if (pC.eLog) logEnvironment("Bounce reflectivity 0: " + bounceReflectivityRatio[0] + " bounce reflectivity 1: " + bounceReflectivityRatio[1] + " bounce reflectivity 2: " + bounceReflectivityRatio[2] + " bounce reflectivity 3: " + bounceReflectivityRatio[3]);
 
 
 		sendGain1 *= bounceReflectivityRatio[1];
-		sendGain2 *= (float) Math.pow(bounceReflectivityRatio[2], 3.0);
-		sendGain3 *= (float) Math.pow(bounceReflectivityRatio[3], 4.0);
+		sendGain2 *= Math.pow(bounceReflectivityRatio[2], 3.0);
+		sendGain3 *= Math.pow(bounceReflectivityRatio[3], 4.0);
 
 		sendGain0 = MathHelper.clamp(sendGain0, 0.0f, 1.0f);
 		sendGain1 = MathHelper.clamp(sendGain1, 0.0f, 1.0f);
 		sendGain2 = MathHelper.clamp(sendGain2 * 1.05f - 0.05f, 0.0f, 1.0f);
 		sendGain3 = MathHelper.clamp(sendGain3 * 1.05f - 0.05f, 0.0f, 1.0f);
 
-		sendGain0 *= (float) Math.pow(sendCutoff0, 0.1);
-		sendGain1 *= (float) Math.pow(sendCutoff1, 0.1);
-		sendGain2 *= (float) Math.pow(sendCutoff2, 0.1);
-		sendGain3 *= (float) Math.pow(sendCutoff3, 0.1);
+		sendGain0 *= Math.pow(sendCutoff0, 0.1);
+		sendGain1 *= Math.pow(sendCutoff1, 0.1);
+		sendGain2 *= Math.pow(sendCutoff2, 0.1);
+		sendGain3 *= Math.pow(sendCutoff3, 0.1);
 
-		logEnvironment("Final environment settings:   " + sendGain0 + ",   " + sendGain1 + ",   " + sendGain2 + ",   " + sendGain3);
+		if (pC.eLog) logEnvironment("Final environment settings:   " + sendGain0 + ",   " + sendGain1 + ",   " + sendGain2 + ",   " + sendGain3);
 
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())

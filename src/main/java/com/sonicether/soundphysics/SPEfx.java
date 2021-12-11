@@ -1,7 +1,7 @@
 package com.sonicether.soundphysics;
 
 import com.sonicether.soundphysics.config.ConfigManager;
-import com.sonicether.soundphysics.config.ReverbParams;
+import com.sonicether.soundphysics.config.presets.ReverbParams;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
@@ -107,34 +107,34 @@ public class SPEfx {
         syncReverbParams();
     }
 
-    protected static void setEnvironment(final int sourceID, final float sendGain0, final float sendGain1,
-                                       final float sendGain2, final float sendGain3, final float sendCutoff0, final float sendCutoff1,
-                                       final float sendCutoff2, final float sendCutoff3, final float directCutoff, final float directGain)
+    protected static void setEnvironment(final int sourceID, final double sendGain0, final double sendGain1,
+                                       final double sendGain2, final double sendGain3, final double sendCutoff0, final double sendCutoff1,
+                                       final double sendCutoff2, final double sendCutoff3, final double directCutoff, final double directGain)
     {
         if (!ConfigManager.getConfig().enabled) return;
         // Set reverb send filter values and set source to send to all reverb fx slots
-        EXTEfx.alFilterf(sendFilter0, EXTEfx.AL_LOWPASS_GAIN, sendGain0);
-        EXTEfx.alFilterf(sendFilter0, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff0);
+        EXTEfx.alFilterf(sendFilter0, EXTEfx.AL_LOWPASS_GAIN, (float) sendGain0);
+        EXTEfx.alFilterf(sendFilter0, EXTEfx.AL_LOWPASS_GAINHF, (float) sendCutoff0);
         AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot0, 1, sendFilter0);
         checkErrorLog("Set Environment filter0:");
 
-        EXTEfx.alFilterf(sendFilter1, EXTEfx.AL_LOWPASS_GAIN, sendGain1);
-        EXTEfx.alFilterf(sendFilter1, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff1);
+        EXTEfx.alFilterf(sendFilter1, EXTEfx.AL_LOWPASS_GAIN, (float) sendGain1);
+        EXTEfx.alFilterf(sendFilter1, EXTEfx.AL_LOWPASS_GAINHF, (float) sendCutoff1);
         AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot1, 1, sendFilter1);
         checkErrorLog("Set Environment filter1:");
 
-        EXTEfx.alFilterf(sendFilter2, EXTEfx.AL_LOWPASS_GAIN, sendGain2);
-        EXTEfx.alFilterf(sendFilter2, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff2);
+        EXTEfx.alFilterf(sendFilter2, EXTEfx.AL_LOWPASS_GAIN, (float) sendGain2);
+        EXTEfx.alFilterf(sendFilter2, EXTEfx.AL_LOWPASS_GAINHF, (float) sendCutoff2);
         AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot2, 1, sendFilter2);
         checkErrorLog("Set Environment filter2:");
 
-        EXTEfx.alFilterf(sendFilter3, EXTEfx.AL_LOWPASS_GAIN, sendGain3);
-        EXTEfx.alFilterf(sendFilter3, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff3);
+        EXTEfx.alFilterf(sendFilter3, EXTEfx.AL_LOWPASS_GAIN, (float) sendGain3);
+        EXTEfx.alFilterf(sendFilter3, EXTEfx.AL_LOWPASS_GAINHF, (float) sendCutoff3);
         AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot3, 1, sendFilter3);
         checkErrorLog("Set Environment filter3:");
 
-        EXTEfx.alFilterf(directFilter0, EXTEfx.AL_LOWPASS_GAIN, directGain);
-        EXTEfx.alFilterf(directFilter0, EXTEfx.AL_LOWPASS_GAINHF, directCutoff);
+        EXTEfx.alFilterf(directFilter0, EXTEfx.AL_LOWPASS_GAIN, (float) directGain);
+        EXTEfx.alFilterf(directFilter0, EXTEfx.AL_LOWPASS_GAINHF, (float) directCutoff);
         AL10.alSourcei(sourceID, EXTEfx.AL_DIRECT_FILTER, directFilter0);
         checkErrorLog("Set Environment directFilter0:");
 
@@ -145,7 +145,7 @@ public class SPEfx {
     public static void setSoundPos(final int sourceID, final Vec3d pos) {
         if (!ConfigManager.getConfig().enabled) return;
         //System.out.println(pos);//TO DO
-        AL10.alSourcefv(sourceID, 4100, new float[]{(float)pos.x, (float)pos.y, (float)pos.z});
+        AL10.alSourcefv(sourceID, 4100, new float[]{(float) pos.x, (float) pos.y, (float) pos.z});
     }
 
     /*

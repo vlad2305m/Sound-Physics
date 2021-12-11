@@ -1,6 +1,5 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.config.ConfigManager;
 import org.lwjgl.openal.AL10;
 
 public class SPLog {
@@ -11,30 +10,11 @@ public class SPLog {
         System.out.println(logPrefix + ": " + message);
     }
 
-    protected static void logOcclusion(String message)
-    {
-        if (!ConfigManager.getConfig().Misc.occlusionLogging)
-            return;
+    protected static void logOcclusion(String message) {System.out.println(logPrefix + " [OCCLUSION] " + ": " + message);}
 
-        System.out.println(logPrefix + " [OCCLUSION] " + ": " + message);
-    }
+    protected static void logEnvironment(String message) {System.out.println(logPrefix + " [ENVIRONMENT] " + ": " + message);}
 
-    protected static void logEnvironment(String message)
-    {
-        if (!ConfigManager.getConfig().Misc.environmentLogging)
-            return;
-
-        System.out.println(logPrefix + " [ENVIRONMENT] " + ": " + message);
-    }
-
-
-    protected static void logGeneral(String message)
-    {
-        if (!ConfigManager.getConfig().Misc.debugLogging)
-            return;
-
-        System.out.println(logPrefix + ": " + message);
-    }
+    protected static void logGeneral(String message) {System.out.println(logPrefix + ": " + message);}
 
     public static void logError(String errorMessage)
     {

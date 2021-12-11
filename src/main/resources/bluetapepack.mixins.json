@@ -1,11 +1,9 @@
 {
-  "required": true,
+  "required": false,
   "minVersion": "0.8.2",
   "package": "com.sonicether.soundphysics.config.BlueTapePack.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-
-  ],
+  "mixins": [  ],
   "client": [
     "GuiRegistriesAccessorMixin",
     "NestedListSaveContentMixin"

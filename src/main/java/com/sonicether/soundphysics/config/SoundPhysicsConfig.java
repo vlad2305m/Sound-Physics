@@ -1,5 +1,6 @@
 package com.sonicether.soundphysics.config;
 
+import com.sonicether.soundphysics.config.presets.ConfigPresets;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
@@ -16,9 +17,6 @@ public class SoundPhysicsConfig implements ConfigData {
 
     @Comment("Enable reverb?")
     public boolean enabled = true;
-
-    @Comment("Don't forget to make this true when you change the preset!")
-    public boolean reloadReverb = true;
 
     @ConfigEntry.Gui.CollapsibleObject
     public General General = new General();

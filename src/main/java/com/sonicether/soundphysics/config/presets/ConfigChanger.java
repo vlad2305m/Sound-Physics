@@ -1,18 +1,20 @@
-package com.sonicether.soundphysics.config;
+package com.sonicether.soundphysics.config.presets;
 
+import com.sonicether.soundphysics.config.ConfigManager;
+import com.sonicether.soundphysics.config.MaterialData;
+import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 public class ConfigChanger {
     public static void changeConfig(SoundPhysicsConfig config, @Nullable Boolean enabled,
-        @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
-        @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Integer environmentEvaluationRayBounces, @Nullable Boolean simplerSharedAirspaceSimulation,
-        @Nullable Map<String, MaterialData> reflectivityMap,
-        @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double directRaysDirEvalMultiplier, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect
+                                    @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
+                                    @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Integer environmentEvaluationRayBounces, @Nullable Boolean simplerSharedAirspaceSimulation,
+                                    @Nullable Map<String, MaterialData> reflectivityMap,
+                                    @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double directRaysDirEvalMultiplier, @Nullable Double maxDirVariance, @Nullable Boolean notOccludedNoRedirect
     ) {
         if (enabled != null) config.enabled = enabled;
-        config.reloadReverb = true;
         setGeneral(config.General, attenuationFactor, globalReverbGain, globalReverbBrightness, globalBlockAbsorption, globalBlockReflectance, soundDistanceAllowance, airAbsorption, underwaterFilter);
         setPerformance(config.Performance, skipRainOcclusionTracing, environmentEvaluationRays, environmentEvaluationRayBounces, simplerSharedAirspaceSimulation);
         setMaterial_Properties(config.Material_Properties, reflectivityMap);
