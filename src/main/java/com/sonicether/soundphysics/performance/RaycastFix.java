@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.sonicether.soundphysics.SoundPhysics.pC;
 
@@ -38,11 +36,13 @@ public class RaycastFix {
         return raycast(context.getStart(), context.getEnd(),
                 (pos) -> {
                     //SoundPhysics.t1();
+                    //final long t = System.nanoTime();// rm
+                    //SoundPhysics.tt.addAndGet(System.nanoTime()-t);// rm
                     //===============================================
                     if (new BlockPos(pos).equals(ignore)) return null;
                     //===============================================
 
-                    BlockState bs = world.getBlockState(pos);
+                    BlockState bs = world.getBlockState(pos);//All performance is in getting air
 
                     if (bs.isAir() || bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
                     long posl = pos.asLong();

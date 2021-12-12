@@ -70,15 +70,15 @@ public class SoundPhysics
 	public static PrecomputedConfig pC = null;
 	//Private fields
 	// ψ time ψ
-	//public static double tt = 0;
+	//public static AtomicLong tt = new AtomicLong(0);
 	//private static long ttt;
 	//private static double cumtt = 0;
 	//private static long navgt = 0;
 	//public static void t1() {ttt = System.nanoTime(); }
-	//public static void t2() { SoundPhysics.tt += (System.nanoTime()-ttt)/1000000d;}
-	//public static void tavg() { cumtt += tt; navgt++; }
-	//public static void tout() { System.out.println(SoundPhysics.tt + "   Avg: " + cumtt/navgt); }
-	//public static void tres() { SoundPhysics.tt = 0; }
+	//public static void t2() { SoundPhysics.tt.addAndGet((System.nanoTime()-ttt));}
+	//public static void tavg() { cumtt += tt.get(); navgt++; }
+	//public static void tout() { System.out.println((SoundPhysics.tt.get()/1e6d) + "   Avg: " + cumtt/navgt/1e6d); }
+	//public static void tres() { SoundPhysics.tt.set(0); }
 
 	private static MinecraftClient mc;
 	
@@ -111,9 +111,10 @@ public class SoundPhysics
 		long endTime;
 		
 		if (pC.pLog) startTime = System.nanoTime();
-		//t1();//rm
+		//t1();
 		evaluateEnvironment(sourceID, posX, posY, posZ, directPass); // time = 4 ^ω^ YAY! ^ω^
-		//t2();if (tt != 0) tavg();tout();tres();// ψ time ψ
+		//t2();
+		//tavg();tout();tres();// ψ time ψ
 		if (pC.pLog) { endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
@@ -244,7 +245,7 @@ public class SoundPhysics
 				SPHitResult rayBack = fixedRaycast(new RaycastContext(rayHit.getPos(), rayOrigin, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player), mc.world, rayHit.getBlockPos());
 
 				if (!rayBack.getBlockPos().equals(lastBlockPos)) { // happens rarely
-					logError("[Occlusion reverse]Block "+lastBlockPos.toString()+ " is not "+rayBack.getBlockPos().toString() );
+					logError("[Occlusion reverse]Block "+lastBlockPos.toString()+ " is not "+rayBack.getBlockPos().toString()+" Did anybody eat a grass block?" );
 					occlusionAccumulation += blockOcclusion;
 				}
 				else
@@ -344,7 +345,7 @@ public class SoundPhysics
 				double blockReflectivity = getBlockReflectivity(rayHit.getBlockState());
 
 				double totalReflectivityCoefficient = Math.min(blockReflectivity, 1);
-				
+
 				// Secondary ray bounces
 				for (int j = 0; j < pC.nRayBounces; j++) {
 					// Cast (one) final ray towards the player. If it's
