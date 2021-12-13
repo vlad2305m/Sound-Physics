@@ -4,7 +4,6 @@ import com.sonicether.soundphysics.SPEfx;
 import com.sonicether.soundphysics.SPLog;
 import com.sonicether.soundphysics.SoundPhysics;
 import com.sonicether.soundphysics.SoundPhysicsMod;
-import com.sonicether.soundphysics.config.BlueTapePack.GuiRegistryinit;
 import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
 import com.sonicether.soundphysics.config.SoundPhysicsConfig;
@@ -24,9 +23,9 @@ public class ConfigManager {
     public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
         Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(0.5, 1, e.getValue().getRight())));
-        map.putIfAbsent("DEFAULT", new MaterialData(0.5, 1, "[default]"));
-        Material_Properties.reflectivityMap = map;
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(e.getValue().getRight(), 0.5, 1)));
+        map.putIfAbsent("DEFAULT", new MaterialData(SoundPhysics.groupMap.get("DEFAULT"), 0.5, 1));
+        Materials.materialProperties = map;
     }};
 
     public static void registerAutoConfig() {
@@ -59,15 +58,15 @@ public class ConfigManager {
     public static void save() { if (holder == null) {registerAutoConfig();} holder.save(); }
 
     public static void handleBrokenMaterials( SoundPhysicsConfig c ){
-        SPLog.logError("Critical reflectivityMap error. Resetting reflectivityMap");
+        SPLog.logError("Critical materialProperties error. Resetting materialProperties");
         SoundPhysicsConfig fallback = DEFAULT;
         ConfigPresets.THEDOCRUBY.configChanger.accept(fallback);
-        c.Material_Properties.reflectivityMap = fallback.Material_Properties.reflectivityMap;
-        c.Material_Properties.blockWhiteList = List.of("block.minecraft.water");
+        c.Materials.materialProperties = fallback.Materials.materialProperties;
+        c.Materials.blockWhiteList = List.of("block.minecraft.water");
     }
 
     public static ActionResult onSave(SoundPhysicsConfig c) {
-        if (c.Material_Properties.reflectivityMap == null || c.Material_Properties.reflectivityMap.get("DEFAULT") == null)
+        if (c.Materials.materialProperties == null || c.Materials.materialProperties.get("DEFAULT") == null)
             handleBrokenMaterials(c);
         if (c.preset != ConfigPresets.LOAD_SUCCESS) {c.preset.configChanger.accept(c);}
         SPEfx.syncReverbParams();

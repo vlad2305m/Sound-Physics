@@ -25,7 +25,7 @@ public class SoundPhysicsConfig implements ConfigData {
     public Performance Performance = new Performance();
 
     @ConfigEntry.Gui.CollapsibleObject
-    public Material_Properties Material_Properties = new Material_Properties();
+    public Materials Materials = new Materials();
 
     @ConfigEntry.Gui.CollapsibleObject
     public Vlads_Tweaks Vlads_Tweaks = new Vlads_Tweaks();
@@ -65,11 +65,11 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean simplerSharedAirspaceSimulation = false;
     }
 
-    public static class Material_Properties {
-        @Comment("Sound reflectivity for blocks.\n0.0 - 1.0")
-        public Map<String, MaterialData> reflectivityMap = null;
+    public static class Materials {
+        @Comment("Material properties for blocks.\n0.0 - 1.0")
+        public Map<String, MaterialData> materialProperties = null;
 
-        @Comment("Makes blocks use name (like block.minecraft.stone) instead of sound group to determine material")
+        @Comment("Makes blocks use ID (e.g. block.minecraft.stone) instead of sound group to determine material")
         public List<String> blockWhiteList = new ArrayList<>();
     }
 
@@ -80,10 +80,8 @@ public class SoundPhysicsConfig implements ConfigData {
         public boolean _9RayDirectOcclusion = true;
         @Comment("Whether to try calculating where the sound should come from based on reflections")
         public boolean soundDirectionEvaluation = true;
-        @Comment("How much the sound direction depends on reflected sounds.\nRequires \"Re-calculate sound direction\" to be enabled.\n0.0 is no reflected sources, 1.0 is 100% reflected sources.\n0.5 is approximately physically accurate.")
+        @Comment("How much the sound direction depends on reflected sounds.\nRequires \"Re-calculate sound direction\" to be enabled.\n0.0 is no reflected sounds, 1.0 is 100% reflected sounds.\n0.5 is approximately physically accurate.")
         public double directRaysDirEvalMultiplier = 0.5;
-        @Comment("Randomness of the perceived direction of incoming sounds\n0.0 means all sounds come straight from the source.\n1.0 means all sounds come from the direction based on reflections\n0.0 - 1.0")
-        public double maxDirRayAntilength = 1.0; // length <0.15 can change direction by 120° in 0.5 m walking. All changes are gradual, so enjoy them.
         @Comment("Skip redirecting non-occluded sounds (the ones you can see directly).\nCan be inaccurate in some situations, especially when \"Re-calculate sound direction\" is enabled.")
         public boolean notOccludedNoRedirect = false;
     }

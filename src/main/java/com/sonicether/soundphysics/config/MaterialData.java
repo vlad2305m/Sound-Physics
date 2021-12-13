@@ -2,11 +2,11 @@ package com.sonicether.soundphysics.config;
 
 @SuppressWarnings("CanBeFinal")
 public class MaterialData {
+    public String example;
     public double reflectivity;
     public double absorption;
-    public String example;
 
-    public MaterialData(double r, double a, String s){
+    public MaterialData(String s, double r, double a){
         reflectivity = r; absorption = a; example = s;
     }
 
@@ -17,7 +17,7 @@ public class MaterialData {
     @SuppressWarnings("unused")
     public MaterialData() { reflectivity = 0; absorption = 1; example = ""; }
 
+    public String getExample() {return example;}
     public double getReflectivity() {return reflectivity;}
     public double getAbsorption() {return absorption;}
-    public String getExample() {return example;}
 }

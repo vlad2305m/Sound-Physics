@@ -45,7 +45,7 @@ public class SoundPhysicsMod implements ModInitializer {
                         },
                          (f) -> {
                              try {
-                                 return new Pair<>(f.getName(), (f.get(null) instanceof BlockSoundGroup g ? g.getBreakSound().getId().getPath().split("\\.")[1] : "not a group"));
+                                 return new Pair<>(f.getName(), (f.get(null) instanceof BlockSoundGroup g ? (SoundPhysics.groupMap.containsKey(f.getName()) ?  SoundPhysics.groupMap.get(f.getName()) : g.getBreakSound().getId().getPath().split("\\.")[1] ): "not a group"));
                              } catch (IllegalAccessException e) {
                                  e.printStackTrace();
                              }

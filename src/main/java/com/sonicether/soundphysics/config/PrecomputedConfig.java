@@ -47,7 +47,6 @@ public class PrecomputedConfig {
     public final boolean _9Ray;
     public final boolean soundDirectionEvaluation;
     public final double directRaysDirEvalMultiplier;
-    public final double maxDirVarianceSquared;
     public final boolean notOccludedRedirect;
 
     public final boolean dLog;
@@ -78,16 +77,16 @@ public class PrecomputedConfig {
         rcpTotRays = rcpNRays/nRayBounces;
         simplerSharedAirspaceSimulation = c.Performance.simplerSharedAirspaceSimulation;
 
-        blockWhiteSet = new HashSet<>(c.Material_Properties.blockWhiteList);
-        defaultReflectivity = c.Material_Properties.reflectivityMap.get("DEFAULT").reflectivity;
-        defaultAbsorption = c.Material_Properties.reflectivityMap.get("DEFAULT").absorption;
-        blockWhiteMap = c.Material_Properties.blockWhiteList.stream()
-                .map((a) -> new Pair<>(a, c.Material_Properties.reflectivityMap.get(a)))
+        blockWhiteSet = new HashSet<>(c.Materials.blockWhiteList);
+        defaultReflectivity = c.Materials.materialProperties.get("DEFAULT").reflectivity;
+        defaultAbsorption = c.Materials.materialProperties.get("DEFAULT").absorption;
+        blockWhiteMap = c.Materials.blockWhiteList.stream()
+                .map((a) -> new Pair<>(a, c.Materials.materialProperties.get(a)))
                 .map((e) -> {
                     if (e.getRight() != null) return e;
                     SPLog.logError("Missing material data for "+e.getLeft()+" Default entry created");
-                    final MaterialData newData = new MaterialData(defaultReflectivity, defaultAbsorption, "{"+e.getLeft()+"}");
-                    c.Material_Properties.reflectivityMap.put(e.getLeft(), newData);
+                    final MaterialData newData = new MaterialData("{"+e.getLeft()+"}", defaultReflectivity, defaultAbsorption);
+                    c.Materials.materialProperties.put(e.getLeft(), newData);
                     e.setRight(newData); return e;
                 }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
@@ -95,7 +94,7 @@ public class PrecomputedConfig {
         absorptionMap = new Reference2DoubleOpenHashMap<>();
         final List<String> wrong = new java.util.ArrayList<>();
         final List<String> toRemove = new java.util.ArrayList<>();
-        c.Material_Properties.reflectivityMap.forEach((k, v) -> {
+        c.Materials.materialProperties.forEach((k, v) -> {
             BlockSoundGroup bsg = SoundPhysicsMod.groupSoundBlocks.get(k);
             if (bsg != null){
                 reflectivityMap.put(bsg, v.reflectivity);
@@ -110,14 +109,13 @@ public class PrecomputedConfig {
         });
         if (!wrong.isEmpty()) {
             SPLog.logError("MaterialData map contains "+wrong.size()+" extra entries: "+ Arrays.toString(new List[]{wrong})+"\nRemoving...");
-            toRemove.forEach((e) -> c.Material_Properties.reflectivityMap.remove(e));
+            toRemove.forEach((e) -> c.Materials.materialProperties.remove(e));
         }
 
         maxDirectOcclusionFromBlocks = c.Vlads_Tweaks.maxDirectOcclusionFromBlocks;
         _9Ray = c.Vlads_Tweaks._9RayDirectOcclusion;
         soundDirectionEvaluation = c.Vlads_Tweaks.soundDirectionEvaluation;
         directRaysDirEvalMultiplier = Math.pow(c.Vlads_Tweaks.directRaysDirEvalMultiplier, 10.66);
-        maxDirVarianceSquared = (1 - c.Vlads_Tweaks.maxDirRayAntilength)*(1 - c.Vlads_Tweaks.maxDirRayAntilength);
         notOccludedRedirect = !c.Vlads_Tweaks.notOccludedNoRedirect;
 
         dLog = c.Misc.debugLogging;

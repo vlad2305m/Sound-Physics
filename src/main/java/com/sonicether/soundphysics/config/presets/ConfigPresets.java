@@ -26,8 +26,8 @@ public enum ConfigPresets {
 
             Map.ofEntries(entry("DEFAULT", new MaterialData(0.5, 1.0))),
 
-            10.0, true, true, 0.5, 0.0, false
-    ))/*</editor-fold>*/,
+            10.0, true, true, 0.5, false
+    )),//</editor-fold>
     //<editor-fold desc="DEFAULT_PERFORMANCE">
     DEFAULT_PERFORMANCE("Performance (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
@@ -38,9 +38,9 @@ public enum ConfigPresets {
 
             Map.ofEntries(entry("DEFAULT", new MaterialData(0.5, 1.0))),
 
-            10.0, true, true, 0.5, 0.0, true
-    ))/*</editor-fold>*/,
-    //<editor-fold desc="DEFAULT_QUALITY">*/
+            10.0, true, true, 0.5, true
+    )),//</editor-fold>
+    //<editor-fold desc="DEFAULT_QUALITY">
     DEFAULT_QUALITY("Quality (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
@@ -50,17 +50,17 @@ public enum ConfigPresets {
 
             Map.ofEntries(entry("DEFAULT", new MaterialData(0.5, 1.0))),
 
-            10.0, true, true, 0.5, 0.0, false
-    ))/*</editor-fold>*/,
-    //<editor-fold desc="THEDOCRUBY">*/
+            10.0, true, true, 0.5, false
+    )),//</editor-fold>
+    //<editor-fold desc="THEDOCRUBY">
     THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 0.8, 1.0, 0.8,
             3.0, 3.0, 1.0, 0.8,
 
-            false, 256, 16, false,
+            true, 256, 16, false,
 
-            //<editor-fold desc="Map.ofEntries()">*/
+            //<editor-fold desc="Map.ofEntries()">
             Map.<String, MaterialData>ofEntries(
                     entry("field_11528", new MaterialData(0.16666666666666667,  0.9)),    // Coral              (coral_block)
                     entry("field_11529", new MaterialData(0.4,                  0.8)),    // Gravel, Dirt       (gravel, rooted_dirt)
@@ -109,11 +109,11 @@ public enum ConfigPresets {
                     entry("field_17734", new MaterialData(0.06666666666666667,  1.0)),    // Lanterns           (lantern)
                     entry("field_28060", new MaterialData(0.6,                  1.2)),    // Dripstone          (dripstone_block, pointed_dripstone)
                     entry("DEFAULT"    , new MaterialData(0.5,                  1.0))     // Default Material   ()
-            )/*</editor-fold>*/,
+            ),//</editor-fold>
 
-            10.0, true, true, 0.5, 0.1/*TODO*/, false
+            10.0, true, true, 0.5, false
 
-    ))/*</editor-fold>*/,
+    )),//</editor-fold>
     //<editor-fold desc="SUPER_REVERB">
     SUPER_REVERB("Super Reverb", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, 1.8, null, null,
@@ -123,9 +123,9 @@ public enum ConfigPresets {
 
             null,
 
-            null, null, null, null, null, null
+            null, null, null, null, null
 
-    ))/*</editor-fold>*/,
+    )),//</editor-fold>
     //<editor-fold desc="NO_ABSORPTION">
     NO_ABSORPTION("No Absorption", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, null, 0.0,
@@ -135,8 +135,8 @@ public enum ConfigPresets {
 
             null,
 
-            0.0, null, null, null, null, null
-    ))/*</editor-fold>*/,
+            0.0, null, null, null, null
+    )),//</editor-fold>
     //<editor-fold desc="LOW_FREQ">
     LOW_FREQ("Bass Boost", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, 0.2, null,
@@ -146,8 +146,8 @@ public enum ConfigPresets {
 
             null,
 
-            null, null, null, null, null, null
-    ))/*</editor-fold>*/,
+            null, null, null, null, null
+    )),//</editor-fold>
     //<editor-fold desc="HIGH_FREQ">
     HIGH_FREQ("Treble Boost", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, 1.8, null,
@@ -157,8 +157,8 @@ public enum ConfigPresets {
 
             null,
 
-            null, null, null, null, null, null
-    ))/*</editor-fold>*/,
+            null, null, null, null, null
+    )),//</editor-fold>
     //<editor-fold desc="FOG">
     FOG("Foggy Air", (SoundPhysicsConfig c) -> changeConfig(c, true,
             2.5, null, null, null,
@@ -168,8 +168,8 @@ public enum ConfigPresets {
 
             null,
 
-            null, null, null, null, null, null
-    ))/*</editor-fold>*/,
+            null, null, null, null, null
+    )),//</editor-fold>
     //<editor-fold desc="TOTAL_OCCLUSION">
     TOTAL_OCCLUSION("Total Occlusion", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
@@ -180,8 +180,8 @@ public enum ConfigPresets {
 
             null,
 
-            10.0,  null, null, null, null, null
-    ))/*</editor-fold>*/,
+            10.0,  null, null, null, null
+    )),//</editor-fold>
     //<editor-fold desc="RESET_MATERIALS">
     RESET_MATERIALS("Clear Material Properties", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
@@ -192,8 +192,8 @@ public enum ConfigPresets {
 
             Map.<String, MaterialData>ofEntries(entry("DEFAULT", new MaterialData(0.5, 1.0))),
 
-            null, null, null,null, null, null
-    ))/*</editor-fold>*/;
+            null, null, null,null, null
+    ));//</editor-fold>
 
     public final Consumer<SoundPhysicsConfig> configChanger;
     public final String text;

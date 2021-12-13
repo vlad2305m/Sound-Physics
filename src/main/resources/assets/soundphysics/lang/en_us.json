@@ -5,7 +5,7 @@
 
   "text.autoconfig.sound_physics.option.General": "General options:",
   "text.autoconfig.sound_physics.option.Performance": "Performance options:",
-  "text.autoconfig.sound_physics.option.Material_Properties": "Material properties:",
+  "text.autoconfig.sound_physics.option.Materials": "Materials:",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks": "Vlad's tweaks:",
   "text.autoconfig.sound_physics.option.Misc": "Logging options:",
 
@@ -23,14 +23,13 @@
   "text.autoconfig.sound_physics.option.Performance.environmentEvaluationRayBounces": "Reflections per ray",
   "text.autoconfig.sound_physics.option.Performance.simplerSharedAirspaceSimulation": "Cheap shared airspace detection",
 
-  "text.autoconfig.sound_physics.option.Material_Properties.reflectivityMap": "Advanced users only!",
-  "text.autoconfig.sound_physics.option.Material_Properties.blockWhiteList": "Edit in config file",
+  "text.autoconfig.sound_physics.option.Materials.materialProperties": "Material Properties",
+  "text.autoconfig.sound_physics.option.Materials.blockWhiteList": "Block Whitelist",
 
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirectOcclusionFromBlocks": "Maximum direct occlusion",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray direct occlusion calculation",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.soundDirectionEvaluation": "Re-calculate sound direction",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.directRaysDirEvalMultiplier": "Sound reflection bias",
-  "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirRayAntilength": "Max direction variance (antilength)",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.notOccludedNoRedirect": "Skip redirecting directly visible blocks",
 
   "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
@@ -41,10 +40,8 @@
 
   "text.autoconfig.sound_physics.option.preset": "Preset",
 
-
-
-  "text.autoconfig.sound_physics.option.MaterialData": "Material Data",
+  "text.autoconfig.sound_physics.option.MaterialData": "Set material properties:",
+  "text.autoconfig.sound_physics.option.MaterialData.example": "Material",
   "text.autoconfig.sound_physics.option.MaterialData.reflectivity": "Reflectivity",
-  "text.autoconfig.sound_physics.option.MaterialData.absorption": "Occlusion density",
-  "text.autoconfig.sound_physics.option.MaterialData.example": "Break sound"
+  "text.autoconfig.sound_physics.option.MaterialData.absorption": "Occlusion density"
 }
