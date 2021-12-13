@@ -56,7 +56,7 @@ public enum ConfigPresets {
     THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 0.8, 1.0, 0.8,
-            3.0, 3.0, 1.0, 0.8,
+            1.0, 3.0, 1.0, 0.8,
 
             true, 256, 16, false,
 
