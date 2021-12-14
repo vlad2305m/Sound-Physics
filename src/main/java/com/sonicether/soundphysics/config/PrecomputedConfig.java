@@ -43,6 +43,7 @@ public class PrecomputedConfig {
     public final Set<String> blockWhiteSet;
     public final Map<String, MaterialData> blockWhiteMap;
 
+    public final boolean recordsDisable;
     public final double maxDirectOcclusionFromBlocks;
     public final boolean _9Ray;
     public final boolean soundDirectionEvaluation;
@@ -64,7 +65,7 @@ public class PrecomputedConfig {
         defaultAttenuationFactor = c.General.attenuationFactor;
         globalReverbGain = (float) (c.General.globalReverbGain * 0.0595);
         globalReverbBrightness = (float) (c.General.globalReverbBrightness * 0.7);
-        globalBlockAbsorption = c.General.globalBlockAbsorption * 3;
+        globalBlockAbsorption = c.General.globalBlockAbsorption * 2;
         soundDistanceAllowance = c.General.soundDistanceAllowance;
         globalBlockReflectance = c.General.globalBlockReflectance;
         airAbsorption = (float) c.General.airAbsorption;
@@ -98,7 +99,7 @@ public class PrecomputedConfig {
             BlockSoundGroup bsg = SoundPhysicsMod.groupSoundBlocks.get(k);
             if (bsg != null){
                 reflectivityMap.put(bsg, v.reflectivity);
-                absorptionMap.put(bsg, v.absorption);
+                absorptionMap.put(bsg, v.absorption * 2);
             }
             else {
                 if (!k.equals("DEFAULT") && !blockWhiteSet.contains(k)){
@@ -112,6 +113,7 @@ public class PrecomputedConfig {
             toRemove.forEach((e) -> c.Materials.materialProperties.remove(e));
         }
 
+        recordsDisable = c.Vlads_Tweaks.recordsDisable;
         maxDirectOcclusionFromBlocks = c.Vlads_Tweaks.maxDirectOcclusionFromBlocks;
         _9Ray = c.Vlads_Tweaks._9RayDirectOcclusion;
         soundDirectionEvaluation = c.Vlads_Tweaks.soundDirectionEvaluation;

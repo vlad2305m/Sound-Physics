@@ -23,8 +23,8 @@ public class ConfigManager {
     public static final SoundPhysicsConfig DEFAULT = new SoundPhysicsConfig(){{
         Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
-                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(e.getValue().getRight(), 0.5, 1)));
-        map.putIfAbsent("DEFAULT", new MaterialData(SoundPhysics.groupMap.get("DEFAULT"), 0.5, 1));
+                        .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(e.getValue().getRight(), 0.5, 0.5)));
+        map.putIfAbsent("DEFAULT", new MaterialData(SoundPhysics.groupMap.get("DEFAULT"), 0.5, 0.5));
         Materials.materialProperties = map;
     }};
 

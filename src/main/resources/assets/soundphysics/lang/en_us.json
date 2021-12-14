@@ -26,11 +26,12 @@
   "text.autoconfig.sound_physics.option.Materials.materialProperties": "Material Properties",
   "text.autoconfig.sound_physics.option.Materials.blockWhiteList": "Block Whitelist",
 
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.recordsDisable": "Skip Jukebox/Note Block occlusion (Broken)",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.maxDirectOcclusionFromBlocks": "Maximum direct occlusion",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks._9RayDirectOcclusion": "9 ray direct occlusion calculation",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.soundDirectionEvaluation": "Re-calculate sound direction",
   "text.autoconfig.sound_physics.option.Vlads_Tweaks.directRaysDirEvalMultiplier": "Sound reflection bias",
-  "text.autoconfig.sound_physics.option.Vlads_Tweaks.notOccludedNoRedirect": "Skip redirecting directly visible blocks",
+  "text.autoconfig.sound_physics.option.Vlads_Tweaks.notOccludedNoRedirect": "Skip redirecting visible blocks",
 
   "text.autoconfig.sound_physics.option.Misc.debugLogging": "Logging",
   "text.autoconfig.sound_physics.option.Misc.occlusionLogging": "Occlusion logging",

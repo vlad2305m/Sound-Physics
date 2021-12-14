@@ -204,7 +204,7 @@ public class SoundPhysics
 
 		if (pC.off) return;
 
-		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || lastSoundCategory == SoundCategory.RECORDS || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
+		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || (pC.recordsDisable && lastSoundCategory == SoundCategory.RECORDS) || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
@@ -403,7 +403,7 @@ public class SoundPhysics
 					// Cast (one) final ray towards the player. If it's
 					// unobstructed, then the sound source and the player
 					// share airspace.
-					final double energyTowardsPlayer = blockReflectivity * pC.globalBlockReflectance * 0.1875 + 0.0625;
+					final double energyTowardsPlayer = Math.pow(blockReflectivity, 1 / pC.globalBlockReflectance) * 0.1875 + 0.0625;
 					if (!pC.simplerSharedAirspaceSimulation || j == pC.nRayBounces - 1) {
 						final Vec3d finalRayStart = new Vec3d(lastHitPos.x + lastHitNormal.getX() * 0.01,
 								lastHitPos.y + lastHitNormal.getY() * 0.01, lastHitPos.z + lastHitNormal.getZ() * 0.01);
@@ -421,7 +421,7 @@ public class SoundPhysics
 
 							sharedAirspace.updateAndGet(v -> v + 1d);
 
-							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * blockReflectivity * pC.globalBlockReflectance;
+							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * Math.pow(blockReflectivity, 1 / pC.globalBlockReflectance);
 
 							final double cross0 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 0d), 0d, 1d);
 							final double cross1 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 1d), 0d, 1d);
@@ -460,7 +460,7 @@ public class SoundPhysics
 						if (pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayHitPos, Formatting.BLUE.getColorValue());
 
 
-						bounceReflectivityRatio[j] += blockReflectivity * pC.globalBlockReflectance;
+						bounceReflectivityRatio[j] += Math.pow(blockReflectivity, 1 / pC.globalBlockReflectance);
 
 						totalRayDistance += newRayLength;
 

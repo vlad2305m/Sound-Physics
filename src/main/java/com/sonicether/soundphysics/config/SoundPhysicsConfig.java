@@ -74,7 +74,9 @@ public class SoundPhysicsConfig implements ConfigData {
     }
 
     public static class Vlads_Tweaks {
-        @Comment("The amount at which this is capped. 10 * block_occlusion is the theoretical limit")
+        @Comment("Disable occlusion of jukeboxes and note blocks.\nUseful if you have an audio signaling system that you need to hear clearly")
+        public boolean recordsDisable = true;
+        @Comment("The amount at which occlusion is capped. 10 * block_occlusion is the theoretical limit")
         public double maxDirectOcclusionFromBlocks = 10;
         @Comment("Calculate direct occlusion as the minimum of 9 rays from vertices of a block")
         public boolean _9RayDirectOcclusion = true;
