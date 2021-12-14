@@ -1,6 +1,5 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
 import com.sonicether.soundphysics.performance.RaycastFix;
 import com.sonicether.soundphysics.performance.SPHitResult;
@@ -14,6 +13,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 
 import java.awt.*;
 import java.util.List;
@@ -136,7 +136,8 @@ public class SoundPhysics
 	
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;
-	private static boolean inWorld = false;
+	private static World inWorld = null;
+	private static boolean isNative = false;
 	private static long worldJoinedTime = 0;
 
 	public static void init()
@@ -198,9 +199,7 @@ public class SoundPhysics
 	@SuppressWarnings("ConstantConditions")
 	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ, boolean directPass)
 	{
-		boolean oldInWorld = inWorld;
-		inWorld = mc.world != null;
-		if (!oldInWorld && inWorld) worldJoinedTime = mc.world.getTime();
+		if (inWorld != (inWorld = mc.world) && mc.world != null) worldJoinedTime = mc.world.getTime();
 
 		if (pC.off) return;
 
@@ -211,12 +210,20 @@ public class SoundPhysics
 			return;
 		}
 		final long timeT = mc.world.getTime();
-		if (timeT-worldJoinedTime < 400) {
-			int t = (int) (timeT-worldJoinedTime);
-			mc.player.sendMessage(new LiteralText("Sound Physics starting... "+(419-t)/20), true);
-			if (timeT % 40 != 0) return; // let some through to warm it up
+		int t = (int) (timeT-worldJoinedTime);
+		if (isNative) {
+			if (t < 100) { // wait 5s for the chunks
+				mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (99 - t) / 20), true);
+				return;
+			}
+		} else if (t < 400) {
+			if (t < 200 || t > 300) { // wait 10s for the chunks, kick it to make ray tracing native, and then wait 5s to let it cool
+				mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (419 - t) / 20), true);
+				return;
+			}
+			mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (419 - t) / 20), true);
 		} else if(timeT-worldJoinedTime < 420) mc.player.sendMessage(new LiteralText("Sound Physics started!"), true);
-		else if(timeT-worldJoinedTime < 430) mc.player.sendMessage(new LiteralText(""), true);
+		else if(timeT-worldJoinedTime < 430) {mc.player.sendMessage(new LiteralText(""), true); isNative = true;}
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
 
