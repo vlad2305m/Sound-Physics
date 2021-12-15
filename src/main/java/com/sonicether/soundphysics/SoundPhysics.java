@@ -214,6 +214,7 @@ public class SoundPhysics
 		}
 		final long timeT = mc.world.getTime();
 		int t = (int) (timeT-worldJoinedTime);
+		if (t < 0) { worldJoinedTime = timeT - 500; t = 500; }
 		if (isNative) {
 			if (t < 100) { // wait 5s for the chunks
 				mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (99 - t) / 20), true);
@@ -227,8 +228,6 @@ public class SoundPhysics
 			mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (419 - t) / 20), true);
 		} else if(timeT-worldJoinedTime < 420) mc.player.sendMessage(new LiteralText("Sound Physics started!"), true);
 		else if(timeT-worldJoinedTime < 430) {mc.player.sendMessage(new LiteralText(""), true); isNative = true;}
-
-		if (t < 0) worldJoinedTime = timeT - 500;
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
 
