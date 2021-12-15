@@ -1,4 +1,4 @@
-package com.sonicether.soundphysics.mixin;
+package com.sonicether.soundphysics.mixin.server;
 
 import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;

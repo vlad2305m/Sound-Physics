@@ -1,4 +1,4 @@
-package com.sonicether.soundphysics.mixin;
+package com.sonicether.soundphysics.mixin.server;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;

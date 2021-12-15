@@ -1,4 +1,4 @@
-package com.sonicether.soundphysics.mixin;
+package com.sonicether.soundphysics.mixin.server;
 
 import com.sonicether.soundphysics.config.BlueTapePack.ConfigManager;
 import net.minecraft.server.command.ReloadCommand;

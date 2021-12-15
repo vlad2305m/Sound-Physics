@@ -1,22 +1,22 @@
 package com.sonicether.soundphysics.performance;
 
-import com.sonicether.soundphysics.SoundPhysics;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.WorldChunk;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import static com.sonicether.soundphysics.SoundPhysics.pC;
 
@@ -25,62 +25,44 @@ public class RaycastFix {
     public static long lastUpd = 0;
     public static Map<Long, ImmutableTriple<BlockState,VoxelShape, VoxelShape>> shapeCache = new Long2ObjectOpenHashMap<>(2048, 0.75f);
     // reset every tick, usually up to 2200
-        // {pos, (block state, (block, fluid)) }
+        // {pos, (block state, block, fluid) }
+
+    public static int maxY;
+    public static int minY;
+    public static int maxX;
+    public static int minX;
+    public static int maxZ;
+    public static int minZ;
+
+    private final static VoxelShape EMPTY = VoxelShapes.empty();
+    private final static VoxelShape CUBE = VoxelShapes.fullCube();
 
     // ===copied and modified===
 
-    public static SPHitResult fixedRaycast(RaycastContext context, BlockView world, @Nullable BlockPos ignore) {
+    public static SPHitResult fixedRaycast(Vec3d start, Vec3d end, World world, @Nullable BlockPos ignore, @Nullable WorldChunk chunk) {
+        LiquidStorage currentNotAirStorage = chunk == null ? null : ((WorldChunkAccess)chunk).getNotAirLiquidStorage();
+        int currentX = chunk == null ? ((int) Math.floor(start.x)) >> 4 : chunk.getPos().x;
+        int currentZ = chunk == null ? ((int) Math.floor(start.z)) >> 4 : chunk.getPos().z;
+        boolean[] currentSlice = currentNotAirStorage == null ? null :currentNotAirStorage.getSection((int)Math.floor(start.y));
+        int currentY = (int) start.y;
+        // <editor-fold desc="end = clamp(context.getEnd(), start);">
 
-        final Vec3d start = context.getStart();
-        final Vec3d end = context.getEnd();
-        return raycast(context.getStart(), context.getEnd(),
-                (pos) -> {
-                    //SoundPhysics.t1();
-                    //final long t = System.nanoTime();// rm
-                    //SoundPhysics.tt.addAndGet(System.nanoTime()-t);// rm
-                    //===============================================
-                    if (new BlockPos(pos).equals(ignore)) return null;
-                    //===============================================
-
-                    BlockState bs = world.getBlockState(pos);//All performance is in getting air
-
-                    if (bs.isAir() || bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
-                    long posl = pos.asLong();
-                    ImmutableTriple<BlockState, VoxelShape, VoxelShape> shapes;
-                    //noinspection SynchronizeOnNonFinalField
-                    synchronized (shapeCache) {
-                        shapes = shapeCache.computeIfAbsent(posl, (key) -> {
-                            //SoundPhysics.t2();
-                            //SoundPhysics.t1();
-                            if (bs.getBlock().equals(Blocks.MOVING_PISTON)) return null;
-                            if (pC.dRays)
-                                ((World) world).addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY() + 1d, pos.getZ() + 0.5d, 0, 0, 0);
-                            return new ImmutableTriple<>(bs, bs.getCollisionShape(world, pos), context.getFluidShape(world.getFluidState(pos), world, pos));
-                        });
-                    }
-
-                    //SoundPhysics.t1();
+        if (start.x > maxX || start.y > maxY || start.z > maxZ || start.x < minX || start.y < minY || start.z < minZ) {
+            return SPHitResult.createMissed(start, null, new BlockPos(start), chunk);
+        }
+        Vec3d delta = end.subtract(start);
+        if (!(end.x <= maxX && end.y <= maxY && end.z <= maxZ && end.x >= minX && end.y >= minY && end.z >= minZ)) {
+            double fx = delta.x == 0 ? Double.MAX_VALUE : (((delta.x > 0 ? maxX : minX) - start.x) / delta.x);
+            double fy = delta.y == 0 ? Double.MAX_VALUE : (((delta.y > 0 ? maxY : minY) - start.y) / delta.y);
+            double fz = delta.z == 0 ? Double.MAX_VALUE : (((delta.z > 0 ? maxZ : minZ) - start.z) / delta.z);
+            double factor = Math.min(Math.min(fx, fy), fz);
+            delta = delta.multiply(factor);
+            end = start.add(delta);
+        }//</editor-fold>
 
 
-                    if (shapes == null) return null;
-                    VoxelShape voxelShape = shapes.getMiddle();//BlockShape
-                    SPHitResult blockHitResult = SPHitResult.get(world.raycastBlock(start, end, pos, voxelShape, bs), bs);
-                    VoxelShape voxelShape2 = shapes.getRight();//FluidShape
-                    SPHitResult blockHitResult2 = SPHitResult.get(voxelShape2.raycast(start, end, pos), bs);
-
-                    //SoundPhysics.t2();
-                    if (blockHitResult2 == null) return blockHitResult;
-                    if (blockHitResult == null) return blockHitResult2;
-                    double d = start.squaredDistanceTo(blockHitResult.getPos());
-                    double e = start.squaredDistanceTo(blockHitResult2.getPos());
-                    return d <= e ? blockHitResult : blockHitResult2;
-                });
-
-    }
-
-    static SPHitResult raycast(Vec3d start, Vec3d end, Function<BlockPos, SPHitResult> blockHitFactory) {
         if (start.equals(end)) {
-            return SPHitResult.createMissed(end, null, new BlockPos(end));
+            return SPHitResult.createMissed(end, null, new BlockPos(end), chunk);
         } else {
             double xe1 = MathHelper.lerp(-1.0E-7D, end.x, start.x); // x end v1.1
             double ye1 = MathHelper.lerp(-1.0E-7D, end.y, start.y);
@@ -88,11 +70,41 @@ public class RaycastFix {
             double xs1 = MathHelper.lerp(-1.0E-7D, start.x, end.x); // x start v1.1
             double ys1 = MathHelper.lerp(-1.0E-7D, start.y, end.y);
             double zs1 = MathHelper.lerp(-1.0E-7D, start.z, end.z);
-            int xbs1 = MathHelper.floor(xs1); // x blockPos start v1.1
-            int ybs1 = MathHelper.floor(ys1);
-            int zbs1 = MathHelper.floor(zs1);
-            BlockPos.Mutable blockPosStart1 = new BlockPos.Mutable(xbs1, ybs1, zbs1);
-            SPHitResult hitResultStart = blockHitFactory.apply(blockPosStart1);
+            int xbs = MathHelper.floor(xs1); // x blockPos start v1.1
+            int ybs = MathHelper.floor(ys1);
+            int zbs = MathHelper.floor(zs1);
+            BlockPos.Mutable blockPosStart1 = new BlockPos.Mutable(xbs, ybs, zbs);
+            //////////////////////
+            int xx = xbs >> 4; int zz = zbs >> 4;
+            if (currentX != xx || currentZ != zz) {
+                if (currentNotAirStorage != null) {
+                    int ddx = currentX - xx; int ddz = currentZ - zz;
+                    if (ddz == 0) {
+                        if (ddx == -1) chunk = currentNotAirStorage.xm;
+                        else if (ddx == 1) chunk = currentNotAirStorage.xp;
+                    } else if (ddx == 0) {
+                        if (ddz == -1) chunk = currentNotAirStorage.zm;
+                        else if (ddz == 1) chunk = currentNotAirStorage.zp;
+                    } else chunk = (WorldChunk) world.getChunk(xx, zz, ChunkStatus.FULL, false);
+                } else
+                    chunk = (WorldChunk) world.getChunk(xx, zz, ChunkStatus.FULL, false);
+                currentX = xx; currentZ = zz; currentY = ybs;
+                currentNotAirStorage = chunk == null ? null : ((WorldChunkAccess)chunk).getNotAirLiquidStorage();
+                currentSlice = currentNotAirStorage == null ? null : currentNotAirStorage.getSection(ybs);
+            } else if (ybs != currentY) {
+                currentSlice = currentNotAirStorage == null ? null : currentNotAirStorage.getSection(ybs);
+                currentY = ybs;
+            }
+            /////////////////////
+            final SPHitResult hitResultStart;
+            if (currentSlice == null || !currentSlice[(xbs & 15) + ((zbs & 15) << 4)] || blockPosStart1.equals(ignore))
+                hitResultStart = null;
+            else {
+                BlockState bs1 = chunk.getBlockState(blockPosStart1);
+                if (bs1.isAir() || bs1.getBlock().equals(Blocks.MOVING_PISTON)) hitResultStart = null;
+                else hitResultStart = finalRaycast(world, bs1, blockPosStart1, start, end, chunk, (short)4);
+            }
+
             if (hitResultStart != null) {
                 return hitResultStart;
             } else {
@@ -105,38 +117,169 @@ public class RaycastFix {
                 double rdx = dirx == 0 ? 1.7976931348623157E308D : (double)dirx / dx; // 1/dx
                 double rdy = diry == 0 ? 1.7976931348623157E308D : (double)diry / dy;
                 double rdz = dirz == 0 ? 1.7976931348623157E308D : (double)dirz / dz;
-                double rxs = rdx * (dirx > 0 ? 1.0D - MathHelper.fractionalPart(xs1) : MathHelper.fractionalPart(xs1)); // relative to blockPos start
-                double rys = rdy * (diry > 0 ? 1.0D - MathHelper.fractionalPart(ys1) : MathHelper.fractionalPart(ys1));
-                double rzs = rdz * (dirz > 0 ? 1.0D - MathHelper.fractionalPart(zs1) : MathHelper.fractionalPart(zs1));
+                double tx = rdx * (dirx > 0 ? 1.0D - MathHelper.fractionalPart(xs1) : MathHelper.fractionalPart(xs1)); // relative to blockPos start
+                double ty = rdy * (diry > 0 ? 1.0D - MathHelper.fractionalPart(ys1) : MathHelper.fractionalPart(ys1));
+                double tz = rdz * (dirz > 0 ? 1.0D - MathHelper.fractionalPart(zs1) : MathHelper.fractionalPart(zs1));
 
-                SPHitResult object2;
+                SPHitResult object2 = null;
                 do {
-                    if (!(rxs <= 1.0D) && !(rys <= 1.0D) && !(rzs <= 1.0D)) {
-                        return SPHitResult.createMissed(end, null, new BlockPos(end));
+                    if (tx > 1.0D && ty > 1.0D && tz > 1.0D) {
+                        return SPHitResult.createMissed(end, null, new BlockPos(end), chunk);
                     }
 
-                    if (rxs < rys) {
-                        if (rxs < rzs) {
-                            xbs1 += dirx;
-                            rxs += rdx;
+                    short side;
+
+                    if (tx < ty) {
+                        if (tx < tz) {
+                            xbs += dirx;
+                            tx += rdx;
+                            side = 1;
                         } else {
-                            zbs1 += dirz;
-                            rzs += rdz;
+                            zbs += dirz;
+                            tz += rdz;
+                            side = 3;
                         }
-                    } else if (rys < rzs) {
-                        ybs1 += diry;
-                        rys += rdy;
+                    } else if (ty < tz) {
+                        ybs += diry;
+                        ty += rdy;
+                        side = 2;
                     } else {
-                        zbs1 += dirz;
-                        rzs += rdz;
+                        zbs += dirz;
+                        tz += rdz;
+                        side = 3;
                     }
 
-                    object2 = blockHitFactory.apply(blockPosStart1.set(xbs1, ybs1, zbs1));
+                    /////////////////////
+                    int x = xbs >> 4; int z = zbs >> 4;
+                    if (currentX != x || currentZ != z) {
+                        if (currentNotAirStorage != null) {
+                            int ddx = currentX - x; int ddz = currentZ - z;
+                            if (ddz == 0) {
+                                if (ddx == -1) chunk = currentNotAirStorage.xm;
+                                else if (ddx == 1) chunk = currentNotAirStorage.xp;
+                            } else if (ddx == 0) {
+                                if (ddz == -1) chunk = currentNotAirStorage.zm;
+                                else if (ddz == 1) chunk = currentNotAirStorage.zp;
+                            } else chunk = (WorldChunk) world.getChunk(x, z, ChunkStatus.FULL, false);
+                        } else
+                        chunk = (WorldChunk) world.getChunk(x, z, ChunkStatus.FULL, false);
+                        currentX = x; currentZ = z; currentY = ybs;
+                        currentNotAirStorage = chunk == null ? null : ((WorldChunkAccess)chunk).getNotAirLiquidStorage();
+                        currentSlice = currentNotAirStorage == null ? null : currentNotAirStorage.getSection(ybs);
+                    } else if (ybs != currentY) {
+                        currentSlice = currentNotAirStorage == null ? null : currentNotAirStorage.getSection(ybs);
+                        currentY = ybs;
+                    }
+                    /////////////////////
+                    blockPosStart1.set(xbs, ybs, zbs);
+                    //SoundPhysics.t1();
+                    //final long t = System.nanoTime();// rm
+                    //SoundPhysics.tt.addAndGet(System.nanoTime()-t);// rm
+
+                    if (currentSlice != null) {
+                        if (currentSlice[(xbs & 15) + ((zbs & 15) << 4)] && !blockPosStart1.equals(ignore)) {
+                            BlockState bs = chunk.getBlockState(blockPosStart1);
+
+                            if (!bs.isAir() && !bs.getBlock().equals(Blocks.MOVING_PISTON)) {
+                                Vec3d start1;
+                                double f;
+                                if (side == 1) {
+                                    f = (((-dirx * 0.499 + xbs + 0.5) - start.x) * rdx * dirx);
+                                } else if (side == 2) {
+                                    f = (((-diry * 0.499 + ybs + 0.5) - start.y) * rdy * diry);
+                                } else {
+                                    f = (((-dirz * 0.499 + zbs + 0.5) - start.z) * rdz * dirz);
+                                }
+                                start1 = start.add(delta.multiply(f));
+                                Vec3d end1;
+                                double fx = (((dirx * 0.5001 + xbs + 0.5) - start.x) * rdx * dirx);
+                                double fy = (((diry * 0.5001 + ybs + 0.5) - start.y) * rdy * diry);
+                                double fz = (((dirz * 0.5001 + zbs + 0.5) - start.z) * rdz * dirz);
+                                end1 = start.add(delta.multiply(Math.min(Math.min(fx, fy), fz)));
+
+                                object2 = finalRaycast(world, bs, blockPosStart1, start1, end1, chunk, side);
+                            }
+                        }
+                    } else {
+                        int dx1 = ((dirx * 15 + (x<<5) + 15)>>1) - xbs; int dz1 = ((dirz * 15 + (z<<5) + 15)>>1) - zbs;
+                        double dtx1 = dx1 * rdx * dirx; double dtz1 = dz1 * rdz * dirz;
+                        if (currentNotAirStorage == null || (diry == 1 && ybs > currentNotAirStorage.top) || (diry == -1 && ybs < currentNotAirStorage.bottom)
+                                || (dtx1+tx < ty && dtz1+tz < ty)) {
+
+                            if (dtx1*dirx > dtz1*dirz){
+                                zbs+=dz1; tz+=dtz1;
+                            } else {
+                                xbs+=dx1; tx+=dtx1;
+                            }
+                        }
+                        else { while (true) {
+                            if (tx < ty) {
+                                if (tx < tz) {
+                                    xbs += dirx;
+                                    tx += rdx;
+                                } else {
+                                    zbs += dirz;
+                                    tz += rdz;
+                                }
+                            } else if (ty < tz) {
+                                break;
+                            } else {
+                                zbs += dirz;
+                                tz += rdz;
+                            }
+                        } }
+                    }
                 } while(object2 == null);
 
                 return object2;
             }
         }
     }
+
+    private static SPHitResult finalRaycast(World world, BlockState bs, BlockPos pos, Vec3d start, Vec3d end, WorldChunk c, Short side) {
+        long posl = pos.asLong();
+        ImmutableTriple<BlockState, VoxelShape, VoxelShape> shapes;
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (shapeCache) {
+            shapes = shapeCache.get(posl);
+            if (shapes == null) {
+                if (pC.dRays) world.addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY() + 1d, pos.getZ() + 0.5d, 0, 0, 0);
+                VoxelShape fluidShape = bs.getFluidState().getShape(world, pos);
+                VoxelShape collisionShape = bs.getCollisionShape(world, pos);
+                shapes =  new ImmutableTriple<>(bs, collisionShape == EMPTY ? null : collisionShape, fluidShape == EMPTY ? null : fluidShape);
+            shapeCache.put(posl, shapes);
+            }
+        }
+
+        VoxelShape voxelShape = shapes.getMiddle();//BlockShape
+        VoxelShape voxelShape2 = shapes.getRight();//FluidShape
+        if (voxelShape == CUBE || voxelShape2 == CUBE) {
+            Direction direction =
+                    side == 1 ? Direction.EAST :
+                    side == 2 ? Direction.UP :
+                    side == 3 ? Direction.NORTH :
+                    Direction.getFacing(start.x-pos.getX()-0.5, start.y-pos.getY()-0.5, start.z-pos.getZ()-0.5);
+            return new SPHitResult(false, start, direction, pos, true, bs, c);
+        }
+        SPHitResult blockHitResult = voxelShape == null ? null : SPHitResult.get(voxelShape.raycast(start, end, pos), bs, c);
+        SPHitResult blockHitResult2 = voxelShape2 == null ? null : SPHitResult.get(voxelShape2.raycast(start, end, pos), bs, c);
+
+        if (blockHitResult2 == null) return blockHitResult;
+        if (blockHitResult == null) return blockHitResult2;
+        double d = start.squaredDistanceTo(blockHitResult.getPos());
+        double e = start.squaredDistanceTo(blockHitResult2.getPos());
+        return d <= e ? blockHitResult : blockHitResult2;
+    }
+
+    /*private static Vec3d clampToBlock(Vec3d end, Vec3d pos) {
+        if (pos.x > maxX || pos.y > maxY || pos.z > maxZ || pos.x < minX || pos.y < minY || pos.z < minZ) return pos;
+        if (end.x <= maxX && end.y <= maxY && end.z <= maxZ && end.x >= minX && end.y >= minY && end.z >= minZ) return end;
+        Vec3d delta = end.subtract(pos);
+        double fx = delta.x == 0 ? Double.MAX_VALUE : (((delta.x > 0 ? maxX : minX) - pos.x) / delta.x);
+        double fy = delta.y == 0 ? Double.MAX_VALUE : (((delta.y > 0 ? maxY : minY) - pos.y) / delta.y);
+        double fz = delta.z == 0 ? Double.MAX_VALUE : (((delta.z > 0 ? maxZ : minZ) - pos.z) / delta.z);
+        double factor = Math.min(Math.min(fx,fy), fz);
+        return pos.add(delta.multiply(factor));
+    }*/
 
 }
