@@ -202,7 +202,7 @@ public class RaycastFix {
                         }
                     } else {
                         int dx1 = ((dirx * 15 + (x<<5) + 15)>>1) - xbs; int dz1 = ((dirz * 15 + (z<<5) + 15)>>1) - zbs;
-                        double dtx1 = dx1 * rdx; double dtz1 = dz1 * rdz;
+                        double dtx1 = dx1 * rdx * dirx; double dtz1 = dz1 * rdz * dirz;
                         if (currentNotAirStorage == null || (diry == 1 && ybs > currentNotAirStorage.top) || (diry == -1 && ybs < currentNotAirStorage.bottom)
                                 || (dtx1+tx < ty && dtz1+tz < ty)) {
 
