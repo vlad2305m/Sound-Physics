@@ -228,6 +228,8 @@ public class SoundPhysics
 		} else if(timeT-worldJoinedTime < 420) mc.player.sendMessage(new LiteralText("Sound Physics started!"), true);
 		else if(timeT-worldJoinedTime < 430) {mc.player.sendMessage(new LiteralText(""), true); isNative = true;}
 
+		if (t < 0) worldJoinedTime = timeT - 500;
+
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
 
 		if (pC.skipRainOcclusionTracing && isRain)
