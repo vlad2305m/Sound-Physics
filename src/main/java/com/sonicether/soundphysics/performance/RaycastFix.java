@@ -202,11 +202,11 @@ public class RaycastFix {
                         }
                     } else {
                         int dx1 = ((dirx * 15 + (x<<5) + 15)>>1) - xbs; int dz1 = ((dirz * 15 + (z<<5) + 15)>>1) - zbs;
-                        double dtx1 = dx1 * rdx * dirx; double dtz1 = dz1 * rdz * dirz;
+                        double dtx1 = dx1 * rdx; double dtz1 = dz1 * rdz;
                         if (currentNotAirStorage == null || (diry == 1 && ybs > currentNotAirStorage.top) || (diry == -1 && ybs < currentNotAirStorage.bottom)
                                 || (dtx1+tx < ty && dtz1+tz < ty)) {
 
-                            if (dtx1*dirx > dtz1*dirz){
+                            if (dtx1 > dtz1){
                                 zbs+=dz1; tz+=dtz1;
                             } else {
                                 xbs+=dx1; tx+=dtx1;
