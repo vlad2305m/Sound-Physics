@@ -206,26 +206,28 @@ public class RaycastFix {
                         if (currentNotAirStorage == null || (diry == 1 && ybs > currentNotAirStorage.top) || (diry == -1 && ybs < currentNotAirStorage.bottom)
                                 || (dtx1+tx < ty && dtz1+tz < ty)) {
 
-                            if (dtx1*dirx > dtz1*dirz){
+                            if (dtx1 > dtz1){
                                 zbs+=dz1; tz+=dtz1;
                             } else {
                                 xbs+=dx1; tx+=dtx1;
                             }
-                        }
-                        else { while (true) {
+                        } else { while (dx1 > 0 && dz1 > 0) {
                             if (tx < ty) {
                                 if (tx < tz) {
                                     xbs += dirx;
                                     tx += rdx;
+                                    dx1-=dirx;
                                 } else {
                                     zbs += dirz;
                                     tz += rdz;
+                                    dz1-=dirz;
                                 }
                             } else if (ty < tz) {
                                 break;
                             } else {
                                 zbs += dirz;
                                 tz += rdz;
+                                dz1-=dirz;
                             }
                         } }
                     }
