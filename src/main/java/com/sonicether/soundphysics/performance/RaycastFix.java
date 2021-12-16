@@ -211,21 +211,23 @@ public class RaycastFix {
                             } else {
                                 xbs+=dx1; tx+=dtx1;
                             }
-                        }
-                        else { while (true) {
+                        } else { while (dx1 > 0 && dz1 > 0) {
                             if (tx < ty) {
                                 if (tx < tz) {
                                     xbs += dirx;
                                     tx += rdx;
+                                    dx1-=dirx;
                                 } else {
                                     zbs += dirz;
                                     tz += rdz;
+                                    dz1-=dirz;
                                 }
                             } else if (ty < tz) {
                                 break;
                             } else {
                                 zbs += dirz;
                                 tz += rdz;
+                                dz1-=dirz;
                             }
                         } }
                     }
