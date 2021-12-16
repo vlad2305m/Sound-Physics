@@ -1,9 +1,11 @@
 package com.sonicether.soundphysics.mixin;
 
 import com.sonicether.soundphysics.SPLog;
+import com.sonicether.soundphysics.SourceAccessor;
 import com.sonicether.soundphysics.config.BlueTapePack.ConfigManager;
 import com.sonicether.soundphysics.SoundPhysics;
 import net.minecraft.client.sound.Source;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 @Mixin(Source.class)
-public class SourceMixin {
+public class SourceMixin implements SourceAccessor {
 
     @Shadow
     @Final
@@ -41,4 +43,9 @@ public class SourceMixin {
         return  attenuation / (float)(ConfigManager.getConfig().General.attenuationFactor);
     }
 
+    public void calculateReverb(SoundCategory category, String name) {
+        SoundPhysics.setLastSoundCategoryAndName(category, name);
+        SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer);
+        SPLog.checkErrorLog("onRecalculate");
+    }
 }

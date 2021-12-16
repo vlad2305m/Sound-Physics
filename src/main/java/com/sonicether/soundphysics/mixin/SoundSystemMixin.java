@@ -1,16 +1,23 @@
 package com.sonicether.soundphysics.mixin;
 
 import com.sonicether.soundphysics.SoundPhysics;
+import com.sonicether.soundphysics.SourceAccessor;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
 import net.minecraft.client.sound.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Identifier;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Iterator;
+import java.util.Map;
+
+import static com.sonicether.soundphysics.SoundPhysics.mc;
 
 @Mixin(SoundSystem.class)
 public class SoundSystemMixin {
@@ -28,6 +35,14 @@ public class SoundSystemMixin {
     @ModifyArg(method = "getAdjustedVolume", at = @At(value = "INVOKE", target = "net/minecraft/util/math/MathHelper.clamp (FFF)F"), index = 0)
     private float VolumeMultiplierInjector(float vol){
         return vol * PrecomputedConfig.globalVolumeMultiplier;
+    }
+    @SuppressWarnings("InvalidInjectorMethodSignature")
+    @Inject(method = "tick()V", at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 3), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void recalculate(CallbackInfo ci, Iterator<?> iterator, Map.Entry<?, ?> entry, Channel.SourceManager f, SoundInstance g, float vec3d){
+        if (mc.world != null && mc.world.getTime()%4==0){
+            f.run((s) -> ((SourceAccessor)s).calculateReverb(g.getCategory(), g.getId().getPath()));
+        }
+            //((SourceAccessor)null)
     }
 
 }

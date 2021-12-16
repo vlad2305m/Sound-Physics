@@ -12,7 +12,6 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -23,7 +22,7 @@ import static com.sonicether.soundphysics.SoundPhysics.pC;
 public class RaycastFix {
 
     public static long lastUpd = 0;
-    public static Map<Long, ImmutableTriple<BlockState,VoxelShape, VoxelShape>> shapeCache = new ConcurrentHashMap<>(2048);
+    public static Map<Long, Shapes> shapeCache = new ConcurrentHashMap<>(2048);
     // reset every tick, usually up to 2200
         // {pos, (block state, block, fluid) }
 
@@ -240,17 +239,18 @@ public class RaycastFix {
 
     private static SPHitResult finalRaycast(World world, BlockState bs, BlockPos pos, Vec3d start, Vec3d end, WorldChunk c, Short side) {
         long posl = pos.asLong();
-        ImmutableTriple<BlockState, VoxelShape, VoxelShape> shapes;
+        Shapes shapes;
         shapes = shapeCache.get(posl);
         if (shapes == null) {
             if (pC.dRays) world.addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY() + 1d, pos.getZ() + 0.5d, 0, 0, 0);
             VoxelShape fluidShape = bs.getFluidState().getShape(world, pos);
             VoxelShape collisionShape = bs.getCollisionShape(world, pos);
-            shapes =  new ImmutableTriple<>(bs, collisionShape == EMPTY ? null : collisionShape, fluidShape == EMPTY ? null : fluidShape);shapeCache.put(posl, shapes);
+            shapes =  new Shapes(collisionShape == EMPTY ? null : collisionShape, fluidShape == EMPTY ? null : fluidShape);
+            shapeCache.put(posl, shapes);
         }
 
-        VoxelShape voxelShape = shapes.getMiddle();//BlockShape
-        VoxelShape voxelShape2 = shapes.getRight();//FluidShape
+        VoxelShape voxelShape = shapes.getSolid();//BlockShape
+        VoxelShape voxelShape2 = shapes.getLiquid();//FluidShape
         if (voxelShape == CUBE || voxelShape2 == CUBE) {
             Direction direction =
                     side == 1 ? Direction.EAST :
@@ -269,15 +269,5 @@ public class RaycastFix {
         return d <= e ? blockHitResult : blockHitResult2;
     }
 
-    /*private static Vec3d clampToBlock(Vec3d end, Vec3d pos) {
-        if (pos.x > maxX || pos.y > maxY || pos.z > maxZ || pos.x < minX || pos.y < minY || pos.z < minZ) return pos;
-        if (end.x <= maxX && end.y <= maxY && end.z <= maxZ && end.x >= minX && end.y >= minY && end.z >= minZ) return end;
-        Vec3d delta = end.subtract(pos);
-        double fx = delta.x == 0 ? Double.MAX_VALUE : (((delta.x > 0 ? maxX : minX) - pos.x) / delta.x);
-        double fy = delta.y == 0 ? Double.MAX_VALUE : (((delta.y > 0 ? maxY : minY) - pos.y) / delta.y);
-        double fz = delta.z == 0 ? Double.MAX_VALUE : (((delta.z > 0 ? maxZ : minZ) - pos.z) / delta.z);
-        double factor = Math.min(Math.min(fx,fy), fz);
-        return pos.add(delta.multiply(factor));
-    }*/
 
 }

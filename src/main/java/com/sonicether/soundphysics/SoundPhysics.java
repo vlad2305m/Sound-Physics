@@ -13,7 +13,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.awt.*;
@@ -134,13 +133,10 @@ public class SoundPhysics
 	//public static void tout() { System.out.println((SoundPhysics.tt/1e6d) + "   Avg: " + cumtt/navgt/1e6d); }
 	//public static void tres() { SoundPhysics.tt=0; }
 
-	private static MinecraftClient mc;
+	public static MinecraftClient mc;
 	
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;
-	private static World inWorld = null;
-	private static boolean isNative = false;
-	private static long worldJoinedTime = 0;
 
 	public static void init()
 	{
@@ -199,10 +195,8 @@ public class SoundPhysics
 	{return new Vec3d(normal.getX() == 0 ? dir.x : -dir.x, normal.getY() == 0 ? dir.y : -dir.y, normal.getZ() == 0 ? dir.z : -dir.z);}
 
 	@SuppressWarnings("ConstantConditions")
-	private static void evaluateEnvironment(final int sourceID, final double posX, final double posY, final double posZ, boolean directPass)
+	private static void evaluateEnvironment(final int sourceID, double posX, double posY, double posZ, boolean directPass)
 	{
-		if (inWorld != (inWorld = mc.world) && mc.world != null) worldJoinedTime = mc.world.getTime();
-
 		if (pC.off) return;
 
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || (pC.recordsDisable && lastSoundCategory == SoundCategory.RECORDS) || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
@@ -214,6 +208,8 @@ public class SoundPhysics
 		final long timeT = mc.world.getTime();
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
+		boolean block = blockPattern.matcher(lastSoundName).matches();
+		if (lastSoundCategory == SoundCategory.RECORDS){posX+=0.5;posY+=0.5;posZ+=0.5;block = true;}
 
 		if (pC.skipRainOcclusionTracing && isRain)
 		{
@@ -260,7 +256,7 @@ public class SoundPhysics
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
 		BlockPos lastBlockPos = soundBlockPos;
-		final boolean _9ray = pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || blockPattern.matcher(lastSoundName).matches()) && !stepPattern.matcher(lastSoundName).matches();
+		final boolean _9ray = pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || block) && !stepPattern.matcher(lastSoundName).matches();
 		final int nOccRays = _9ray ? 9 : 1;
 		double occlusionAccMin = Double.MAX_VALUE;
 		for (int j = 0; j < nOccRays; j++) {

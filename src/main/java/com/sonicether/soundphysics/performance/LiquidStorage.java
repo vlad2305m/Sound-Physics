@@ -15,7 +15,7 @@ import java.util.Set;
  */
 
 public class LiquidStorage {
-    private boolean full = false;
+    private boolean full;
     public int bottom;
     public int top;
     private boolean[][] sections;
