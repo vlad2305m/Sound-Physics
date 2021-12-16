@@ -3,12 +3,10 @@ package com.sonicether.soundphysics;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
 import com.sonicether.soundphysics.performance.RaycastFix;
 import com.sonicether.soundphysics.performance.SPHitResult;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -22,6 +20,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -125,15 +124,15 @@ public class SoundPhysics
 	public static PrecomputedConfig pC = null;
 	//Private fields
 	// ψ time ψ
-	//public static AtomicLong tt = new AtomicLong(0);
+	//public static long tt = 0;
 	//private static long ttt;
 	//private static double cumtt = 0;
 	//private static long navgt = 0;
 	//public static void t1() {ttt = System.nanoTime(); }
-	//public static void t2() { SoundPhysics.tt.addAndGet((System.nanoTime()-ttt));}
-	//public static void tavg() { cumtt += tt.get(); navgt++; }
-	//public static void tout() { System.out.println((SoundPhysics.tt.get()/1e6d) + "   Avg: " + cumtt/navgt/1e6d); }
-	//public static void tres() { SoundPhysics.tt.set(0); }
+	//public static void t2() { SoundPhysics.tt+=(System.nanoTime()-ttt);}
+	//public static void tavg() { cumtt += tt; navgt++; }
+	//public static void tout() { System.out.println((SoundPhysics.tt/1e6d) + "   Avg: " + cumtt/navgt/1e6d); }
+	//public static void tres() { SoundPhysics.tt=0; }
 
 	private static MinecraftClient mc;
 	
@@ -168,9 +167,9 @@ public class SoundPhysics
 		
 		if (pC.pLog) startTime = System.nanoTime();
 		//t1();// rm
-		evaluateEnvironment(sourceID, posX, posY, posZ, directPass); // time = 4 ^ω^ YAY! ^ω^
+		evaluateEnvironment(sourceID, posX, posY, posZ, directPass); // time = 0.5? OωO
 		//t2();
-		//tavg();tout();tres();// ψ time ψ
+		//tavg();tres();//tout();// ψ time ψ
 		if (pC.pLog) { endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
@@ -213,21 +212,6 @@ public class SoundPhysics
 			return;
 		}
 		final long timeT = mc.world.getTime();
-		int t = (int) (timeT-worldJoinedTime);
-		if (t < 0) { worldJoinedTime = timeT - 500; t = 500; }
-		if (isNative) {
-			if (t < 100) { // wait 5s for the chunks
-				mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (99 - t) / 20), true);
-				return;
-			}
-		} else if (t < 400) {
-			if (t < 200 || t > 300) { // wait 10s for the chunks, kick it to make ray tracing native, and then wait 5s to let it cool
-				mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (419 - t) / 20), true);
-				return;
-			}
-			mc.player.sendMessage(new LiteralText("Sound Physics starting... " + (419 - t) / 20), true);
-		} else if(timeT-worldJoinedTime < 420) mc.player.sendMessage(new LiteralText("Sound Physics started!"), true);
-		else if(timeT-worldJoinedTime < 430) {mc.player.sendMessage(new LiteralText(""), true); isNative = true;}
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
 
@@ -239,7 +223,7 @@ public class SoundPhysics
 
 		if (RaycastFix.lastUpd != timeT) {
 			if (timeT % 1024 == 0) {
-				RaycastFix.shapeCache = new Long2ObjectOpenHashMap<>(2048,0.75f); // just in case something gets corrupted
+				RaycastFix.shapeCache = new ConcurrentHashMap<>(2048); // just in case something gets corrupted
 				//cumtt = 0; navgt = 0; ψ time ψ
 			}
 			else {

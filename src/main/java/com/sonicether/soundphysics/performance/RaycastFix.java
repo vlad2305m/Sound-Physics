@@ -1,6 +1,5 @@
 package com.sonicether.soundphysics.performance;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.particle.ParticleTypes;
@@ -17,13 +16,14 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sonicether.soundphysics.SoundPhysics.pC;
 
 public class RaycastFix {
 
     public static long lastUpd = 0;
-    public static Map<Long, ImmutableTriple<BlockState,VoxelShape, VoxelShape>> shapeCache = new Long2ObjectOpenHashMap<>(2048, 0.75f);
+    public static Map<Long, ImmutableTriple<BlockState,VoxelShape, VoxelShape>> shapeCache = new ConcurrentHashMap<>(2048);
     // reset every tick, usually up to 2200
         // {pos, (block state, block, fluid) }
 
@@ -114,9 +114,9 @@ public class RaycastFix {
                 int dirx = MathHelper.sign(dx);
                 int diry = MathHelper.sign(dy);
                 int dirz = MathHelper.sign(dz);
-                double rdx = dirx == 0 ? 1.7976931348623157E308D : (double)dirx / dx; // 1/dx
-                double rdy = diry == 0 ? 1.7976931348623157E308D : (double)diry / dy;
-                double rdz = dirz == 0 ? 1.7976931348623157E308D : (double)dirz / dz;
+                double rdx = dirx == 0 ? 1.7976931348623157E300D : (double)dirx / dx; // 1/dx
+                double rdy = diry == 0 ? 1.7976931348623157E300D : (double)diry / dy;
+                double rdz = dirz == 0 ? 1.7976931348623157E300D : (double)dirz / dz;
                 double tx = rdx * (dirx > 0 ? 1.0D - MathHelper.fractionalPart(xs1) : MathHelper.fractionalPart(xs1)); // relative to blockPos start
                 double ty = rdy * (diry > 0 ? 1.0D - MathHelper.fractionalPart(ys1) : MathHelper.fractionalPart(ys1));
                 double tz = rdz * (dirz > 0 ? 1.0D - MathHelper.fractionalPart(zs1) : MathHelper.fractionalPart(zs1));
@@ -241,16 +241,12 @@ public class RaycastFix {
     private static SPHitResult finalRaycast(World world, BlockState bs, BlockPos pos, Vec3d start, Vec3d end, WorldChunk c, Short side) {
         long posl = pos.asLong();
         ImmutableTriple<BlockState, VoxelShape, VoxelShape> shapes;
-        //noinspection SynchronizeOnNonFinalField
-        synchronized (shapeCache) {
-            shapes = shapeCache.get(posl);
-            if (shapes == null) {
-                if (pC.dRays) world.addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY() + 1d, pos.getZ() + 0.5d, 0, 0, 0);
-                VoxelShape fluidShape = bs.getFluidState().getShape(world, pos);
-                VoxelShape collisionShape = bs.getCollisionShape(world, pos);
-                shapes =  new ImmutableTriple<>(bs, collisionShape == EMPTY ? null : collisionShape, fluidShape == EMPTY ? null : fluidShape);
-            shapeCache.put(posl, shapes);
-            }
+        shapes = shapeCache.get(posl);
+        if (shapes == null) {
+            if (pC.dRays) world.addParticle(ParticleTypes.END_ROD, false, pos.getX() + 0.5d, pos.getY() + 1d, pos.getZ() + 0.5d, 0, 0, 0);
+            VoxelShape fluidShape = bs.getFluidState().getShape(world, pos);
+            VoxelShape collisionShape = bs.getCollisionShape(world, pos);
+            shapes =  new ImmutableTriple<>(bs, collisionShape == EMPTY ? null : collisionShape, fluidShape == EMPTY ? null : fluidShape);shapeCache.put(posl, shapes);
         }
 
         VoxelShape voxelShape = shapes.getMiddle();//BlockShape
