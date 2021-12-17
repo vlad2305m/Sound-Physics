@@ -26,7 +26,7 @@ public enum ConfigPresets {
 
             Map.ofEntries(entry("DEFAULT", new MaterialData(0.5, 0.5))),
 
-            true, 10.0, true, true, 0.5, false
+            4, 10.0, true, true, 0.5, false
     )),//</editor-fold>
     //<editor-fold desc="DEFAULT_PERFORMANCE,">
     DEFAULT_PERFORMANCE("Performance (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
@@ -38,7 +38,7 @@ public enum ConfigPresets {
 
             Map.ofEntries(entry("DEFAULT", new MaterialData(0.5, 0.5))),
 
-            true, 10.0, true, true, 0.5, true
+            4, 10.0, true, true, 0.5, true
     )),//</editor-fold>
     //<editor-fold desc="DEFAULT_QUALITY,">
     DEFAULT_QUALITY("Quality (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
@@ -50,7 +50,7 @@ public enum ConfigPresets {
 
             Map.ofEntries(entry("DEFAULT", new MaterialData(0.5, 0.5))),
 
-            true, 10.0, true, true, 0.5, false
+            4, 10.0, true, true, 0.5, false
     )),//</editor-fold>
     //<editor-fold desc="THEDOCRUBY,">
     THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
@@ -111,7 +111,7 @@ public enum ConfigPresets {
                     entry("DEFAULT"    , new MaterialData(0.5,                  0.5  ))     // Default Material   ()
             ),//</editor-fold>
 
-            true, 10.0, true, true, 0.5, false
+            4, 10.0, true, true, 0.5, false
 
     )),//</editor-fold>
     //<editor-fold desc="SUPER_REVERB,">

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static com.sonicether.soundphysics.SoundPhysics.mc;
+import static com.sonicether.soundphysics.SoundPhysics.pC;
 
 @Mixin(SoundSystem.class)
 public class SoundSystemMixin {
@@ -39,7 +40,7 @@ public class SoundSystemMixin {
     @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(method = "tick()V", at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 3), locals = LocalCapture.CAPTURE_FAILHARD)
     private void recalculate(CallbackInfo ci, Iterator<?> iterator, Map.Entry<?, ?> entry, Channel.SourceManager f, SoundInstance g, float vec3d){
-        if (mc.world != null && mc.world.getTime()%4==0){
+        if (mc.world != null && mc.world.getTime()%pC.continuousRefreshRate==0){
             f.run((s) -> ((SourceAccessor)s).calculateReverb(g.getCategory(), g.getId().getPath()));
         }
             //((SourceAccessor)null)

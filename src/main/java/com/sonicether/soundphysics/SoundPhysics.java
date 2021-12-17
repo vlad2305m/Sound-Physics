@@ -8,12 +8,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.List;
@@ -149,12 +149,12 @@ public class SoundPhysics
 
 	public static void setLastSoundCategoryAndName(SoundCategory sc, String name) { lastSoundCategory = sc; lastSoundName = name; }
 
-	public static void onPlaySound(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, true);}
+	public static void onPlaySound(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, false);}
 
 	@SuppressWarnings("unused")
-	public static void onPlayReverb(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, false);}
+	public static void onPlayReverb(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, true);}
 
-	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean directPass)
+	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean auxOnly)
 	{
 		if (pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
@@ -163,7 +163,7 @@ public class SoundPhysics
 		
 		if (pC.pLog) startTime = System.nanoTime();
 		//t1();// rm
-		evaluateEnvironment(sourceID, posX, posY, posZ, directPass); // time = 0.5? OωO
+		evaluateEnvironment(sourceID, posX, posY, posZ, auxOnly); // time = 0.5? OωO
 		//t2();
 		//tavg();tres();//tout();// ψ time ψ
 		if (pC.pLog) { endTime = System.nanoTime();
@@ -195,25 +195,25 @@ public class SoundPhysics
 	{return new Vec3d(normal.getX() == 0 ? dir.x : -dir.x, normal.getY() == 0 ? dir.y : -dir.y, normal.getZ() == 0 ? dir.z : -dir.z);}
 
 	@SuppressWarnings("ConstantConditions")
-	private static void evaluateEnvironment(final int sourceID, double posX, double posY, double posZ, boolean directPass)
+	private static void evaluateEnvironment(final int sourceID, double posX, double posY, double posZ, boolean auxOnly)
 	{
 		if (pC.off) return;
 
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || (pC.recordsDisable && lastSoundCategory == SoundCategory.RECORDS) || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
-			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
+			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, auxOnly ? 0.0f : 1.0f);
 			return;
 		}
 		final long timeT = mc.world.getTime();
 
 		final boolean isRain = rainPattern.matcher(lastSoundName).matches();
-		boolean block = blockPattern.matcher(lastSoundName).matches();
+		boolean block = blockPattern.matcher(lastSoundName).matches() && !stepPattern.matcher(lastSoundName).matches();
 		if (lastSoundCategory == SoundCategory.RECORDS){posX+=0.5;posY+=0.5;posZ+=0.5;block = true;}
 
 		if (pC.skipRainOcclusionTracing && isRain)
 		{
-			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, directPass ? 1.0f : 0.0f);
+			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, auxOnly ? 0.0f : 1.0f);
 			return;
 		}
 
@@ -240,9 +240,7 @@ public class SoundPhysics
 		final WorldChunk soundChunk = mc.world.getChunk(((int)Math.floor(posX))>>4,((int)Math.floor(posZ))>>4);
 
 
-		double directCutoff; // time = 0.1
-
-		//Direct sound occlusion
+		//Direct sound occlusion // time = 0.1
 
 		final Vec3d soundPos = new Vec3d(posX, posY, posZ);
 		Vec3d normalToPlayer = playerPos.subtract(soundPos).normalize();
@@ -256,7 +254,7 @@ public class SoundPhysics
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
 		BlockPos lastBlockPos = soundBlockPos;
-		final boolean _9ray = pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || block) && !stepPattern.matcher(lastSoundName).matches();
+		final boolean _9ray = pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || block);
 		final int nOccRays = _9ray ? 9 : 1;
 		double occlusionAccMin = Double.MAX_VALUE;
 		for (int j = 0; j < nOccRays; j++) {
@@ -276,7 +274,7 @@ public class SoundPhysics
 				//If we hit a block
 
 				if (pC.dRays) RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
-				if (rayHit.getType() == HitResult.Type.MISS) {
+				if (rayHit.isMissed()) {
 					if (pC.soundDirectionEvaluation) directions.add(Map.entry(rayOrigin.subtract(playerPos),
 							(_9ray?9:1) * Math.pow(soundPos.distanceTo(playerPos), 2.0)* pC.rcpTotRays
 									/
@@ -311,14 +309,14 @@ public class SoundPhysics
 			if (oAValid) occlusionAccMin = Math.min(occlusionAccMin, occlusionAccumulation);
 		}
 		occlusionAccumulation = Math.min(occlusionAccMin, pC.maxDirectOcclusionFromBlocks);
-		directCutoff = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption);
-		double directGain = directPass ? Math.pow(directCutoff, 0.1) : 0;
+		double directCutoff = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption);
+		double directGain = auxOnly ? 0 : Math.pow(directCutoff, 0.01);
 
 		if (pC.oLog) logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
 
 		final double[] δsendGain = {0d,0d,0d,0d};
 
-		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, occlusionAccumulation, directGain, directPass, null, δsendGain); return;}
+		if (isRain) {finalizeEnvironment(true, sourceID, directCutoff, 0, occlusionAccumulation, directGain, auxOnly, null, δsendGain); return;}
 
 		// Shoot rays around sound
 
@@ -381,7 +379,7 @@ public class SoundPhysics
 
 			if (pC.dRays) RaycastRenderer.addSoundBounceRay(soundPos, rayHit.getPos(), Formatting.GREEN.getColorValue());
 
-			if (rayHit.getType() == HitResult.Type.BLOCK) {
+			if (!rayHit.isMissed()) {
 
 				// Additional bounces
 				BlockPos lastHitBlock = rayHit.getBlockPos();
@@ -408,7 +406,7 @@ public class SoundPhysics
 						final SPHitResult finalRayHit = fixedRaycast(finalRayStart, playerPos, mc.world, null, rayHit.chunk);
 
 						int color = Formatting.GRAY.getColorValue();
-						if (finalRayHit.getType() == HitResult.Type.MISS) {
+						if (finalRayHit.isMissed()) {
 							color = Formatting.WHITE.getColorValue();
 
 							double totalFinalRayDistance = totalRayDistance + finalRayStart.distanceTo(playerPos);
@@ -447,7 +445,7 @@ public class SoundPhysics
 					rayHit = fixedRaycast(newRayStart, newRayEnd, mc.world, lastHitBlock, rayHit.chunk);
 
 
-					if (rayHit.getType() == HitResult.Type.MISS) {
+					if (rayHit.isMissed()) {
 						if (pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayEnd, Formatting.DARK_RED.getColorValue());
 						break;
 					} else {
@@ -501,10 +499,10 @@ public class SoundPhysics
 		}
 
 
-		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace.get(), occlusionAccumulation,  directGain, directPass, bounceReflectivityRatio, δsendGain);
+		finalizeEnvironment(false, sourceID, directCutoff, sharedAirspace.get(), occlusionAccumulation,  directGain, auxOnly, bounceReflectivityRatio, δsendGain);
 	}
 
-	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double occlusionAccumulation, double directGain, boolean directPass, double[] bounceReflectivityRatio, double[] δsendGain) {
+	private static void finalizeEnvironment(boolean isRain, int sourceID, double directCutoff, double sharedAirspace, double occlusionAccumulation, double directGain, boolean auxOnly, double[] bounceReflectivityRatio, double @NotNull [] δsendGain) {
 		// Calculate reverb parameters for this sound
 		double sendGain0 = 0d + δsendGain[0];
 		double sendGain1 = 0d + δsendGain[1];
@@ -516,6 +514,7 @@ public class SoundPhysics
 		double sendCutoff2 = 1d;
 		double sendCutoff3 = 1d;
 
+		double directCutoff0 = directCutoff;
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
 		{
@@ -540,16 +539,16 @@ public class SoundPhysics
 		final double sharedAirspaceWeight2 = MathHelper.clamp(sharedAirspace * 0.1, 0d, 1d);
 		final double sharedAirspaceWeight3 = MathHelper.clamp(sharedAirspace * 0.1, 0d, 1d);
 
-		sendCutoff0 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption) * (1d - sharedAirspaceWeight0) + sharedAirspaceWeight0;
-		sendCutoff1 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption) * (1d - sharedAirspaceWeight1) + sharedAirspaceWeight1;
-		sendCutoff2 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption * 1d) * (1d - sharedAirspaceWeight2) + sharedAirspaceWeight2;
-		sendCutoff3 = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption * 1d) * (1d - sharedAirspaceWeight3) + sharedAirspaceWeight3;
+		sendCutoff0 = directCutoff0 * (1d - sharedAirspaceWeight0) + sharedAirspaceWeight0;
+		sendCutoff1 = directCutoff0 * (1d - sharedAirspaceWeight1) + sharedAirspaceWeight1;
+		sendCutoff2 = directCutoff0 * (1d - sharedAirspaceWeight2) + sharedAirspaceWeight2;
+		sendCutoff3 = directCutoff0 * (1d - sharedAirspaceWeight3) + sharedAirspaceWeight3;
 
 		// attempt to preserve directionality when airspace is shared by allowing some dry signal through but filtered
 		final double averageSharedAirspace = (sharedAirspaceWeight0 + sharedAirspaceWeight1 + sharedAirspaceWeight2 + sharedAirspaceWeight3) * 0.25;
 		directCutoff = Math.max(Math.pow(averageSharedAirspace, 0.5) * 0.2, directCutoff);
 
-		directGain = directPass ? Math.pow(directCutoff, 0.1) : 0d;
+		directGain = auxOnly ? 0d : Math.pow(directCutoff, 0.1);
 
 		//logDetailed("HitRatio0: " + hitRatioBounce1 + " HitRatio1: " + hitRatioBounce2 + " HitRatio2: " + hitRatioBounce3 + " HitRatio3: " + hitRatioBounce4);
 

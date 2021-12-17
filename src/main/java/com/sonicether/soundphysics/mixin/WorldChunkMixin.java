@@ -34,15 +34,11 @@ import java.util.stream.Stream;
 public abstract class WorldChunkMixin extends Chunk implements WorldChunkAccess {
     private LiquidStorage notAirLiquidStorage = null;
     //private LiquidStorage waterLiquidStorage = null;//todo
-    //private LiquidStorage lavaLiquidStorage = null;
 
     public LiquidStorage getNotAirLiquidStorage() {return notAirLiquidStorage;}
     //public LiquidStorage getWaterLiquidStorage() {return waterLiquidStorage;}
-    //public LiquidStorage getLavaLiquidStorage() {return lavaLiquidStorage;}
 
     @Shadow @Final World world;
-
-    @Shadow public abstract boolean shouldRenderOnUpdate();
 
     public WorldChunkMixin(ChunkPos pos, UpgradeData upgradeData, HeightLimitView heightLimitView, Registry<Biome> biome, long inhabitedTime, @Nullable ChunkSection[] sectionArrayInitializer, @Nullable BlendingData blendingData) {
         super(pos, upgradeData, heightLimitView, biome, inhabitedTime, sectionArrayInitializer, blendingData);

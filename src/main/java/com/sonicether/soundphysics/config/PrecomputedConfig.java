@@ -44,6 +44,7 @@ public class PrecomputedConfig {
     public final Map<String, MaterialData> blockWhiteMap;
 
     public final boolean recordsDisable;
+    public final int continuousRefreshRate;
     public final double maxDirectOcclusionFromBlocks;
     public final boolean _9Ray;
     public final boolean soundDirectionEvaluation;
@@ -114,6 +115,7 @@ public class PrecomputedConfig {
         }
 
         recordsDisable = c.Vlads_Tweaks.recordsDisable;
+        continuousRefreshRate = c.Vlads_Tweaks.continuousRefreshRate;
         maxDirectOcclusionFromBlocks = c.Vlads_Tweaks.maxDirectOcclusionFromBlocks;
         _9Ray = c.Vlads_Tweaks._9RayDirectOcclusion;
         soundDirectionEvaluation = c.Vlads_Tweaks.soundDirectionEvaluation;

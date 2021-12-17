@@ -1,40 +1,38 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.config.presets.ReverbParams;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
 import static com.sonicether.soundphysics.SoundPhysics.pC;
 
 import static com.sonicether.soundphysics.SPLog.*;
 
+/*
+                                        !!!Documentation for OpenAL!!!
+                * I am not responsible for anything that happens after you go to these links *
+    - ExtEfx(aka Effects Extension) https://github.com/rtpHarry/Sokoban/blob/master/libraries/OpenAL%201.1%20SDK/docs/Effects%20Extension%20Guide.pdf or https://usermanual.wiki/Pdf/Effects20Extension20Guide.90272296/view
+    - Core spec(aka OpenAL 1.1 Specification and Reference) https://www.openal.org/documentation/openal-1.1-specification.pdf
+    - Core guide(aka OpenAL Programmer's Guide) http://openal.org/documentation/OpenAL_Programmers_Guide.pdf
+ */
+
 public class SPEfx {
 
-    private static int auxFXSlot0;
-    private static int auxFXSlot1;
-    private static int auxFXSlot2;
-    private static int auxFXSlot3;
-    private static int reverb0;
-    private static int reverb1;
-    private static int reverb2;
-    private static int reverb3;
+    private static final ReverbSlot slot1 = new ReverbSlot(0.15f , 0.0f, 1.0f, 2, 0.99f, 0.8571429f, 2.5f, 0.001f, 1.26f, 0.011f, 0.994f, 0.16f);
+    private static final ReverbSlot slot2 = new ReverbSlot(0.55f , 0.0f, 1.0f, 3, 0.99f, 1         , 0.2f, 0.015f, 1.26f, 0.011f, 0.994f, 0.15f);
+    private static final ReverbSlot slot3 = new ReverbSlot(1.68f , 0.1f, 1.0f, 5, 0.99f, 1         , 0.0f, 0.021f, 1.26f, 0.021f, 0.994f, 0.13f);
+    private static final ReverbSlot slot4 = new ReverbSlot(4.142f, 0.5f, 1.0f, 4, 0.89f, 1         , 0.0f, 0.025f, 1.26f, 0.021f, 0.994f, 0.11f);
     private static int directFilter0;
-    private static int sendFilter0;
-    private static int sendFilter1;
-    private static int sendFilter2;
-    private static int sendFilter3;
 
     public static void syncReverbParams()
     {
-        if (auxFXSlot0 != 0)
+        if (slot1.initialised)
         {
             //Set the global reverb parameters and apply them to the effect and effectslot
-            setReverbParams(ReverbParams.getReverb0(), auxFXSlot0, reverb0);
-            setReverbParams(ReverbParams.getReverb1(), auxFXSlot1, reverb1);
-            setReverbParams(ReverbParams.getReverb2(), auxFXSlot2, reverb2);
-            setReverbParams(ReverbParams.getReverb3(), auxFXSlot3, reverb3);
+            slot1.set();
+            slot2.set();
+            slot3.set();
+            slot4.set();
         }
     }
 
@@ -49,89 +47,32 @@ public class SPEfx {
             logError("EFX Extension not found on current device. Aborting.");
             return;
         }
+        // Delete previous filter if it was there
+        if (slot1.initialised) EXTEfx.alDeleteFilters(directFilter0);
 
         // Create auxiliary effect slots
-        auxFXSlot0 = EXTEfx.alGenAuxiliaryEffectSlots();
-        log("Aux slot " + auxFXSlot0 + " created");
-        EXTEfx.alAuxiliaryEffectSloti(auxFXSlot0, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, AL10.AL_TRUE);
-
-        auxFXSlot1 = EXTEfx.alGenAuxiliaryEffectSlots();
-        log("Aux slot " + auxFXSlot1 + " created");
-        EXTEfx.alAuxiliaryEffectSloti(auxFXSlot1, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, AL10.AL_TRUE);
-
-        auxFXSlot2 = EXTEfx.alGenAuxiliaryEffectSlots();
-        log("Aux slot " + auxFXSlot2 + " created");
-        EXTEfx.alAuxiliaryEffectSloti(auxFXSlot2, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, AL10.AL_TRUE);
-
-        auxFXSlot3 = EXTEfx.alGenAuxiliaryEffectSlots();
-        log("Aux slot " + auxFXSlot3 + " created");
-        EXTEfx.alAuxiliaryEffectSloti(auxFXSlot3, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, AL10.AL_TRUE);
-        checkErrorLog("Failed creating auxiliary effect slots!");
-
-        //Create effect objects
-        reverb0 = EXTEfx.alGenEffects();												//Create effect object
-        EXTEfx.alEffecti(reverb0, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_EAXREVERB);		//Set effect object to be reverb
-        checkErrorLog("Failed creating reverb effect slot 0!");
-        reverb1 = EXTEfx.alGenEffects();												//Create effect object
-        EXTEfx.alEffecti(reverb1, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_EAXREVERB);		//Set effect object to be reverb
-        checkErrorLog("Failed creating reverb effect slot 1!");
-        reverb2 = EXTEfx.alGenEffects();												//Create effect object
-        EXTEfx.alEffecti(reverb2, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_EAXREVERB);		//Set effect object to be reverb
-        checkErrorLog("Failed creating reverb effect slot 2!");
-        reverb3 = EXTEfx.alGenEffects();												//Create effect object
-        EXTEfx.alEffecti(reverb3, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_EAXREVERB);		//Set effect object to be reverb
-        checkErrorLog("Failed creating reverb effect slot 3!");
+        slot1.initialize();
+        slot2.initialize();
+        slot3.initialize();
+        slot4.initialize();
 
         // Create filters
         directFilter0 = EXTEfx.alGenFilters();
         EXTEfx.alFilteri(directFilter0, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_LOWPASS);
         logGeneral("directFilter0: "+directFilter0);
-
-        sendFilter0 = EXTEfx.alGenFilters();
-        EXTEfx.alFilteri(sendFilter0, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_LOWPASS);
-        logGeneral("filter0: "+sendFilter0);
-
-        sendFilter1 = EXTEfx.alGenFilters();
-        EXTEfx.alFilteri(sendFilter1, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_LOWPASS);
-        logGeneral("filter1: "+sendFilter1);
-
-        sendFilter2 = EXTEfx.alGenFilters();
-        EXTEfx.alFilteri(sendFilter2, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_LOWPASS);
-        logGeneral("filter2: "+sendFilter2);
-
-        sendFilter3 = EXTEfx.alGenFilters();
-        EXTEfx.alFilteri(sendFilter3, EXTEfx.AL_FILTER_TYPE, EXTEfx.AL_FILTER_LOWPASS);
-        logGeneral("filter3: "+sendFilter3);
-        checkErrorLog("Error creating lowpass filters!");
-
-        syncReverbParams();
     }
 
-    protected static void setEnvironment(final int sourceID, final float sendGain0, final float sendGain1,
-                                       final float sendGain2, final float sendGain3, final float sendCutoff0, final float sendCutoff1,
-                                       final float sendCutoff2, final float sendCutoff3, final float directCutoff, final float directGain)
+    protected static void setEnvironment(final int sourceID,
+                                         final float sendGain0,   final float sendGain1,   final float sendGain2,   final float sendGain3,
+                                         final float sendCutoff0, final float sendCutoff1, final float sendCutoff2, final float sendCutoff3,
+                                         final float directCutoff, final float directGain)
     {
         if (pC.off) return;
         // Set reverb send filter values and set source to send to all reverb fx slots
-        EXTEfx.alFilterf(sendFilter0, EXTEfx.AL_LOWPASS_GAIN, sendGain0);
-        EXTEfx.alFilterf(sendFilter0, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff0);
-        AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot0, 1, sendFilter0);
-        checkErrorLog("Set Environment filter0:");
-
-        EXTEfx.alFilterf(sendFilter1, EXTEfx.AL_LOWPASS_GAIN, sendGain1);
-        EXTEfx.alFilterf(sendFilter1, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff1);
-        AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot1, 1, sendFilter1);
-        checkErrorLog("Set Environment filter1:");
-
-        EXTEfx.alFilterf(sendFilter2, EXTEfx.AL_LOWPASS_GAIN, sendGain2);
-        EXTEfx.alFilterf(sendFilter2, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff2);
-        AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot2, 1, sendFilter2);
-        checkErrorLog("Set Environment filter2:");
-
-        EXTEfx.alFilterf(sendFilter3, EXTEfx.AL_LOWPASS_GAIN, sendGain3);
-        EXTEfx.alFilterf(sendFilter3, EXTEfx.AL_LOWPASS_GAINHF, sendCutoff3);
-        AL11.alSource3i(sourceID, EXTEfx.AL_AUXILIARY_SEND_FILTER, auxFXSlot3, 1, sendFilter3);
-        checkErrorLog("Set Environment filter3:");
+        slot1.applyFilter(sourceID, sendGain0, sendCutoff0);
+        slot2.applyFilter(sourceID, sendGain1, sendCutoff1);
+        slot3.applyFilter(sourceID, sendGain2, sendCutoff2);
+        slot4.applyFilter(sourceID, sendGain3, sendCutoff3);
 
         EXTEfx.alFilterf(directFilter0, EXTEfx.AL_LOWPASS_GAIN, directGain);
         EXTEfx.alFilterf(directFilter0, EXTEfx.AL_LOWPASS_GAINHF, directCutoff);
@@ -146,39 +87,6 @@ public class SPEfx {
         if (pC.off) return;
         //System.out.println(pos);//TO DO
         AL10.alSourcefv(sourceID, 4100, new float[]{(float) pos.x, (float) pos.y, (float) pos.z});
-    }
-
-    /*
-     * Applies the parameters in the enum ReverbParams to the main reverb effect.
-     */
-    protected static void setReverbParams(final ReverbParams r, final int auxFXSlot, final int reverbSlot)
-    {
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_DENSITY, r.density);		//Set default parameters
-        checkErrorLog("Error while assigning reverb density: " + r.density);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_DIFFUSION, r.diffusion);		//Set default parameters
-        checkErrorLog("Error while assigning reverb diffusion: " + r.diffusion);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_GAIN, r.gain);		//Set default parameters
-        checkErrorLog("Error while assigning reverb gain: " + r.gain);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_GAINHF, r.gainHF);		//Set default parameters
-        checkErrorLog("Error while assigning reverb gainHF: " + r.gainHF);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_DECAY_TIME, r.decayTime);		//Set default parameters
-        checkErrorLog("Error while assigning reverb decayTime: " + r.decayTime);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_DECAY_HFRATIO, r.decayHFRatio);		//Set default parameters
-        checkErrorLog("Error while assigning reverb decayHFRatio: " + r.decayHFRatio);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_REFLECTIONS_GAIN, r.reflectionsGain);		//Set default parameters
-        checkErrorLog("Error while assigning reverb reflectionsGain: " + r.reflectionsGain);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_LATE_REVERB_GAIN, r.lateReverbGain);		//Set default parameters
-        checkErrorLog("Error while assigning reverb lateReverbGain: " + r.lateReverbGain);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_LATE_REVERB_DELAY, r.lateReverbDelay);		//Set default parameters
-        checkErrorLog("Error while assigning reverb lateReverbDelay: " + r.lateReverbDelay);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_AIR_ABSORPTION_GAINHF, r.airAbsorptionGainHF);		//Set default parameters
-        checkErrorLog("Error while assigning reverb airAbsorptionGainHF: " + r.airAbsorptionGainHF);
-        EXTEfx.alEffectf(reverbSlot, EXTEfx.AL_EAXREVERB_ROOM_ROLLOFF_FACTOR, r.roomRolloffFactor);		//Set default parameters
-        checkErrorLog("Error while assigning reverb roomRolloffFactor: " + r.roomRolloffFactor);
-
-
-        //Attach updated effect object
-        EXTEfx.alAuxiliaryEffectSloti(auxFXSlot, EXTEfx.AL_EFFECTSLOT_EFFECT, reverbSlot);
     }
 
 }

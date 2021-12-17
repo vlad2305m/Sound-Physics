@@ -12,12 +12,11 @@ public class SPHitResult extends HitResult {
     private final Direction side;
     private final BlockPos blockPos;
     private final boolean missed;
-    private final boolean insideBlock;
     private final BlockState blockState;
     public final WorldChunk chunk;
 
     public static SPHitResult createMissed(Vec3d pos, Direction side, BlockPos blockPos, WorldChunk c) {
-        return new SPHitResult(true, pos, side, blockPos, false, null, c);
+        return new SPHitResult(true, pos, side, blockPos, null, c);
     }
 
     public SPHitResult(BlockHitResult blockHitResult, BlockState bs, WorldChunk c) {
@@ -25,17 +24,15 @@ public class SPHitResult extends HitResult {
         this.missed = false;//blockHitResult.getType() == Type.MISS;
         this.side = blockHitResult.getSide();
         this.blockPos = blockHitResult.getBlockPos();
-        this.insideBlock = blockHitResult.isInsideBlock();
         this.blockState = bs;
         this.chunk = c;
     }
 
-    public SPHitResult(boolean missed, Vec3d pos, Direction side, BlockPos blockPos, boolean insideBlock, BlockState bs, WorldChunk c) {
+    public SPHitResult(boolean missed, Vec3d pos, Direction side, BlockPos blockPos, BlockState bs, WorldChunk c) {
         super(pos);
         this.missed = missed;
         this.side = side;
         this.blockPos = blockPos;
-        this.insideBlock = insideBlock;
         this.blockState = bs;
         this.chunk = c;
     }
@@ -46,8 +43,8 @@ public class SPHitResult extends HitResult {
 
     public BlockPos getBlockPos() {return this.blockPos;}
     public Direction getSide() {return this.side;}
+    @Deprecated
     public Type getType() {return this.missed ? Type.MISS : Type.BLOCK;}
     public boolean isMissed() {return this.missed;}
-    public boolean isInsideBlock() {return this.insideBlock;}
     public BlockState getBlockState() {return blockState;}
 }

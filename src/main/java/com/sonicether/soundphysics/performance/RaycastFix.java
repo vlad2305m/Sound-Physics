@@ -202,7 +202,8 @@ public class RaycastFix {
                     } else {
                         int dx1 = ((dirx * 15 + (x<<5) + 15)>>1) - xbs; int dz1 = ((dirz * 15 + (z<<5) + 15)>>1) - zbs;
                         double dtx1 = dx1 * rdx * dirx; double dtz1 = dz1 * rdz * dirz;
-                        if (currentNotAirStorage == null || (diry == 1 && ybs > currentNotAirStorage.top) || (diry == -1 && ybs < currentNotAirStorage.bottom)
+                        if (currentNotAirStorage == null || currentNotAirStorage.isEmpty()
+                                || (diry == 1 && ybs > currentNotAirStorage.top) || (diry == -1 && ybs < currentNotAirStorage.bottom)
                                 || (dtx1+tx < ty && dtz1+tz < ty)) {
 
                             if (dtx1 > dtz1){
@@ -257,7 +258,7 @@ public class RaycastFix {
                     side == 2 ? Direction.UP :
                     side == 3 ? Direction.NORTH :
                     Direction.getFacing(start.x-pos.getX()-0.5, start.y-pos.getY()-0.5, start.z-pos.getZ()-0.5);
-            return new SPHitResult(false, start, direction, pos, true, bs, c);
+            return new SPHitResult(false, start, direction, pos, bs, c);
         }
         SPHitResult blockHitResult = voxelShape == null ? null : SPHitResult.get(voxelShape.raycast(start, end, pos), bs, c);
         SPHitResult blockHitResult2 = voxelShape2 == null ? null : SPHitResult.get(voxelShape2.raycast(start, end, pos), bs, c);
