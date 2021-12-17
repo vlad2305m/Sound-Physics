@@ -26,7 +26,8 @@ public class PrecomputedConfig {
     public final float globalReverbBrightness;
     public final double globalBlockAbsorption;
     public final double globalBlockReflectance;
-    public final float airAbsorption;//todo Is this the one?
+    public final float airAbsorption; // todo Is this the one?
+    public final boolean humidityToggle;
     public final double underwaterFilter;
 
     public final boolean skipRainOcclusionTracing;
@@ -70,6 +71,7 @@ public class PrecomputedConfig {
         soundDistanceAllowance = c.General.soundDistanceAllowance;
         globalBlockReflectance = c.General.globalBlockReflectance;
         airAbsorption = (float) c.General.airAbsorption;
+        humidityToggle = c.General.humidityToggle;
         underwaterFilter = 1 - c.General.underwaterFilter;
 
         skipRainOcclusionTracing = c.Performance.skipRainOcclusionTracing;
