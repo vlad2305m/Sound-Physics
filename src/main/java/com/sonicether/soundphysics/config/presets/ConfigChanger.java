@@ -9,20 +9,20 @@ import java.util.Map;
 
 public class ConfigChanger {
     public static void changeConfig(SoundPhysicsConfig config, @Nullable Boolean enabled,
-                                    @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Boolean humidityToggle, @Nullable Double underwaterFilter,
+                                    @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter,
                                     @Nullable Boolean skipRainOcclusionTracing, @Nullable Integer environmentEvaluationRays, @Nullable Integer environmentEvaluationRayBounces, @Nullable Boolean simplerSharedAirspaceSimulation,
                                     @Nullable Map<String, MaterialData> materialProperties,
                                     @Nullable Integer continuousRefreshRate, @Nullable Double maxDirectOcclusionFromBlocks, @Nullable Boolean _9RayDirectOcclusion, @Nullable Boolean soundDirectionEvaluation, @Nullable Double directRaysDirEvalMultiplier, @Nullable Boolean notOccludedNoRedirect
     ) {
         if (enabled != null) config.enabled = enabled;
-        setGeneral(config.General, attenuationFactor, globalReverbGain, globalReverbBrightness, globalBlockAbsorption, globalBlockReflectance, soundDistanceAllowance, airAbsorption, humidityToggle, underwaterFilter);
+        setGeneral(config.General, attenuationFactor, globalReverbGain, globalReverbBrightness, globalBlockAbsorption, globalBlockReflectance, soundDistanceAllowance, airAbsorption, underwaterFilter);
         setPerformance(config.Performance, skipRainOcclusionTracing, environmentEvaluationRays, environmentEvaluationRayBounces, simplerSharedAirspaceSimulation);
         setMaterial_Properties(config.Materials, materialProperties);
         setVlads_Tweaks(config.Vlads_Tweaks, continuousRefreshRate, maxDirectOcclusionFromBlocks, _9RayDirectOcclusion, soundDirectionEvaluation, directRaysDirEvalMultiplier, notOccludedNoRedirect);
         config.preset = ConfigPresets.LOAD_SUCCESS;
     }
 
-    public static void setGeneral(SoundPhysicsConfig.General general, @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Boolean humidityToggle, @Nullable Double underwaterFilter) {
+    public static void setGeneral(SoundPhysicsConfig.General general, @Nullable Double attenuationFactor, @Nullable Double globalReverbGain, @Nullable Double globalReverbBrightness, @Nullable Double globalBlockAbsorption, @Nullable Double globalBlockReflectance, @Nullable Double soundDistanceAllowance, @Nullable Double airAbsorption, @Nullable Double underwaterFilter) {
         if (attenuationFactor != null) general.attenuationFactor = attenuationFactor;
         if (globalReverbGain != null) general.globalReverbGain = globalReverbGain;
         if (globalReverbBrightness != null) general.globalReverbBrightness = globalReverbBrightness;
@@ -30,7 +30,6 @@ public class ConfigChanger {
         if (globalBlockReflectance != null) general.globalBlockReflectance = globalBlockReflectance;
         if (soundDistanceAllowance != null) general.soundDistanceAllowance = soundDistanceAllowance;
         if (airAbsorption != null) general.airAbsorption = airAbsorption;
-        if (humidityToggle != null) general.humidityToggle = humidityToggle;
         if (underwaterFilter != null) general.underwaterFilter = underwaterFilter;
     }
 

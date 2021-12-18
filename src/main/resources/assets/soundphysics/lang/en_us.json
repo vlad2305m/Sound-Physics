@@ -16,7 +16,6 @@
   "text.autoconfig.sound_physics.option.General.globalBlockReflectance": "Block reflectance multiplier",
   "text.autoconfig.sound_physics.option.General.soundDistanceAllowance": "Sound max distance multiplier",
   "text.autoconfig.sound_physics.option.General.airAbsorption": "Sound absorption by air",
-  "text.autoconfig.sound_physics.option.General.humidityToggle": "Humidity Absorption Toggle",
   "text.autoconfig.sound_physics.option.General.underwaterFilter": "Underwater filter strength",
 
   "text.autoconfig.sound_physics.option.Performance.skipRainOcclusionTracing": "Skip tracing for rain sounds",

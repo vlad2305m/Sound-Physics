@@ -48,8 +48,6 @@ public class SoundPhysicsConfig implements ConfigData {
         public double soundDistanceAllowance = 4.0;
         @Comment("Represents how aggressively air absorbs high frequencies over distance.\nA value of 1.0 is physically correct for air with normal humidity and temperature.\nHigher values mean air will absorb more high frequencies with distance.\nA value of 0.0 disables this effect.")
         public double airAbsorption = 1.0;
-        @Comment("If enabled, the humidity of the environment will affect the air absorption.")
-        public boolean humidityToggle = true;
         @Comment("How much sound is filtered when the player is underwater.\n0.0 means no filter. 1.0 means fully filtered.\n0.0 - 1.0")
         public double underwaterFilter = 0.8;
     }
