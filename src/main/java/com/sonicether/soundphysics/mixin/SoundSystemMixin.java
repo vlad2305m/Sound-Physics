@@ -1,6 +1,6 @@
 package com.sonicether.soundphysics.mixin;
 
-import com.sonicether.soundphysics.SPEfx;
+import com.sonicether.soundphysics.ALstuff.SPEfx;
 import com.sonicether.soundphysics.SoundPhysics;
 import com.sonicether.soundphysics.SourceAccessor;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
