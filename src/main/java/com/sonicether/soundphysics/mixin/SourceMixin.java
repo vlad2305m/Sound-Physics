@@ -26,9 +26,7 @@ public class SourceMixin implements SourceAccessor {
     private Vec3d pos;
 
     @Inject(method = "setPosition", at = @At("HEAD"))
-    private void SoundPosStealer(Vec3d poss, CallbackInfo ci) {
-        this.pos = poss;
-    }
+    private void SoundPosStealer(Vec3d poss, CallbackInfo ci) {this.pos = poss;}
 
     @Inject(method = "play", at = @At("HEAD"))
     private void OnPlaySoundInjector(CallbackInfo ci) {

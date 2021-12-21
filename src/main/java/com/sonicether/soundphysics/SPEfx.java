@@ -1,10 +1,14 @@
 package com.sonicether.soundphysics;
 
+import com.sonicether.soundphysics.math.FloatProvider;
+import com.sonicether.soundphysics.math.SmoothedFloat;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
+
 import static com.sonicether.soundphysics.SoundPhysics.pC;
+import static com.sonicether.soundphysics.SoundPhysics.mc;
 
 import static com.sonicether.soundphysics.SPLog.*;
 
@@ -23,17 +27,11 @@ public class SPEfx {
     private static final ReverbSlot slot3 = new ReverbSlot(1.68f , 0.1f, 1.0f, 5, 0.99f, 1         , 0.0f, 0.021f, 1.26f, 0.021f, 0.994f, 0.13f);
     private static final ReverbSlot slot4 = new ReverbSlot(4.142f, 0.5f, 1.0f, 4, 0.89f, 1         , 0.0f, 0.025f, 1.26f, 0.021f, 0.994f, 0.11f);
     private static int directFilter0;
+    private static final FloatProvider smoothedRainProvider = new SmoothedFloat(1200, SPEfx::getRain);
 
     public static void syncReverbParams()
-    {
-        if (slot1.initialised)
-        {
-            //Set the global reverb parameters and apply them to the effect and effectslot
-            slot1.set();
-            slot2.set();
-            slot3.set();
-            slot4.set();
-        }
+    {   //Set the global reverb parameters and apply them to the effect and effectslot
+        if (slot1.initialised){slot1.set(); slot2.set(); slot3.set(); slot4.set();}
     }
 
     static void setupEFX()
@@ -62,12 +60,25 @@ public class SPEfx {
         logGeneral("directFilter0: "+directFilter0);
     }
 
-    protected static void setEnvironment(final int sourceID,
-                                         final float sendGain0,   final float sendGain1,   final float sendGain2,   final float sendGain3,
-                                         final float sendCutoff0, final float sendCutoff1, final float sendCutoff2, final float sendCutoff3,
-                                         final float directCutoff, final float directGain)
+    protected static void setEnvironment(
+            final int sourceID,
+            final float sendGain0,   final float sendGain1,   final float sendGain2,   final float sendGain3,
+            final float sendCutoff0, final float sendCutoff1, final float sendCutoff2, final float sendCutoff3,
+            final float directCutoff, final float directGain
+    )
     {
         if (pC.off) return;
+        float absorptionHF = (mc == null || mc.world == null || mc.player == null) ? 1.0f : (float) SPMath.lerp(1.0f, 0.892f, (0.05f * (
+                (pC.humidityAbsorption * (mc.world.getBiome(mc.player.getBlockPos()).getDownfall() * (3.0f * Math.max(getRain(), getSmoothRain()) + 1.0f))) // Humidity Absorption
+                + (pC.rainAbsorption * 4.0 * (SPMath.clamp(getRain(), Math.max(0.2f, mc.world.getBiome(mc.player.getBlockPos()).getDownfall()), 0.2f) - 0.2f) * 1.25f) // Rain Absorption
+        ) + (5.0f / 90.0f - 0.02f)));
+        slot1.airAbsorptionGainHF = absorptionHF;
+        slot2.airAbsorptionGainHF = absorptionHF;
+        slot3.airAbsorptionGainHF = absorptionHF;
+        slot4.airAbsorptionGainHF = absorptionHF;
+
+        syncReverbParams();
+
         // Set reverb send filter values and set source to send to all reverb fx slots
         slot1.applyFilter(sourceID, sendGain0, sendCutoff0);
         slot2.applyFilter(sourceID, sendGain1, sendCutoff1);
@@ -79,14 +90,18 @@ public class SPEfx {
         AL10.alSourcei(sourceID, EXTEfx.AL_DIRECT_FILTER, directFilter0);
         checkErrorLog("Set Environment directFilter0:");
 
-        AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, pC.airAbsorption);
+        AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, Math.min(10.0f, Math.max(0.0f, pC.airAbsorption)));
         checkErrorLog("Set Environment airAbsorption:");
     }
 
-    public static void setSoundPos(final int sourceID, final Vec3d pos) {
+    public static void setSoundPos(final int sourceID, final Vec3d pos)
+    {
         if (pC.off) return;
         //System.out.println(pos);//TO DO
         AL10.alSourcefv(sourceID, 4100, new float[]{(float) pos.x, (float) pos.y, (float) pos.z});
     }
-
+    public static float getRain(){
+        float tickDelta = 1.0f;
+        return (mc==null || mc.world==null) ? 0.0f : mc.world.getRainGradient(tickDelta);}
+    public static float getSmoothRain(){return smoothedRainProvider.getAsFloat();}
 }

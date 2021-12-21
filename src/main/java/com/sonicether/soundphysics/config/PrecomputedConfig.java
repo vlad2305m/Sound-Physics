@@ -18,7 +18,7 @@ public class PrecomputedConfig {
     public final static float globalVolumeMultiplier = 4f;
     public static double soundDistanceAllowance = 4;
     public static double defaultAttenuationFactor = 1;
-    public final boolean multiThreading = true; //todo do we need to turn it off?
+    public final boolean multiThreading = true;
 
     public final boolean off;
 
@@ -26,7 +26,9 @@ public class PrecomputedConfig {
     public final float globalReverbBrightness;
     public final double globalBlockAbsorption;
     public final double globalBlockReflectance;
-    public final float airAbsorption;//todo Is this the one?
+    public final float airAbsorption; // todo Is this the one?
+    public final float humidityAbsorption;
+    public final float rainAbsorption;
     public final double underwaterFilter;
 
     public final boolean skipRainOcclusionTracing;
@@ -35,7 +37,7 @@ public class PrecomputedConfig {
     public final int nRayBounces;
     public final double rcpTotRays;
     public final boolean simplerSharedAirspaceSimulation;
-//todo?
+
     public final Reference2DoubleOpenHashMap<BlockSoundGroup> reflectivityMap;
     public final double defaultReflectivity;
     public final Reference2DoubleOpenHashMap<BlockSoundGroup> absorptionMap;
@@ -70,6 +72,8 @@ public class PrecomputedConfig {
         soundDistanceAllowance = c.General.soundDistanceAllowance;
         globalBlockReflectance = c.General.globalBlockReflectance;
         airAbsorption = (float) c.General.airAbsorption;
+        humidityAbsorption = (float) c.General.humidityAbsorption;
+        rainAbsorption = (float) c.General.rainAbsorption;
         underwaterFilter = 1 - c.General.underwaterFilter;
 
         skipRainOcclusionTracing = c.Performance.skipRainOcclusionTracing;
@@ -86,8 +90,8 @@ public class PrecomputedConfig {
                 .map((a) -> new Pair<>(a, c.Materials.materialProperties.get(a)))
                 .map((e) -> {
                     if (e.getRight() != null) return e;
-                    SPLog.logError("Missing material data for "+e.getLeft()+" Default entry created");
-                    final MaterialData newData = new MaterialData("{"+e.getLeft()+"}", defaultReflectivity, defaultAbsorption);
+                    SPLog.logError("Missing material data for "+e.getLeft()+", Default entry created");
+                    final MaterialData newData = new MaterialData(e.getLeft(), defaultReflectivity, defaultAbsorption);
                     c.Materials.materialProperties.put(e.getLeft(), newData);
                     e.setRight(newData); return e;
                 }).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));

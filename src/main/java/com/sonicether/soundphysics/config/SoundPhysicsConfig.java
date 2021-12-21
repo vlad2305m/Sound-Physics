@@ -46,8 +46,12 @@ public class SoundPhysicsConfig implements ConfigData {
         public double globalBlockReflectance = 1.0;
         @Comment("Minecraft won't allow sounds to play past a certain distance;\nSoundPhysics makes that configurable by multiplying this parameter by the default distance.\nValues too high can cause polyphony issues.\n1.0 - 6.0")
         public double soundDistanceAllowance = 4.0;
-        @Comment("Represents how aggressively air absorbs high frequencies over distance.\nA value of 1.0 is physically correct for air with normal humidity and temperature.\nHigher values mean air will absorb more high frequencies with distance.\nA value of 0.0 disables this effect.")
+        @Comment("Represents how aggressively air absorbs high frequencies over distance.\nA value of 1.0 is physically correct for air with normal humidity and temperature.\nHigher values mean air will absorb more high frequencies with distance.\nA value of 0.0 disables this effect. 0.0 - 10.0")
         public double airAbsorption = 1.0;
+        @Comment("How much humidity contributes to the air absorption.\nA value of 1.0 is physically correct.\nHigher values mean air will absorb more high frequencies with distance, depending on the local humidity.\nA value of 0.0 disables this effect. 0.0 - 2.0")
+        public double humidityAbsorption = 1.0;
+        @Comment("How much rain drops contribute to the air absorption.\nA value of 1.0 is approximately physically correct.\nHigher values mean air will absorb more high frequencies with distance, depending on the local rainfall.\nA value of 0.0 disables this effect. 0.0 - 2.0")
+        public double rainAbsorption = 1.0;
         @Comment("How much sound is filtered when the player is underwater.\n0.0 means no filter. 1.0 means fully filtered.\n0.0 - 1.0")
         public double underwaterFilter = 0.8;
     }

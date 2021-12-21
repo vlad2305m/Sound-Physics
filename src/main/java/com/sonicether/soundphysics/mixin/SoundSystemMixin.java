@@ -33,6 +33,9 @@ public class SoundSystemMixin {
         SoundPhysics.setLastSoundCategoryAndName(soundCategory, sound.getId().getPath());
     }
 
+    @Inject(method = "tick()V", at = @At(value = "HEAD"))
+    private void Ticker(CallbackInfo ci){SoundPhysics.ticker.onTick();}
+
     @ModifyArg(method = "getAdjustedVolume", at = @At(value = "INVOKE", target = "net/minecraft/util/math/MathHelper.clamp (FFF)F"), index = 0)
     private float VolumeMultiplierInjector(float vol){
         return vol * PrecomputedConfig.globalVolumeMultiplier;

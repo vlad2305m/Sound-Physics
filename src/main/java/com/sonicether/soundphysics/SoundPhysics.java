@@ -16,6 +16,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -118,8 +119,9 @@ public class SoundPhysics
 					entry("field_22154", "Nether Mushroom"		),    	// Nether Mushroom      	(fungus)
 					entry("field_17734", "Lanterns"				),    	// Lanterns           		(lantern)
 					entry("field_28060", "Dripstone"				),    	// Dripstone          		(dripstone_block, pointed_dripstone)
-					entry("DEFAULT"    , "Default Material"		)     	// Default Material   		()
-			);/*</editor-fold>*/
+					entry("DEFAULT"    , "Default Material"		),    	// Default Material   		()
+					entry("block.minecraft.water"    , "Water" 	)     	// Water   					(block.minecraft.water)
+			);//</editor-fold>
 	public static PrecomputedConfig pC = null;
 	//Private fields
 	// ψ time ψ
@@ -134,6 +136,7 @@ public class SoundPhysics
 	//public static void tres() { SoundPhysics.tt=0; }
 
 	public static MinecraftClient mc;
+	public static SPTicker ticker = new SPTicker();
 	
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;

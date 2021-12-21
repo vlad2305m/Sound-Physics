@@ -242,7 +242,7 @@ public class ReverbSlot {
      * Lowering the value simulates a more absorbent medium (more humidity in the air, for example);
      * raising the value simulates a less absorbent medium (dry desert air, for example).
      */
-    public final float airAbsorptionGainHF;	// min: 0.892f 	max: 1.0f   (Linear gain per meter)     default: 0.994f
+    public float airAbsorptionGainHF;	// min: 0.892f 	max: 1.0f   (Linear gain per meter)     default: 0.994f
     /**
      * When this flag is set, the high-frequency decay time automatically stays below a limit value that is
      * derived from the setting of the property Air Absorption Gain HF.

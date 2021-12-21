@@ -20,7 +20,7 @@ public enum ConfigPresets {
     DEFAULT_BALANCED("Balanced (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
-            1.0, 4.0, 1.0, 0.8,
+            1.0, 4.0, 1.0, 1.0, 1.0, 0.8,
 
             true, 224, 12, false,
 
@@ -32,7 +32,7 @@ public enum ConfigPresets {
     DEFAULT_PERFORMANCE("Performance (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
-            1.0, 4.0, 1.0, 0.8,
+            1.0, 4.0, 1.0, 1.0, 1.0, 0.8,
 
             true, 96, 6, true,
 
@@ -44,7 +44,7 @@ public enum ConfigPresets {
     DEFAULT_QUALITY("Quality (Base)", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 1.0, 1.0, 1.0,
-            1.0, 4.0, 1.0, 0.8,
+            1.0, 4.0, 1.0, 1.0, 1.0, 0.8,
 
             false, 512, 24, false,
 
@@ -56,7 +56,7 @@ public enum ConfigPresets {
     THEDOCRUBY("Dr. Rubisco's Signature Sound", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             1.0, 0.8, 1.0, 0.8,
-            1.0, 3.5, 1.0, 0.8,
+            1.0, 3.5, 1.0, 1.0, 1.0, 0.8,
 
             true, 256, 16, false,
 
@@ -108,7 +108,8 @@ public enum ConfigPresets {
                     entry("field_22154", new MaterialData(0.4,                  0.6  )),    // Nether Fungus      (fungus)
                     entry("field_17734", new MaterialData(0.75,                 0.4  )),    // Lanterns           (lantern)
                     entry("field_28060", new MaterialData(0.9,                  0.6  )),    // Dripstone          (dripstone_block, pointed_dripstone)
-                    entry("DEFAULT"    , new MaterialData(0.5,                  0.5  ))     // Default Material   ()
+                    entry("DEFAULT"    , new MaterialData(0.5,                  0.5  )),    // Default Material   ()
+                    entry("block.minecraft.water"    , new MaterialData(0.5,    0.03 ))     // Water              (block.minecraft.water)
             ),//</editor-fold>
 
             4, 10.0, true, true, 0.5, false
@@ -117,7 +118,7 @@ public enum ConfigPresets {
     //<editor-fold desc="SUPER_REVERB,">
     SUPER_REVERB("Super Reverb", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, 1.8, null, null,
-            4.0, null, null, null,
+            4.0, null, null, null, null, null,
 
             null, null, null, null,
 
@@ -129,7 +130,7 @@ public enum ConfigPresets {
     //<editor-fold desc="LUSH_REVERB,">
     LUSH_REVERB("More Lush Cave Reverb", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, null, null,
-            null, null, null, null,
+            null, null, null, null, null, null,
 
             null, null, null, null,
 
@@ -147,7 +148,7 @@ public enum ConfigPresets {
     //<editor-fold desc="NO_ABSORPTION,">
     NO_ABSORPTION("No Absorption", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, null, 0.0,
-            null, null, 0.0, null,
+            null, null, 0.0, 0.0, 0.0, null,
 
             null, null, null, null,
 
@@ -158,7 +159,7 @@ public enum ConfigPresets {
     //<editor-fold desc="LOW_FREQ,">
     LOW_FREQ("Bass Boost", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, 0.2, null,
-            null, null, 2.0, null,
+            null, null, 2.0, 2.0, 2.0, null,
 
             null, null, null, null,
 
@@ -169,7 +170,7 @@ public enum ConfigPresets {
     //<editor-fold desc="HIGH_FREQ,">
     HIGH_FREQ("Treble Boost", (SoundPhysicsConfig c) -> changeConfig(c, true,
             null, null, 1.8, null,
-            null, null, 0.5, null,
+            null, null, 0.5, 0.5, 0.5, null,
 
             null, null, null, null,
 
@@ -180,7 +181,7 @@ public enum ConfigPresets {
     //<editor-fold desc="FOG,">
     FOG("Foggy Air", (SoundPhysicsConfig c) -> changeConfig(c, true,
             2.5, null, null, null,
-            null, null, 25.0, null,
+            null, null, 7.5, 0.5, 1.0, null,
 
             null, null, null, null,
 
@@ -192,7 +193,7 @@ public enum ConfigPresets {
     TOTAL_OCCLUSION("Total Occlusion", (SoundPhysicsConfig c) -> changeConfig(c, true,
 
             null, null, null, 10.0,
-            null, null, null, null,
+            null, null, null, null, null, null,
 
             null, null, null, null,
 
@@ -206,7 +207,7 @@ public enum ConfigPresets {
             null, null, null, null,
             null, null, null, null,
 
-            null, null, null, null,
+            null, null, null, null, null, null,
 
             //<editor-fold desc="Map.ofEntries(),">
             Map.<String, MaterialData>ofEntries(
@@ -256,7 +257,8 @@ public enum ConfigPresets {
                     entry("field_22154", new MaterialData(0.4,                  0.6  )),    // Nether Fungus      (fungus)
                     entry("field_17734", new MaterialData(0.75,                 0.4  )),    // Lanterns           (lantern)
                     entry("field_28060", new MaterialData(0.9,                  0.6  )),    // Dripstone          (dripstone_block, pointed_dripstone)
-                    entry("DEFAULT"    , new MaterialData(0.5,                  0.5  ))     // Default Material   ()
+                    entry("DEFAULT"    , new MaterialData(0.5,                  0.5  )),    // Default Material   ()
+                    entry("block.minecraft.water"    , new MaterialData(0.5,    0.03 ))     // Water              (block.minecraft.water)
             ),//</editor-fold>
 
             null, null, null, null,null, null
