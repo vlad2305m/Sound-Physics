@@ -1,11 +1,11 @@
-package com.sonicether.soundphysics;
+package com.sonicether.soundphysics.ALstuff;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.EXTEfx;
 
 import static com.sonicether.soundphysics.SPLog.*;
-import static com.sonicether.soundphysics.SoundPhysics.pC;
+import static com.sonicether.soundphysics.config.PrecomputedConfig.pC;
 import static com.sonicether.soundphysics.config.PrecomputedConfig.defaultAttenuationFactor;
 
 @SuppressWarnings("DanglingJavadoc")//!!!!!!!!!!!! Ctrl + Shift + '-' !!!!!!!!!!!!
@@ -277,11 +277,12 @@ public class ReverbSlot {
         auxSlotId = EXTEfx.alGenAuxiliaryEffectSlots();
         logGeneral("Aux slot " + auxSlotId + " created");
         EXTEfx.alAuxiliaryEffectSloti(auxSlotId, EXTEfx.AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, AL10.AL_TRUE);
+        checkErrorLog("Failed creating reverb slot "+auxSlotId+"!");
 
         //Create effect objects
         effectId = EXTEfx.alGenEffects();												    //Create effect object
         EXTEfx.alEffecti(effectId, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_EAXREVERB);		//Set effect object to be reverb
-        checkErrorLog("Failed creating reverb effect slot "+effectId+"!");
+        checkErrorLog("Failed creating reverb effect "+effectId+"!");
         logGeneral("effect for "+auxSlotId+": "+effectId);
 
         filterId = EXTEfx.alGenFilters();

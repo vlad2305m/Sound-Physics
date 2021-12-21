@@ -1,5 +1,6 @@
-package com.sonicether.soundphysics;
+package com.sonicether.soundphysics.ALstuff;
 
+import com.sonicether.soundphysics.SPMath;
 import com.sonicether.soundphysics.math.FloatProvider;
 import com.sonicether.soundphysics.math.SmoothedFloat;
 import net.minecraft.util.math.Vec3d;
@@ -7,10 +8,10 @@ import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
 
-import static com.sonicether.soundphysics.SoundPhysics.pC;
 import static com.sonicether.soundphysics.SoundPhysics.mc;
 
 import static com.sonicether.soundphysics.SPLog.*;
+import static com.sonicether.soundphysics.config.PrecomputedConfig.pC;
 
 /*
                                         !!!Documentation for OpenAL!!!
@@ -18,6 +19,9 @@ import static com.sonicether.soundphysics.SPLog.*;
     - ExtEfx(aka Effects Extension) https://github.com/rtpHarry/Sokoban/blob/master/libraries/OpenAL%201.1%20SDK/docs/Effects%20Extension%20Guide.pdf or https://usermanual.wiki/Pdf/Effects20Extension20Guide.90272296/view
     - Core spec(aka OpenAL 1.1 Specification and Reference) https://www.openal.org/documentation/openal-1.1-specification.pdf
     - Core guide(aka OpenAL Programmer's Guide) http://openal.org/documentation/OpenAL_Programmers_Guide.pdf
+
+
+    Source attributes(2&3): https://www.openal.org/documentation/openal-1.1-specification.pdf#page=34 & http://openal.org/documentation/OpenAL_Programmers_Guide.pdf#page=34
  */
 
 public class SPEfx {
@@ -34,7 +38,7 @@ public class SPEfx {
         if (slot1.initialised){slot1.set(); slot2.set(); slot3.set(); slot4.set();}
     }
 
-    static void setupEFX()
+    public static void setupEFX()
     {
         //Get current context and device
         final long currentContext = ALC10.alcGetCurrentContext();
@@ -60,9 +64,9 @@ public class SPEfx {
         logGeneral("directFilter0: "+directFilter0);
     }
 
-    protected static void setEnvironment(
+    public static void setEnvironment(
             final int sourceID,
-            final float sendGain0,   final float sendGain1,   final float sendGain2,   final float sendGain3,
+            final float sendGain0, final float sendGain1, final float sendGain2, final float sendGain3,
             final float sendCutoff0, final float sendCutoff1, final float sendCutoff2, final float sendCutoff3,
             final float directCutoff, final float directGain
     )
@@ -98,7 +102,7 @@ public class SPEfx {
         double rainS = getSmoothRain();
         double biomeHumidity = mc.world.getBiome(mc.player.getBlockPos()).getDownfall();
         double biomeTemp = mc.world.getBiome(mc.player.getBlockPos()).getTemperature();
-        double freq = 10000.0d
+        double freq = 10000.0d;
 
         double relhum = 100.0d * SPMath.lerp(Math.max(biomeHumidity, 0.2d), 1.0d, Math.max(rain, rainS)); // convert biomeHumidity and rain gradients into a dynamic relative humidity value
         double tempK = 25.0d * biomeTemp + 273.15d; // Convert biomeTemp to degrees kelvin

@@ -1,11 +1,13 @@
 package com.sonicether.soundphysics.config.presets;
 
-import com.sonicether.soundphysics.SoundPhysics;
+import com.sonicether.soundphysics.SoundPhysicsMod;
 import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+
+import static com.sonicether.soundphysics.SoundPhysicsMod.groupMap;
 
 public class ConfigChanger {
     public static void changeConfig(SoundPhysicsConfig config, @Nullable Boolean enabled,
@@ -60,6 +62,6 @@ public class ConfigChanger {
         if (directRaysDirEvalMultiplier != null) vlads_tweaks.directRaysDirEvalMultiplier = directRaysDirEvalMultiplier;
         if (notOccludedNoRedirect != null) vlads_tweaks.notOccludedNoRedirect = notOccludedNoRedirect;
     }
-    public static String getExample(String s) {return SoundPhysics.groupMap.get(s);}
-    public static boolean hasExample(String s) {return SoundPhysics.groupMap.containsKey(s);}
+    public static String getExample(String s) {return groupMap.get(s);}
+    public static boolean hasExample(String s) {return groupMap.containsKey(s);}
 }

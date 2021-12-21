@@ -3,6 +3,8 @@ package com.sonicether.soundphysics;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
 import com.sonicether.soundphysics.performance.RaycastFix;
 import com.sonicether.soundphysics.performance.SPHitResult;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.BlockSoundGroup;
@@ -16,7 +18,6 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -25,12 +26,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
-import static com.sonicether.soundphysics.SPEfx.*;
+import static com.sonicether.soundphysics.ALstuff.SPEfx.*;
 import static com.sonicether.soundphysics.SPLog.*;
 import static com.sonicether.soundphysics.performance.RaycastFix.fixedRaycast;
-import static java.util.Map.entry;
 
 @SuppressWarnings({"NonAsciiCharacters", "CommentedOutCode"})
+@Environment(EnvType.CLIENT) //IDK why
 public class SoundPhysics
 {
 
@@ -38,91 +39,6 @@ public class SoundPhysics
 	public static final Pattern stepPattern = Pattern.compile(".*step.*");
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	private static final Pattern uiPattern = Pattern.compile("ui..*");
-	public static final Map<BlockSoundGroup, BlockSoundGroup> redirectMap = //<editor-fold desc="Map.ofEntries()">
-			Map.ofEntries(  // first becomes second
-			entry(BlockSoundGroup.MOSS_CARPET, BlockSoundGroup.MOSS_BLOCK),
-			entry(BlockSoundGroup.AMETHYST_CLUSTER, BlockSoundGroup.AMETHYST_BLOCK),
-			entry(BlockSoundGroup.SMALL_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
-			entry(BlockSoundGroup.MEDIUM_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
-			entry(BlockSoundGroup.LARGE_AMETHYST_BUD, BlockSoundGroup.AMETHYST_BLOCK),
-			entry(BlockSoundGroup.POINTED_DRIPSTONE, BlockSoundGroup.DRIPSTONE_BLOCK),
-			entry(BlockSoundGroup.FLOWERING_AZALEA, BlockSoundGroup.AZALEA),
-			entry(BlockSoundGroup.DEEPSLATE_BRICKS, BlockSoundGroup.POLISHED_DEEPSLATE),
-			entry(BlockSoundGroup.COPPER, BlockSoundGroup.METAL),
-			entry(BlockSoundGroup.ANVIL, BlockSoundGroup.METAL),
-			entry(BlockSoundGroup.NETHER_SPROUTS, BlockSoundGroup.ROOTS),
-			entry(BlockSoundGroup.WEEPING_VINES_LOW_PITCH, BlockSoundGroup.WEEPING_VINES),
-			entry(BlockSoundGroup.LILY_PAD, BlockSoundGroup.WET_GRASS),
-			entry(BlockSoundGroup.NETHER_GOLD_ORE, BlockSoundGroup.NETHERRACK),
-			entry(BlockSoundGroup.NETHER_ORE, BlockSoundGroup.NETHERRACK),
-			entry(BlockSoundGroup.CALCITE, BlockSoundGroup.STONE),
-			entry(BlockSoundGroup.GILDED_BLACKSTONE, BlockSoundGroup.STONE),
-			entry(BlockSoundGroup.SMALL_DRIPLEAF, BlockSoundGroup.CAVE_VINES),
-			entry(BlockSoundGroup.BIG_DRIPLEAF, BlockSoundGroup.CAVE_VINES),
-			entry(BlockSoundGroup.SPORE_BLOSSOM, BlockSoundGroup.CAVE_VINES),
-			entry(BlockSoundGroup.GLOW_LICHEN, BlockSoundGroup.VINE),
-			entry(BlockSoundGroup.HANGING_ROOTS, BlockSoundGroup.VINE),
-			entry(BlockSoundGroup.ROOTED_DIRT, BlockSoundGroup.GRAVEL),
-			entry(BlockSoundGroup.WART_BLOCK, BlockSoundGroup.NETHER_WART),
-			entry(BlockSoundGroup.CROP, BlockSoundGroup.GRASS),
-			entry(BlockSoundGroup.BAMBOO_SAPLING, BlockSoundGroup.GRASS),
-			entry(BlockSoundGroup.SWEET_BERRY_BUSH, BlockSoundGroup.GRASS),
-			entry(BlockSoundGroup.SCAFFOLDING, BlockSoundGroup.BAMBOO),
-			entry(BlockSoundGroup.LODESTONE, BlockSoundGroup.NETHERITE),
-			entry(BlockSoundGroup.LADDER, BlockSoundGroup.WOOD)
-	);//</editor-fold>
-	public static final Map<String, String> groupMap = //<editor-fold desc="Map.ofEntries()">
-			Map.ofEntries(
-					entry("field_11528", "Coral"					),		// Coral              		(coral_block)
-					entry("field_11529", "Gravel, Dirt"			),    	// Gravel, Dirt       		(gravel, rooted_dirt)
-					entry("field_27197", "Amethyst"				),    	// Amethyst           		(amethyst_block, small_amethyst_bud, medium_amethyst_bud, large_amethyst_bud, amethyst_cluster)
-					entry("field_11526", "Sand"					),    	// Sand               		(sand)
-					entry("field_27196", "Candle Wax"				),    	// Candle Wax         		(candle)
-					entry("field_22140", "Weeping Vines"			),    	// Weeping Vines      		(weeping_vines, weeping_vines_low_pitch)
-					entry("field_22141", "Soul Sand"				),    	// Soul Sand          		(soul_sand)
-					entry("field_22142", "Soul Soil"				),    	// Soul Soil          		(soul_soil)
-					entry("field_22143", "Basalt"					),    	// Basalt             		(basalt)
-					entry("field_22145", "Netherrack"				),    	// Netherrack         		(netherrack, nether_ore, nether_gold_ore)
-					entry("field_22146", "Nether Brick"			),    	// Nether Brick       		(nether_bricks)
-					entry("field_21214", "Honey"					),    	// Honey              		(honey_block)
-					entry("field_22149", "Bone"					),    	// Bone               		(bone_block)
-					entry("field_17581", "Nether Wart"			),    	// Nether Wart        		(nether_wart, wart_block)
-					entry("field_11535", "Grass, Crops, Foliage"	),    	// Grass, Crops, Foliage  	(grass, crop, bamboo_sapling, sweet_berry_bush)
-					entry("field_11533", "Metal"					),    	// Metal              		(metal, copper, anvil)
-					entry("field_11534", "Aquatic Foliage"		),    	// Aquatic Foliage    		(wet_grass, lily_pad)
-					entry("field_11537", "Glass, Ice"				),    	// Glass, Ice         		(glass)
-					entry("field_28116", "Sculk Sensor"			),    	// Sculk Sensor       		(sculk_sensor)
-					entry("field_22138", "Nether Foliage"			),    	// Nether Foliage     		(roots, nether_sprouts)
-					entry("field_22139", "Shroomlight"			),    	// Shroomlight        		(shroomlight)
-					entry("field_24119", "Chain"					),    	// Chain              		(chain)
-					entry("field_29033", "Deepslate"				),    	// Deepslate          		(deepslate)
-					entry("field_11547", "Wood"					),    	// Wood               		(wood, ladder)
-					entry("field_29035", "Deepslate Tiles"		),    	// Deepslate Tiles    		(deepslate_tiles)
-					entry("field_11544", "Stone, Blackstone"		),    	// Stone, Blackstone  		(stone, calcite, gilded_blackstone)
-					entry("field_11545", "Slime"					),    	// Slime              		(slime_block)
-					entry("field_29036", "Polished Deepslate"		),    	// Polished Deepslate 		(polished_deepslate, deepslate_bricks)
-					entry("field_11548", "Snow"					),    	// Snow               		(snow)
-					entry("field_28702", "Azalea Leaves"			),    	// Azalea Leaves      		(azalea_leaves)
-					entry("field_11542", "Bamboo"					),    	// Bamboo             		(bamboo, scaffolding)
-					entry("field_18852", "Mushroom Stems"			),    	// Mushroom Stems     		(stem)
-					entry("field_11543", "Wool"					),    	// Wool               		(wool)
-					entry("field_23083", "Dry Foliage"			),    	// Dry Foliage        		(vine, hanging_roots, glow_lichen)
-					entry("field_28694", "Azalea Bush"			),    	// Azalea Bush        		(azalea)
-					entry("field_28692", "Lush Cave Foliage"		),    	// Lush Cave Foliage       	(cave_vines, spore_blossom, small_dripleaf, big_dripleaf)
-					entry("field_22150", "Netherite"				),    	// Netherite          		(netherite_block, lodestone)
-					entry("field_22151", "Ancient Debris"			),    	// Ancient Debris     		(ancient_debris)
-					entry("field_22152", "Nether Fungus Stem"		),    	// Nether Fungus Stem 		(nether_stem)
-					entry("field_27884", "Powder Snow"			),    	// Powder Snow        		(powder_snow)
-					entry("field_27202", "Tuff"					),    	// Tuff               		(tuff)
-					entry("field_28697", "Moss"					),    	// Moss               		(moss, moss_carpet)
-					entry("field_22153", "Nylium"					),    	// Nylium             		(nylium)
-					entry("field_22154", "Nether Mushroom"		),    	// Nether Mushroom      	(fungus)
-					entry("field_17734", "Lanterns"				),    	// Lanterns           		(lantern)
-					entry("field_28060", "Dripstone"				),    	// Dripstone          		(dripstone_block, pointed_dripstone)
-					entry("DEFAULT"    , "Default Material"		),    	// Default Material   		()
-					entry("block.minecraft.water"    , "Water" 	)     	// Water   					(block.minecraft.water)
-			);//</editor-fold>
-	public static PrecomputedConfig pC = null;
 	//Private fields
 	// ψ time ψ
 	//public static long tt = 0;
@@ -137,7 +53,7 @@ public class SoundPhysics
 
 	public static MinecraftClient mc;
 	public static SPTicker ticker = new SPTicker();
-	
+
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;
 
@@ -159,17 +75,17 @@ public class SoundPhysics
 
 	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean auxOnly)
 	{
-		if (pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
+		if (PrecomputedConfig.pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
 		long startTime = 0;
 		long endTime;
 		
-		if (pC.pLog) startTime = System.nanoTime();
+		if (PrecomputedConfig.pC.pLog) startTime = System.nanoTime();
 		//t1();// rm
 		evaluateEnvironment(sourceID, posX, posY, posZ, auxOnly); // time = 0.5? OωO
 		//t2();
 		//tavg();tres();//tout();// ψ time ψ
-		if (pC.pLog) { endTime = System.nanoTime();
+		if (PrecomputedConfig.pC.pLog) { endTime = System.nanoTime();
 			log("Total calculation time for sound " + lastSoundName + ": " + (double)(endTime - startTime)/(double)1000000 + " milliseconds"); }
 
 	}
@@ -178,20 +94,20 @@ public class SoundPhysics
 	{
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		String blockName = blockState.getBlock().getTranslationKey();
-		if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).reflectivity;
+		if (PrecomputedConfig.pC.blockWhiteSet.contains(blockName)) return PrecomputedConfig.pC.blockWhiteMap.get(blockName).reflectivity;
 
-		double r = pC.reflectivityMap.getOrDefault(soundType, Double.NaN);
-		return Double.isNaN(r) ? pC.defaultReflectivity : r;
+		double r = PrecomputedConfig.pC.reflectivityMap.getOrDefault(soundType, Double.NaN);
+		return Double.isNaN(r) ? PrecomputedConfig.pC.defaultReflectivity : r;
 	}
 
 	private static double getBlockOcclusionD(final BlockState blockState)
 	{
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		String blockName = blockState.getBlock().getTranslationKey();
-		if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).absorption;
+		if (PrecomputedConfig.pC.blockWhiteSet.contains(blockName)) return PrecomputedConfig.pC.blockWhiteMap.get(blockName).absorption;
 
-		double r = pC.absorptionMap.getOrDefault(soundType, Double.NaN);
-		return Double.isNaN(r) ? pC.defaultAbsorption : r;
+		double r = PrecomputedConfig.pC.absorptionMap.getOrDefault(soundType, Double.NaN);
+		return Double.isNaN(r) ? PrecomputedConfig.pC.defaultAbsorption : r;
 	}
 
 	private static Vec3d pseudoReflect(Vec3d dir, Vec3i normal)
@@ -200,9 +116,9 @@ public class SoundPhysics
 	@SuppressWarnings("ConstantConditions")
 	private static void evaluateEnvironment(final int sourceID, double posX, double posY, double posZ, boolean auxOnly)
 	{
-		if (pC.off) return;
+		if (PrecomputedConfig.pC.off) return;
 
-		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || (pC.recordsDisable && lastSoundCategory == SoundCategory.RECORDS) || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
+		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || (PrecomputedConfig.pC.recordsDisable && lastSoundCategory == SoundCategory.RECORDS) || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))
 		{
 			//logDetailed("Menu sound!");
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, auxOnly ? 0.0f : 1.0f);
@@ -214,7 +130,7 @@ public class SoundPhysics
 		boolean block = blockPattern.matcher(lastSoundName).matches() && !stepPattern.matcher(lastSoundName).matches();
 		if (lastSoundCategory == SoundCategory.RECORDS){posX+=0.5;posY+=0.5;posZ+=0.5;block = true;}
 
-		if (pC.skipRainOcclusionTracing && isRain)
+		if (PrecomputedConfig.pC.skipRainOcclusionTracing && isRain)
 		{
 			setEnvironment(sourceID, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, auxOnly ? 0.0f : 1.0f);
 			return;
@@ -250,14 +166,14 @@ public class SoundPhysics
 
 		final BlockPos soundBlockPos = new BlockPos(soundPos.x, soundPos.y,soundPos.z);
 
-		if (pC.dLog) logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
+		if (PrecomputedConfig.pC.dLog) logGeneral("Player pos: " + playerPos.x + ", " + playerPos.y + ", " + playerPos.z + "      Sound Pos: " + soundPos.x + ", " + soundPos.y + ", " + soundPos.z + "       To player vector: " + normalToPlayer.x + ", " + normalToPlayer.y + ", " + normalToPlayer.z);
 		double occlusionAccumulation = 0;
 		final List<Map.Entry<Vec3d, Double>> directions = new Vector<>(10, 10);
 		//Cast a ray from the source towards the player
 		Vec3d rayOrigin = soundPos;
 		//System.out.println(rayOrigin.toString());
 		BlockPos lastBlockPos = soundBlockPos;
-		final boolean _9ray = pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || block);
+		final boolean _9ray = PrecomputedConfig.pC._9Ray && (lastSoundCategory == SoundCategory.BLOCKS || block);
 		final int nOccRays = _9ray ? 9 : 1;
 		double occlusionAccMin = Double.MAX_VALUE;
 		for (int j = 0; j < nOccRays; j++) {
@@ -276,12 +192,12 @@ public class SoundPhysics
 				lastBlockPos = rayHit.getBlockPos();
 				//If we hit a block
 
-				if (pC.dRays) RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
+				if (PrecomputedConfig.pC.dRays) RaycastRenderer.addOcclusionRay(rayOrigin, rayHit.getPos(), Color.getHSBColor((float) (1F / 3F * (1F - Math.min(1F, occlusionAccumulation / 12F))), 1F, 1F).getRGB());
 				if (rayHit.isMissed()) {
-					if (pC.soundDirectionEvaluation) directions.add(Map.entry(rayOrigin.subtract(playerPos),
-							(_9ray?9:1) * Math.pow(soundPos.distanceTo(playerPos), 2.0)* pC.rcpTotRays
+					if (PrecomputedConfig.pC.soundDirectionEvaluation) directions.add(Map.entry(rayOrigin.subtract(playerPos),
+							(_9ray?9:1) * Math.pow(soundPos.distanceTo(playerPos), 2.0)* PrecomputedConfig.pC.rcpTotRays
 									/
-							(Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption)*pC.directRaysDirEvalMultiplier)
+							(Math.exp(-occlusionAccumulation * PrecomputedConfig.pC.globalBlockAbsorption)* PrecomputedConfig.pC.directRaysDirEvalMultiplier)
 					));
 					oAValid = true;
 					break;
@@ -293,7 +209,7 @@ public class SoundPhysics
 
 				// Regardless to whether we hit from inside or outside
 
-				if (pC.oLog) logOcclusion(blockHit.getBlock().getTranslationKey() + "    " + rayHitPos.x + ", " + rayHitPos.y + ", " + rayHitPos.z);
+				if (PrecomputedConfig.pC.oLog) logOcclusion(blockHit.getBlock().getTranslationKey() + "    " + rayHitPos.x + ", " + rayHitPos.y + ", " + rayHitPos.z);
 
 				rayOrigin = rayHitPos; //new Vec3d(rayHit.getPos().x + normalToPlayer.x * 0.1, rayHit.getPos().y + normalToPlayer.y * 0.1, rayHit.getPos().z + normalToPlayer.z * 0.1);
 
@@ -304,18 +220,18 @@ public class SoundPhysics
 				if (rayBack.getBlockPos().equals(lastBlockPos)) {
 					//Accumulate density
 					occlusionAccumulation += blockOcclusion * (rayOrigin.distanceTo(rayBack.getPos()));
-					if (occlusionAccumulation > pC.maxDirectOcclusionFromBlocks) break;
+					if (occlusionAccumulation > PrecomputedConfig.pC.maxDirectOcclusionFromBlocks) break;
 				}
 
-				if (pC.oLog) logOcclusion("New trace position: " + rayOrigin.x + ", " + rayOrigin.y + ", " + rayOrigin.z);
+				if (PrecomputedConfig.pC.oLog) logOcclusion("New trace position: " + rayOrigin.x + ", " + rayOrigin.y + ", " + rayOrigin.z);
 			}
 			if (oAValid) occlusionAccMin = Math.min(occlusionAccMin, occlusionAccumulation);
 		}
-		occlusionAccumulation = Math.min(occlusionAccMin, pC.maxDirectOcclusionFromBlocks);
-		double directCutoff = Math.exp(-occlusionAccumulation * pC.globalBlockAbsorption);
+		occlusionAccumulation = Math.min(occlusionAccMin, PrecomputedConfig.pC.maxDirectOcclusionFromBlocks);
+		double directCutoff = Math.exp(-occlusionAccumulation * PrecomputedConfig.pC.globalBlockAbsorption);
 		double directGain = auxOnly ? 0 : Math.pow(directCutoff, 0.01);
 
-		if (pC.oLog) logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
+		if (PrecomputedConfig.pC.oLog) logOcclusion("direct cutoff: " + directCutoff + "  direct gain:" + directGain);
 
 		final double[] δsendGain = {0d,0d,0d,0d};
 
@@ -323,38 +239,38 @@ public class SoundPhysics
 
 		// Shoot rays around sound
 
-		final double maxDistance = 256 * pC.nRayBounces;
+		final double maxDistance = 256 * PrecomputedConfig.pC.nRayBounces;
 
-		boolean doDirEval = pC.soundDirectionEvaluation && (occlusionAccumulation > 0 || pC.notOccludedRedirect);
+		boolean doDirEval = PrecomputedConfig.pC.soundDirectionEvaluation && (occlusionAccumulation > 0 || PrecomputedConfig.pC.notOccludedRedirect);
 
-		final double[] bounceReflectivityRatio = new double[pC.nRayBounces];
+		final double[] bounceReflectivityRatio = new double[PrecomputedConfig.pC.nRayBounces];
 		
 		AtomicReference<Double> sharedAirspace = new AtomicReference<>(0d);
 
 		final double gRatio = 1.618033988;
 		final double epsilon;
 		
-		if (pC.nRays >= 600000)
+		if (PrecomputedConfig.pC.nRays >= 600000)
 		{
 			epsilon = 214d;
 		}
-		else if (pC.nRays >= 400000)
+		else if (PrecomputedConfig.pC.nRays >= 400000)
 		{
 			epsilon = 75d;
 		}
-		else if (pC.nRays >= 11000)
+		else if (PrecomputedConfig.pC.nRays >= 11000)
 		{
 			epsilon = 27d;
 		}
-		else if (pC.nRays >= 890)
+		else if (PrecomputedConfig.pC.nRays >= 890)
 		{
 			epsilon = 10d;
 		}
-		else if (pC.nRays >= 177)
+		else if (PrecomputedConfig.pC.nRays >= 177)
 		{
 			epsilon = 3.33d;
 		}
-		else if (pC.nRays >= 24)
+		else if (PrecomputedConfig.pC.nRays >= 24)
 		{
 			epsilon = 1.33d;
 		}
@@ -365,9 +281,9 @@ public class SoundPhysics
 
 		//for (int i = 0; i < pC.nRays; i++)
 
-		IntStream stream = IntStream.range(0, pC.nRays);
-		(pC.multiThreading ? stream.parallel() : stream).forEach((i) -> { // time = 3
-			final double x = (i + epsilon) / (pC.nRays - 1d + 2d*epsilon);
+		IntStream stream = IntStream.range(0, PrecomputedConfig.pC.nRays);
+		(PrecomputedConfig.pC.multiThreading ? stream.parallel() : stream).forEach((i) -> { // time = 3
+			final double x = (i + epsilon) / (PrecomputedConfig.pC.nRays - 1d + 2d*epsilon);
 			final double y = (double) i / gRatio;
 			final double theta = 2d * Math.PI * y;
 			final double phi = Math.acos(1d - 2d*x);
@@ -380,7 +296,7 @@ public class SoundPhysics
 
 			SPHitResult rayHit = fixedRaycast(soundPos, rayEnd, mc.world, soundBlockPos, soundChunk);
 
-			if (pC.dRays) RaycastRenderer.addSoundBounceRay(soundPos, rayHit.getPos(), Formatting.GREEN.getColorValue());
+			if (PrecomputedConfig.pC.dRays) RaycastRenderer.addSoundBounceRay(soundPos, rayHit.getPos(), Formatting.GREEN.getColorValue());
 
 			if (!rayHit.isMissed()) {
 
@@ -397,12 +313,12 @@ public class SoundPhysics
 				double totalReflectivityCoefficient = Math.min(blockReflectivity, 1);
 
 				// Secondary ray bounces
-				for (int j = 0; j < pC.nRayBounces; j++) {
+				for (int j = 0; j < PrecomputedConfig.pC.nRayBounces; j++) {
 					// Cast (one) final ray towards the player. If it's
 					// unobstructed, then the sound source and the player
 					// share airspace.
-					final double energyTowardsPlayer = Math.pow(blockReflectivity, 1 / pC.globalBlockReflectance) * 0.1875 + 0.0625;
-					if (!pC.simplerSharedAirspaceSimulation || j == pC.nRayBounces - 1) {
+					final double energyTowardsPlayer = Math.pow(blockReflectivity, 1 / PrecomputedConfig.pC.globalBlockReflectance) * 0.1875 + 0.0625;
+					if (!PrecomputedConfig.pC.simplerSharedAirspaceSimulation || j == PrecomputedConfig.pC.nRayBounces - 1) {
 						final Vec3d finalRayStart = new Vec3d(lastHitPos.x + lastHitNormal.getX() * 0.01,
 								lastHitPos.y + lastHitNormal.getY() * 0.01, lastHitPos.z + lastHitNormal.getZ() * 0.01);
 
@@ -419,14 +335,14 @@ public class SoundPhysics
 
 							sharedAirspace.updateAndGet(v -> v + 1d);
 
-							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * Math.pow(blockReflectivity, 1 / pC.globalBlockReflectance);
+							final double reflectionDelay = Math.max(totalRayDistance, 0.0) * 0.12 * Math.pow(blockReflectivity, 1 / PrecomputedConfig.pC.globalBlockReflectance);
 
 							final double cross0 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 0d), 0d, 1d);
 							final double cross1 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 1d), 0d, 1d);
 							final double cross2 = 1d - MathHelper.clamp(Math.abs(reflectionDelay - 2d), 0d, 1d);
 							final double cross3 = MathHelper.clamp(reflectionDelay - 2d, 0d, 1d);
 
-							double factor = energyTowardsPlayer * 12.8 * pC.rcpTotRays;
+							double factor = energyTowardsPlayer * 12.8 * PrecomputedConfig.pC.rcpTotRays;
 							synchronized (δsendGain) {
 								δsendGain[0] += cross0 * factor * 0.5;
 								δsendGain[1] += cross1 * factor;
@@ -435,7 +351,7 @@ public class SoundPhysics
 							}
 
 						}
-						if (pC.dRays) RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
+						if (PrecomputedConfig.pC.dRays) RaycastRenderer.addSoundBounceRay(finalRayStart, finalRayHit.getPos(), color);
 					}
 
 					final Vec3d newRayDir = pseudoReflect(lastRayDir, lastHitNormal);
@@ -449,16 +365,16 @@ public class SoundPhysics
 
 
 					if (rayHit.isMissed()) {
-						if (pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayEnd, Formatting.DARK_RED.getColorValue());
+						if (PrecomputedConfig.pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayEnd, Formatting.DARK_RED.getColorValue());
 						break;
 					} else {
 						final Vec3d newRayHitPos = rayHit.getPos();
 						final double newRayLength = lastHitPos.distanceTo(newRayHitPos);
 
-						if (pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayHitPos, Formatting.BLUE.getColorValue());
+						if (PrecomputedConfig.pC.dRays) RaycastRenderer.addSoundBounceRay(newRayStart, newRayHitPos, Formatting.BLUE.getColorValue());
 
 
-						bounceReflectivityRatio[j] += Math.pow(blockReflectivity, 1 / pC.globalBlockReflectance);
+						bounceReflectivityRatio[j] += Math.pow(blockReflectivity, 1 / PrecomputedConfig.pC.globalBlockReflectance);
 
 						totalRayDistance += newRayLength;
 
@@ -473,8 +389,8 @@ public class SoundPhysics
 				}
 			}
 		});
-		for (int i = 0; i < pC.nRayBounces; i++) {
-			bounceReflectivityRatio[i] = bounceReflectivityRatio[i] * pC.rcpNRays;
+		for (int i = 0; i < PrecomputedConfig.pC.nRayBounces; i++) {
+			bounceReflectivityRatio[i] = bounceReflectivityRatio[i] * PrecomputedConfig.pC.rcpNRays;
 		}
 
 		// Take weighted (on squared distance) average of the directions sound reflection came from
@@ -482,7 +398,7 @@ public class SoundPhysics
 		{
 			if (directions.isEmpty()) break dirEval;
 
-			if (pC.pLog) log("Evaluating direction from "+sharedAirspace+" entries...");
+			if (PrecomputedConfig.pC.pLog) log("Evaluating direction from "+sharedAirspace+" entries...");
 			Vec3d sum = new Vec3d(0, 0, 0);
 			double weight = 0;
 
@@ -521,7 +437,7 @@ public class SoundPhysics
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
 		{
-			directCutoff *= pC.underwaterFilter;
+			directCutoff *= PrecomputedConfig.pC.underwaterFilter;
 		}
 
 		if (isRain)
@@ -532,10 +448,10 @@ public class SoundPhysics
 
 		sharedAirspace *= 64d;
 
-		if (pC.simplerSharedAirspaceSimulation)
-			sharedAirspace *= pC.rcpNRays;
+		if (PrecomputedConfig.pC.simplerSharedAirspaceSimulation)
+			sharedAirspace *= PrecomputedConfig.pC.rcpNRays;
 		else
-			sharedAirspace *= pC.rcpTotRays;
+			sharedAirspace *= PrecomputedConfig.pC.rcpTotRays;
 
 		final double sharedAirspaceWeight0 = MathHelper.clamp(sharedAirspace * 0.05, 0d, 1d);
 		final double sharedAirspaceWeight1 = MathHelper.clamp(sharedAirspace * 0.06666666666666667, 0d, 1d);
@@ -555,7 +471,7 @@ public class SoundPhysics
 
 		//logDetailed("HitRatio0: " + hitRatioBounce1 + " HitRatio1: " + hitRatioBounce2 + " HitRatio2: " + hitRatioBounce3 + " HitRatio3: " + hitRatioBounce4);
 
-		if (pC.eLog) logEnvironment("Bounce reflectivity 0: " + bounceReflectivityRatio[0] + " bounce reflectivity 1: " + bounceReflectivityRatio[1] + " bounce reflectivity 2: " + bounceReflectivityRatio[2] + " bounce reflectivity 3: " + bounceReflectivityRatio[3]);
+		if (PrecomputedConfig.pC.eLog) logEnvironment("Bounce reflectivity 0: " + bounceReflectivityRatio[0] + " bounce reflectivity 1: " + bounceReflectivityRatio[1] + " bounce reflectivity 2: " + bounceReflectivityRatio[2] + " bounce reflectivity 3: " + bounceReflectivityRatio[3]);
 
 
 		sendGain1 *= bounceReflectivityRatio[1];
@@ -572,7 +488,7 @@ public class SoundPhysics
 		sendGain2 *= Math.pow(sendCutoff2, 0.1);
 		sendGain3 *= Math.pow(sendCutoff3, 0.1);
 
-		if (pC.eLog) logEnvironment("Final environment settings:   " + sendGain0 + ",   " + sendGain1 + ",   " + sendGain2 + ",   " + sendGain3);
+		if (PrecomputedConfig.pC.eLog) logEnvironment("Final environment settings:   " + sendGain0 + ",   " + sendGain1 + ",   " + sendGain2 + ",   " + sendGain3);
 
 		assert mc.player != null;
 		if (mc.player.isSubmergedInWater())
