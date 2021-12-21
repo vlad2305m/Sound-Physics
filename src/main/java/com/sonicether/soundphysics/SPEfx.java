@@ -68,10 +68,7 @@ public class SPEfx {
     )
     {
         if (pC.off) return;
-        float absorptionHF = (mc == null || mc.world == null || mc.player == null) ? 1.0f : (float) SPMath.lerp(1.0f, 0.892f, (0.05f * (
-                (pC.humidityAbsorption * (mc.world.getBiome(mc.player.getBlockPos()).getDownfall() * (3.0f * Math.max(getRain(), getSmoothRain()) + 1.0f))) // Humidity Absorption
-                + (pC.rainAbsorption * 4.0 * (SPMath.clamp(getRain(), Math.max(0.2f, mc.world.getBiome(mc.player.getBlockPos()).getDownfall()), 0.2f) - 0.2f) * 1.25f) // Rain Absorption
-        ) + (5.0f / 90.0f - 0.02f)));
+        float absorptionHF = getAbsorptionHF();
         slot1.airAbsorptionGainHF = absorptionHF;
         slot2.airAbsorptionGainHF = absorptionHF;
         slot3.airAbsorptionGainHF = absorptionHF;
@@ -90,8 +87,30 @@ public class SPEfx {
         AL10.alSourcei(sourceID, EXTEfx.AL_DIRECT_FILTER, directFilter0);
         checkErrorLog("Set Environment directFilter0:");
 
-        AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, Math.min(10.0f, Math.max(0.0f, pC.airAbsorption)));
+        AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, SPMath.clamp(pC.airAbsorption, 10.0f, 0.0f));
         checkErrorLog("Set Environment airAbsorption:");
+    }
+
+    private static float getAbsorptionHF() {
+        if(mc == null || mc.world == null || mc.player == null)
+            return 1.0f;
+        double rain = getRain();
+        double rainS = getSmoothRain();
+        double biomeHumidity = mc.world.getBiome(mc.player.getBlockPos()).getDownfall();
+        double biomeTemp = mc.world.getBiome(mc.player.getBlockPos()).getTemperature();
+        double freq = 10000.0d
+
+        double relhum = 100.0d * SPMath.lerp(Math.max(biomeHumidity, 0.2d), 1.0d, Math.max(rain, rainS)); // convert biomeHumidity and rain gradients into a dynamic relative humidity value
+        double tempK = 25.0d * biomeTemp + 273.15d; // Convert biomeTemp to degrees kelvin
+
+        double hum = relhum*Math.pow(10.0d,4.6151d-6.8346d*Math.pow((273.15d/tempK),1.261d));
+        double tempr = tempK/293.15d; // convert tempK to temperature relative to room temp
+
+        double frO = (24+4.04E+4*hum*(0.02d+hum)/(0.391d+hum));
+        double frN = Math.pow(tempr,-0.5)*(9+280*hum*Math.exp(-4.17d*(Math.pow(tempr,-1/3)-1)));
+        double alpha = 8.686d*freq*freq*(1.84E-11*Math.sqrt(tempr)+Math.pow(tempr,-2.5)*(0.01275d*(Math.exp(-2239.1d/tempK)*1/(frO+freq*freq/frO))+0.1068d*(Math.exp(-3352/tempK)*1/(frN+freq*freq/frN))));
+
+        return (float) Math.pow(10.0d, (alpha * -1.0d * pC.humidityAbsorption)/20.0d); // convert alpha (decibels per meter of attenuation) into airAbsorptionGainHF value and return
     }
 
     public static void setSoundPos(final int sourceID, final Vec3d pos)

@@ -46,7 +46,7 @@ public class ConfigChanger {
         if (materialProperties != null) materialProperties.forEach((s, newData) -> materials.materialProperties.compute(s, (k, v) -> (v == null) ?
                 new MaterialData( hasExample(s) ? getExample(s) : "error",
                         newData.getReflectivity() == -1 ? 0.5 : newData.getReflectivity(),
-                        newData.getAbsorption() == -1 ? 1 : newData.getAbsorption())
+                        newData.getAbsorption() == -1 ? 0.5 : newData.getAbsorption())
               : new MaterialData( (v.getExample() == null) ? (hasExample(s) ? getExample(s) : "error") : v.getExample(),
                         newData.getReflectivity() == -1 ? v.getReflectivity() : newData.getReflectivity(),
                         newData.getAbsorption() == -1 ? v.getAbsorption() : newData.getAbsorption())));
