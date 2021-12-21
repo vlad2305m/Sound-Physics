@@ -16,7 +16,6 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -136,7 +135,6 @@ public class SoundPhysics
 	//public static void tres() { SoundPhysics.tt=0; }
 
 	public static MinecraftClient mc;
-	public static SPTicker ticker = new SPTicker();
 	
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;

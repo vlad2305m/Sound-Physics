@@ -1,7 +1,5 @@
 package com.sonicether.soundphysics;
 
-import com.sonicether.soundphysics.math.FloatProvider;
-import com.sonicether.soundphysics.math.SmoothedFloat;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
@@ -27,7 +25,9 @@ public class SPEfx {
     private static final ReverbSlot slot3 = new ReverbSlot(1.68f , 0.1f, 1.0f, 5, 0.99f, 1         , 0.0f, 0.021f, 1.26f, 0.021f, 0.994f, 0.13f);
     private static final ReverbSlot slot4 = new ReverbSlot(4.142f, 0.5f, 1.0f, 4, 0.89f, 1         , 0.0f, 0.025f, 1.26f, 0.021f, 0.994f, 0.11f);
     private static int directFilter0;
-    private static final FloatProvider smoothedRainProvider = new SmoothedFloat(1200, SPEfx::getRain);
+    private static final float rainDecayConstant = (float) (Math.log(2.0) / 1200);
+    private static float rainAccumulator;
+    private static boolean rainHasInitialValue;
 
     public static void syncReverbParams()
     {   //Set the global reverb parameters and apply them to the effect and effectslot
@@ -91,14 +91,14 @@ public class SPEfx {
         checkErrorLog("Set Environment airAbsorption:");
     }
 
-    private static float getAbsorptionHF() {
+    public static float getAbsorptionHF() {
         if(mc == null || mc.world == null || mc.player == null)
             return 1.0f;
         double rain = getRain();
-        double rainS = getSmoothRain();
+        double rainS = rainAccumulator;
         double biomeHumidity = mc.world.getBiome(mc.player.getBlockPos()).getDownfall();
         double biomeTemp = mc.world.getBiome(mc.player.getBlockPos()).getTemperature();
-        double freq = 10000.0d
+        double freq = 10000.0d;
 
         double relhum = 100.0d * SPMath.lerp(Math.max(biomeHumidity, 0.2d), 1.0d, Math.max(rain, rainS)); // convert biomeHumidity and rain gradients into a dynamic relative humidity value
         double tempK = 25.0d * biomeTemp + 273.15d; // Convert biomeTemp to degrees kelvin
@@ -121,6 +121,35 @@ public class SPEfx {
     }
     public static float getRain(){
         float tickDelta = 1.0f;
-        return (mc==null || mc.world==null) ? 0.0f : mc.world.getRainGradient(tickDelta);}
-    public static float getSmoothRain(){return smoothedRainProvider.getAsFloat();}
+        return (mc==null || mc.world==null) ? 0.0f : mc.world.getRainGradient(tickDelta);
+    }
+    public static void updateSmoothedRain() {
+        if (!rainHasInitialValue) {
+            // There is no smoothing on the first value.
+            // This is not an optimal approach to choosing the initial value:
+            // https://en.wikipedia.org/wiki/Exponential_smoothing#Choosing_the_initial_smoothed_value
+            //
+            // However, it works well enough for now.
+            rainAccumulator = getRain();
+            rainHasInitialValue = true;
+
+            return;
+        }
+
+        // Implements the basic variant of exponential smoothing
+        // https://en.wikipedia.org/wiki/Exponential_smoothing#Basic_(simple)_exponential_smoothing_(Holt_linear)
+
+        // xₜ
+        float newValue = getRain();
+
+        // 𝚫t
+        float tickDelta = 1.0f;
+
+        // Compute the smoothing factor based on our
+        // α = 1 - e^(-𝚫t/τ) = 1 - e^(-k𝚫t)
+        float smoothingFactor = (float) (1.0f - Math.exp(-1*rainDecayConstant*tickDelta));
+
+        // sₜ = αxₜ + (1 - α)sₜ₋₁
+        rainAccumulator = SPMath.lerp(rainAccumulator, newValue, smoothingFactor);
+    }
 }
