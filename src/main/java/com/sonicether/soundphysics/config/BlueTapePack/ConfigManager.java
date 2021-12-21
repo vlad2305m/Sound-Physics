@@ -1,8 +1,7 @@
 package com.sonicether.soundphysics.config.BlueTapePack;
 
-import com.sonicether.soundphysics.SPEfx;
+import com.sonicether.soundphysics.ALstuff.SPEfx;
 import com.sonicether.soundphysics.SPLog;
-import com.sonicether.soundphysics.SoundPhysics;
 import com.sonicether.soundphysics.SoundPhysicsMod;
 import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.PrecomputedConfig;
@@ -24,7 +23,7 @@ public class ConfigManager {
         Map<String, MaterialData> map =
                 SoundPhysicsMod.blockSoundGroups.entrySet().stream()
                         .collect(Collectors.toMap((e)-> e.getValue().getLeft(), (e) -> new MaterialData(e.getValue().getRight(), 0.5, 0.5)));
-        map.putIfAbsent("DEFAULT", new MaterialData(SoundPhysics.groupMap.get("DEFAULT"), 0.5, 0.5));
+        map.putIfAbsent("DEFAULT", new MaterialData(SoundPhysicsMod.groupMap.get("DEFAULT"), 0.5, 0.5));
         Materials.materialProperties = map;
     }};
 
@@ -69,9 +68,10 @@ public class ConfigManager {
         if (c.Materials.materialProperties == null || c.Materials.materialProperties.get("DEFAULT") == null)
             handleBrokenMaterials(c);
         if (c.preset != ConfigPresets.LOAD_SUCCESS) {c.preset.configChanger.accept(c);}
+        if(PrecomputedConfig.pC != null) PrecomputedConfig.pC.deactivate();
+        try {
+            PrecomputedConfig.pC = new PrecomputedConfig(c);} catch (CloneNotSupportedException e) {e.printStackTrace(); return ActionResult.FAIL;}
         SPEfx.syncReverbParams();
-        if(SoundPhysics.pC != null) SoundPhysics.pC.deactivate();
-        try {SoundPhysics.pC = new PrecomputedConfig(c);} catch (CloneNotSupportedException e) {e.printStackTrace(); return ActionResult.FAIL;}
         return ActionResult.SUCCESS;
     }
 }

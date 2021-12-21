@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.sonicether.soundphysics.SoundPhysics.pC;
+import static com.sonicether.soundphysics.config.PrecomputedConfig.pC;
 
 public class RaycastFix {
 

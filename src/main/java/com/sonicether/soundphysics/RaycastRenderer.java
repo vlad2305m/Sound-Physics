@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import static com.sonicether.soundphysics.SoundPhysics.pC;
+import static com.sonicether.soundphysics.config.PrecomputedConfig.pC;
 
 import java.util.ArrayList;
 import java.util.Collections;

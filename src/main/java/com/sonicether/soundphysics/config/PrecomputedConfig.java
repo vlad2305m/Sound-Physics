@@ -18,6 +18,7 @@ public class PrecomputedConfig {
     public final static float globalVolumeMultiplier = 4f;
     public static double soundDistanceAllowance = 4;
     public static double defaultAttenuationFactor = 1;
+    public static PrecomputedConfig pC = null;
     public final boolean multiThreading = true;
 
     public final boolean off;
@@ -26,7 +27,7 @@ public class PrecomputedConfig {
     public final float globalReverbBrightness;
     public final double globalBlockAbsorption;
     public final double globalBlockReflectance;
-    public final float airAbsorption; // todo Is this the one?
+    public final float airAbsorption;
     public final float humidityAbsorption;
     public final float rainAbsorption;
     public final double underwaterFilter;
@@ -62,7 +63,7 @@ public class PrecomputedConfig {
     private boolean active = true;
 
     public PrecomputedConfig(SoundPhysicsConfig c) throws CloneNotSupportedException {
-        if (SoundPhysics.pC != null && SoundPhysics.pC.active) throw new CloneNotSupportedException("Tried creating second instance of precomputedConfig");
+        if (pC != null && pC.active) throw new CloneNotSupportedException("Tried creating second instance of precomputedConfig");
         off = !c.enabled;
 
         defaultAttenuationFactor = c.General.attenuationFactor;

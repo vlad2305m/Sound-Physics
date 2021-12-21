@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static com.sonicether.soundphysics.SoundPhysics.mc;
-import static com.sonicether.soundphysics.SoundPhysics.pC;
+import static com.sonicether.soundphysics.config.PrecomputedConfig.pC;
 
 @Mixin(SoundSystem.class)
 public class SoundSystemMixin {

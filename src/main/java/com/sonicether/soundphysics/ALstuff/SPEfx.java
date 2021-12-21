@@ -1,14 +1,15 @@
-package com.sonicether.soundphysics;
+package com.sonicether.soundphysics.ALstuff;
 
+import com.sonicether.soundphysics.SPMath;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
 
-import static com.sonicether.soundphysics.SoundPhysics.pC;
 import static com.sonicether.soundphysics.SoundPhysics.mc;
 
 import static com.sonicether.soundphysics.SPLog.*;
+import static com.sonicether.soundphysics.config.PrecomputedConfig.pC;
 
 /*
                                         !!!Documentation for OpenAL!!!
@@ -16,6 +17,9 @@ import static com.sonicether.soundphysics.SPLog.*;
     - ExtEfx(aka Effects Extension) https://github.com/rtpHarry/Sokoban/blob/master/libraries/OpenAL%201.1%20SDK/docs/Effects%20Extension%20Guide.pdf or https://usermanual.wiki/Pdf/Effects20Extension20Guide.90272296/view
     - Core spec(aka OpenAL 1.1 Specification and Reference) https://www.openal.org/documentation/openal-1.1-specification.pdf
     - Core guide(aka OpenAL Programmer's Guide) http://openal.org/documentation/OpenAL_Programmers_Guide.pdf
+
+
+    Source attributes(2&3): https://www.openal.org/documentation/openal-1.1-specification.pdf#page=34 & http://openal.org/documentation/OpenAL_Programmers_Guide.pdf#page=34
  */
 
 public class SPEfx {
@@ -34,7 +38,7 @@ public class SPEfx {
         if (slot1.initialised){slot1.set(); slot2.set(); slot3.set(); slot4.set();}
     }
 
-    static void setupEFX()
+    public static void setupEFX()
     {
         //Get current context and device
         final long currentContext = ALC10.alcGetCurrentContext();
@@ -60,9 +64,9 @@ public class SPEfx {
         logGeneral("directFilter0: "+directFilter0);
     }
 
-    protected static void setEnvironment(
+    public static void setEnvironment(
             final int sourceID,
-            final float sendGain0,   final float sendGain1,   final float sendGain2,   final float sendGain3,
+            final float sendGain0, final float sendGain1, final float sendGain2, final float sendGain3,
             final float sendCutoff0, final float sendCutoff1, final float sendCutoff2, final float sendCutoff3,
             final float directCutoff, final float directGain
     )
@@ -107,7 +111,7 @@ public class SPEfx {
         double tempr = tempK/293.15d; // convert tempK to temperature relative to room temp
 
         double frO = (24+4.04E+4*hum*(0.02d+hum)/(0.391d+hum));
-        double frN = Math.pow(tempr,-0.5)*(9+280*hum*Math.exp(-4.17d*(Math.pow(tempr,-1/3)-1)));
+        double frN = Math.pow(tempr,-0.5)*(9+280*hum*Math.exp(-4.17d*(Math.pow(tempr,-1.0f/3.0f)-1)));
         double alpha = 8.686d*freq*freq*(1.84E-11*Math.sqrt(tempr)+Math.pow(tempr,-2.5)*(0.01275d*(Math.exp(-2239.1d/tempK)*1/(frO+freq*freq/frO))+0.1068d*(Math.exp(-3352/tempK)*1/(frN+freq*freq/frN))));
 
         return (float) Math.pow(10.0d, (alpha * -1.0d * pC.humidityAbsorption)/20.0d); // convert alpha (decibels per meter of attenuation) into airAbsorptionGainHF value and return

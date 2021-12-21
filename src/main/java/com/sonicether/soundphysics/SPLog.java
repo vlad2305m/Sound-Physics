@@ -5,7 +5,7 @@ import org.lwjgl.openal.AL10;
 public class SPLog {
 
     private static final String logPrefix = "[SOUND PHYSICS]";
-    protected static void log(String message)
+    public static void log(String message)
     {
         System.out.println(logPrefix + ": " + message);
     }
@@ -14,7 +14,7 @@ public class SPLog {
 
     protected static void logEnvironment(String message) {System.out.println(logPrefix + " [ENVIRONMENT] " + ": " + message);}
 
-    protected static void logGeneral(String message) {System.out.println(logPrefix + ": " + message);}
+    public static void logGeneral(String message) {System.out.println(logPrefix + ": " + message);}
 
     public static void logError(String errorMessage)
     {
