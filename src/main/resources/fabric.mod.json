@@ -3,9 +3,12 @@
   "id": "soundphysics",
   "version": "${version}",
   "name": "Sound Physics",
-  "description": "Provides realistic sound attenuation, reverberation, and absorption through blocks.",
-  "authors": ["Sonic Ether","vlad2305m"],
-  "contact": {},
+  "description": "Provides realistic sound attenuation, reverberation, and absorption through blocks using physically-based raytraced audio shaders.",
+  "authors": ["Sonic Ether","vlad2305m","Dr. Rubisco"],
+  "contact": {
+    "sources": "https://github.com/vlad2305m/Sound-Physics-Fabric",
+    "issues": "https://github.com/vlad2305m/Sound-Physics-Fabric/issues"
+  },
   "license": "GPL",
   "icon": "assets/soundphysics/icon.png",
   "environment": "*",
@@ -25,5 +28,8 @@
     "cloth-config2": ">=6.0.0",
     "fabricloader": ">=0.12.11",
     "minecraft": "1.18.x"
+  },
+  "suggests": {
+    "modmenu": ">=3.0.0"
   }
 }
