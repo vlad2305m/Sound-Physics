@@ -1,7 +1,7 @@
 package com.sonicether.soundphysics.ALstuff;
 
-import com.sonicether.soundphysics.SPMath;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.EXTEfx;
@@ -91,7 +91,7 @@ public class SPEfx {
         AL10.alSourcei(sourceID, EXTEfx.AL_DIRECT_FILTER, directFilter0);
         checkErrorLog("Set Environment directFilter0:");
 
-        AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, SPMath.clamp(pC.airAbsorption, 10.0f, 0.0f));
+        AL10.alSourcef(sourceID, EXTEfx.AL_AIR_ABSORPTION_FACTOR, MathHelper.clamp(pC.airAbsorption, 0.0f, 10.0f));
         checkErrorLog("Set Environment airAbsorption:");
     }
 
@@ -104,7 +104,7 @@ public class SPEfx {
         double biomeTemp = mc.world.getBiome(mc.player.getBlockPos()).getTemperature();
         double freq = 10000.0d;
 
-        double relhum = 100.0d * SPMath.lerp(Math.max(biomeHumidity, 0.2d), 1.0d, Math.max(rain, rainS)); // convert biomeHumidity and rain gradients into a dynamic relative humidity value
+        double relhum = 100.0d * MathHelper.lerp(Math.max(rain, rainS), Math.max(biomeHumidity, 0.2d), 1.0d); // convert biomeHumidity and rain gradients into a dynamic relative humidity value
         double tempK = 25.0d * biomeTemp + 273.15d; // Convert biomeTemp to degrees kelvin
 
         double hum = relhum*Math.pow(10.0d,4.6151d-6.8346d*Math.pow((273.15d/tempK),1.261d));
@@ -154,6 +154,6 @@ public class SPEfx {
         float smoothingFactor = (float) (1.0f - Math.exp(-1*rainDecayConstant*tickDelta));
 
         // sₜ = αxₜ + (1 - α)sₜ₋₁
-        rainAccumulator = SPMath.lerp(rainAccumulator, newValue, smoothingFactor);
+        rainAccumulator = MathHelper.lerp(smoothingFactor, rainAccumulator, newValue);
     }
 }

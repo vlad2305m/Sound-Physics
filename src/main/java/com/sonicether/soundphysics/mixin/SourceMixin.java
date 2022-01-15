@@ -30,7 +30,7 @@ public class SourceMixin implements SourceAccessor {
 
     @Inject(method = "play", at = @At("HEAD"))
     private void OnPlaySoundInjector(CallbackInfo ci) {
-        SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer);
+        SoundPhysics.onPlaySoundReverb(pos.x, pos.y, pos.z, pointer, false);
         SPLog.checkErrorLog("onplayinjector");
     }
 
@@ -43,7 +43,7 @@ public class SourceMixin implements SourceAccessor {
 
     public void calculateReverb(SoundCategory category, String name) {
         SoundPhysics.setLastSoundCategoryAndName(category, name);
-        SoundPhysics.onPlaySound(pos.x, pos.y, pos.z, pointer);
+        SoundPhysics.onPlaySoundReverb(pos.x, pos.y, pos.z, pointer, false);
         SPLog.checkErrorLog("onRecalculate");
     }
 }

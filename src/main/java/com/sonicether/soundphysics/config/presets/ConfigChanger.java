@@ -5,6 +5,7 @@ import com.sonicether.soundphysics.config.MaterialData;
 import com.sonicether.soundphysics.config.SoundPhysicsConfig;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.sonicether.soundphysics.SoundPhysicsMod.groupMap;
