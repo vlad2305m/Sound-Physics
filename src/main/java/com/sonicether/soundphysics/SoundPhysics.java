@@ -54,8 +54,7 @@ public class SoundPhysics
 	private static SoundCategory lastSoundCategory;
 	private static String lastSoundName;
 
-	public static void init()
-	{
+	public static void init() {
 		log("Initializing Sound Physics...");
 		setupEFX();
 		log("EFX ready...");
@@ -71,8 +70,7 @@ public class SoundPhysics
 	@SuppressWarnings("unused") @Deprecated
 	public static void onPlayReverb(double posX, double posY, double posZ, int sourceID){onPlaySoundReverb(posX, posY, posZ, sourceID, true);}
 
-	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean auxOnly)
-	{
+	public static void onPlaySoundReverb(double posX, double posY, double posZ, int sourceID, boolean auxOnly) {
 		if (pC.dLog) logGeneral("On play sound... Source ID: " + sourceID + " " + posX + ", " + posY + ", " + posZ + "    Sound category: " + lastSoundCategory.toString() + "    Sound name: " + lastSoundName);
 
 		long startTime = 0;
@@ -88,8 +86,7 @@ public class SoundPhysics
 
 	}
 	
-	private static double getBlockReflectivity(final BlockState blockState)
-	{
+	private static double getBlockReflectivity(final BlockState blockState) {
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		String blockName = blockState.getBlock().getTranslationKey();
 		if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).reflectivity;
@@ -98,8 +95,7 @@ public class SoundPhysics
 		return Double.isNaN(r) ? pC.defaultReflectivity : r;
 	}
 
-	private static double getBlockOcclusionD(final BlockState blockState)
-	{
+	private static double getBlockOcclusionD(final BlockState blockState) {
 		BlockSoundGroup soundType = blockState.getSoundGroup();
 		String blockName = blockState.getBlock().getTranslationKey();
 		if (pC.blockWhiteSet.contains(blockName)) return pC.blockWhiteMap.get(blockName).absorption;
@@ -112,8 +108,7 @@ public class SoundPhysics
 	{return new Vec3d(normal.getX() == 0 ? dir.x : -dir.x, normal.getY() == 0 ? dir.y : -dir.y, normal.getZ() == 0 ? dir.z : -dir.z);}
 
 	@SuppressWarnings("ConstantConditions")
-	private static void evaluateEnvironment(final int sourceID, double posX, double posY, double posZ, boolean auxOnly)
-	{
+	private static void evaluateEnvironment(final int sourceID, double posX, double posY, double posZ, boolean auxOnly) {
 		if (pC.off) return;
 
 		if (mc.player == null || mc.world == null || posY <= mc.world.getBottomY() || (pC.recordsDisable && lastSoundCategory == SoundCategory.RECORDS) || uiPattern.matcher(lastSoundName).matches() || (posX == 0.0 && posY == 0.0 && posZ == 0.0))

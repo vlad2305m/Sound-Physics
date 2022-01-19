@@ -33,7 +33,7 @@ public class ConfigManager {
         if (holder != null) {throw new IllegalStateException("Configuration already registered");}
         holder = AutoConfig.register(SoundPhysicsConfig.class, JanksonConfigSerializer::new);
 
-        try {GuiRegistryinit.register();} catch (@SuppressWarnings("CatchMayIgnoreException") Exception ignored){ignored.printStackTrace();}
+        try {GuiRegistryinit.register();} catch (Throwable ignored){SPLog.logError("Failed to register config menu unwrappers. Edit config that isn't working in the config file");}
 
         holder.registerSaveListener((holder, config) -> onSave(config));
         holder.registerLoadListener((holder, config) -> onSave(config));
