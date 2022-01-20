@@ -110,5 +110,7 @@ public class SoundPhysicsConfig implements ConfigData {
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
     @Comment("Soft presets. Some of these can be applied one after another to stack effects onto a base profile.")
     public ConfigPresets preset = ConfigPresets.DEFAULT_PERFORMANCE;
+
+    @ConfigEntry.Gui.Excluded
     public String version;
 }
