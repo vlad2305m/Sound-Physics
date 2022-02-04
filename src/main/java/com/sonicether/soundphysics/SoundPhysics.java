@@ -35,7 +35,7 @@ public class SoundPhysics
 {
 
 	private static final Pattern rainPattern = Pattern.compile(".*rain.*");
-	public static final Pattern stepPattern = Pattern.compile(".*step.*");
+	public static final Pattern stepPattern = Pattern.compile(".*step.*"); // Also in EntityMixin.class
 	private static final Pattern blockPattern = Pattern.compile(".*block..*");
 	private static final Pattern uiPattern = Pattern.compile("ui..*");
 	//Private fields

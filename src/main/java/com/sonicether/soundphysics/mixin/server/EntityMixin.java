@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import static com.sonicether.soundphysics.SoundPhysics.stepPattern;
+import java.util.regex.Pattern;
 
 @Mixin(Entity.class)
 public class EntityMixin {
@@ -23,7 +23,7 @@ public class EntityMixin {
         return y + calculateEntitySoundOffset(getStandingEyeHeight(),sound);
     }
 
-
+    private static final Pattern stepPattern = Pattern.compile(".*step.*");
     private static double calculateEntitySoundOffset(float standingEyeHeight, SoundEvent sound)
     {
         if (stepPattern.matcher(sound.getId().getPath()).matches())
